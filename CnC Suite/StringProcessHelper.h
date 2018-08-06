@@ -105,7 +105,7 @@ extern "C" int RemoveBlockFromBufferW32(LPWSTR targetBuffer, LPCWSTR oldBuffer, 
 extern "C" int RemoveBlockFromBufferW64(LPWSTR targetBuffer, LPCWSTR oldBuffer, int startIndex, int endIndex);
 
 
-#if defined _M_IX86
+#ifndef _WIN64//#if defined _M_IX86
 // STRVECT memory blocks must be released with this function
 #define ReleaseStringVect			ReleaseStringVect32
 
@@ -185,6 +185,7 @@ The targetBuffer must have the size of the oldBuffer minus the defined segment +
 The oldBuffer must be zero-terminated.
 If the function fails the return value is negative. (-1 == invalid parameter)*/
 #define	RemoveBlockFromBufferW		RemoveBlockFromBufferW32
+
 #else
 
 // STRVECT memory blocks must be released with this function

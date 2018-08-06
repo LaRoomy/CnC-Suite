@@ -21,7 +21,7 @@ Searchcontrol::Searchcontrol(	HINSTANCE hInst,
 	else
 	{
 		APPSTYLEINFO sInfo;
-		BOOL sSuccess = SendMessage(Main, WM_GETSTYLEINFO, 0, reinterpret_cast<LPARAM>(&sInfo));
+		BOOL sSuccess = (BOOL)SendMessage(Main, WM_GETSTYLEINFO, 0, reinterpret_cast<LPARAM>(&sInfo));
 
 		SecureZeroMemory(this->SC_info, sizeof(SEARCHCTRL_INFO));
 
@@ -464,7 +464,7 @@ LRESULT CALLBACK Searchcontrol::SearchProc( HWND SearchWnd, UINT message, WPARAM
 					}
 					return 0;
 				case WM_CTLCOLORBTN:
-					return reinterpret_cast<LONG>( pSearch->SC_info->background );
+					return reinterpret_cast<LONG_PTR>(pSearch->SC_info->background);
 				case WM_NOTIFY:
 					pSearch->OnNotify( SearchWnd, lParam );
 					return 0;
@@ -1034,7 +1034,7 @@ void Searchcontrol::StartSearch( HWND SearchWnd )
 	gtlx.codepage = 1200;
 	gtlx.flags = GTL_DEFAULT;
 
-	int len = SendMessage( edit, EM_GETTEXTLENGTHEX, reinterpret_cast<WPARAM>( &gtlx ), 0 );
+	int len = (int)SendMessage( edit, EM_GETTEXTLENGTHEX, reinterpret_cast<WPARAM>( &gtlx ), 0 );
 
 	if( len < 1 )
 		return;
@@ -1417,7 +1417,7 @@ void Searchcontrol::HandleOpening( HWND SearchWnd )
 
 				OPENRESULT or;
 				or.resultCount = cnt;
-				or.expandPath  = this->SC_info->settings.ExpandPathToFile;
+				or.expandPath  = (int)this->SC_info->settings.ExpandPathToFile;
 
 				for( int j = 0; j < (int)cnt; j++ )
 				{
@@ -1451,7 +1451,7 @@ void Searchcontrol::HandleOpening( HWND SearchWnd )
 
 			OPENRESULT or;
 			or.resultCount = cnt;
-			or.expandPath  = this->SC_info->settings.ExpandPathToFile;
+			or.expandPath  = (int)this->SC_info->settings.ExpandPathToFile;
 
 			if( this->container[ start ].dwMatchFlags & RSLT_TYPE_FILE )
 			{
@@ -1828,7 +1828,7 @@ BOOL Searchcontrol::ResultDisplayAndStorage( DWORD dwFlags, int& Index, LPTSTR f
 
 void Searchcontrol::PrintResultDC( int Mode, LPTSTR germantext, LPTSTR englishtext )
 {
-	size_t c = 0;
+	int c = 0;
 	TCHAR *buffer = NULL;
 
 	if( Mode == PRINTRESULT )
@@ -1876,7 +1876,7 @@ void Searchcontrol::PrintResultDC( int Mode, LPTSTR germantext, LPTSTR englishte
 			if( len < 1 )
 				return;
 
-			c = len / sizeof( TCHAR );
+			c = (int)(len / sizeof( TCHAR ));
 
 			buffer = new TCHAR[ len + sizeof( TCHAR ) ];
 
@@ -1894,7 +1894,7 @@ void Searchcontrol::PrintResultDC( int Mode, LPTSTR germantext, LPTSTR englishte
 			if( len < 1 )
 				return;
 
-			c = len / sizeof( TCHAR );
+			c = (int)(len / sizeof( TCHAR ));
 
 			buffer = new TCHAR[ len + sizeof( TCHAR ) ];
 
@@ -2129,7 +2129,7 @@ int Searchcontrol::CreateSearchResultString( LPTSTR string_out )
 			return -1;
 		else
 		{
-			c = len / sizeof( TCHAR );
+			c = (int)(len / sizeof( TCHAR ));
 		}
 		if( string_out != NULL )
 		{
@@ -2791,7 +2791,7 @@ BOOL Searchcontrol::ConvertMultilineDescription( LPTSTR desc )
 	if( FAILED( hr ))
 		return FALSE;
 	else
-		max_len = ( len / sizeof( TCHAR ) );
+		max_len = (int)(len / sizeof( TCHAR ));
 	
 	if( max_len > 0 )
 	{

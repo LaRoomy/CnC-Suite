@@ -478,7 +478,13 @@ HRESULT Open_Save_CTRL::Retrieve_WindowText(HWND Main_edit,HWND Descriptedit_one
 
 	for( int i = 0; i < 4; i++ )
 	{
-		int len = SendMessage( Wnd_dest[ i ], EM_GETTEXTLENGTHEX, reinterpret_cast<WPARAM>( &gtlx ), static_cast<LPARAM>( 0 ) );
+		int len =
+			(int)SendMessage(
+				Wnd_dest[ i ],
+				EM_GETTEXTLENGTHEX,
+				reinterpret_cast<WPARAM>( &gtlx ),
+				static_cast<LPARAM>( 0 )
+			);
 
 		if( len == E_INVALIDARG )
 		{

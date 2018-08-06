@@ -2562,7 +2562,7 @@ void TreeViewCTRL::InsertExistingFileToView(LPTSTR path)
 											TVITEM itv = { 0 };										// ?????
 											itv.mask = TVIF_TEXT | TVIF_HANDLE | TVIF_IMAGE;
 											itv.pszText = newPath;
-											itv.cchTextMax = len + sizeof(TCHAR);
+											itv.cchTextMax = (int)(len + sizeof(TCHAR));
 
 											HTREEITEM root = TreeView_GetRoot(this->hwndTV);
 											if (root != NULL)
@@ -3652,7 +3652,7 @@ int TreeViewCTRL::GetExpandImage( LPHEADING EXPimage, DWORD Mode  )
 								}
 								else if(Mode == READ)
 								{
-									EXPimage[ size ].Level = tvi.lParam;
+									EXPimage[ size ].Level = (int)tvi.lParam;
 									EXPimage[ size ].type = tvi.iImage;
 									StringCbCopy( EXPimage[ size ].Heading, sizeof( TCHAR )* MAX_HEADING_LEN, Text );
 
@@ -3810,7 +3810,7 @@ BOOL TreeViewCTRL::GetNextLevel_Image( LPHEADING EXPimage, HTREEITEM Parent, DWO
 					}
 					else if(Mode == READ)
 					{
-						EXPimage[ size ].Level = tvi.lParam;
+						EXPimage[ size ].Level = (int)tvi.lParam;
 						EXPimage[ size ].type = tvi.iImage;
 						StringCbCopy( EXPimage[ size ].Heading, sizeof( TCHAR )* MAX_HEADING_LEN, Text );
 
@@ -3845,7 +3845,7 @@ BOOL TreeViewCTRL::GetNextLevel_Image( LPHEADING EXPimage, HTREEITEM Parent, DWO
 								}
 								else if(Mode == READ)
 								{
-									EXPimage[ size ].Level = tvi.lParam;
+									EXPimage[ size ].Level = (int)tvi.lParam;
 									EXPimage[ size ].type = tvi.iImage;
 									StringCbCopy( EXPimage[ size ].Heading, sizeof( TCHAR )* MAX_HEADING_LEN, Text );
 
@@ -5379,7 +5379,7 @@ int TreeViewCTRL::OnGetInfoTip(LPNMTVGETINFOTIP gtip)
 			SecureZeroMemory(&dInfo, sizeof(DESCRIPTIONINFO));
 
 			BOOL result =
-				SendMessage(
+				(BOOL)SendMessage(
 					GetParent(this->TVFrame),	// this is supposed to be the main window
 					WM_GETDESCRIPTIONS,
 					0,
@@ -6193,10 +6193,12 @@ BOOL TreeViewCTRL::SendConvertInstruction()
 		if (type >= 0)
 		{
 			this->internalFileOperationInProgress = TRUE;
+
 			//if rAction is IDCANCEL -> prevent all actions
 			//if rAction is IDNO -> replace the file
 			//if rAction is IDYES -> create a copy and append "(conv)"
-			BOOL rAction = SendMessage(this->TVFrame, WM_COMMAND, MAKEWPARAM(TV_CTRL_CONVERTTOCNC3, 0), reinterpret_cast<LPARAM>(path));
+
+			BOOL rAction = (BOOL)SendMessage(this->TVFrame, WM_COMMAND, MAKEWPARAM(TV_CTRL_CONVERTTOCNC3, 0), reinterpret_cast<LPARAM>(path));
 			if (rAction != IDCANCEL)
 			{
 				HTREEITEM parent = TreeView_GetParent(this->hwndTV, itemToConv);

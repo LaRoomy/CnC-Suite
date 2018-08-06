@@ -84,6 +84,8 @@ void ResetDialog::CloseDialog()
 
 void ResetDialog::onCustomButtonClick(cObject sender, CTRLID ctrlID)
 {
+	UNREFERENCED_PARAMETER(sender);
+
 	switch (ctrlID)
 	{
 	case RDLG_CTRLID_EXITBUTTON:
