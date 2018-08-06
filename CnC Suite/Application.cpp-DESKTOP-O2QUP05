@@ -1,0 +1,639 @@
+#include"Application.h"
+
+
+Application::Application(HINSTANCE hInst)
+	:hInstance( hInst ), MainWindow(nullptr), hMutex(nullptr), FileNavigator(nullptr), Tabcontrol(nullptr)
+{
+	this->UserInterface = CreateUI_Instance(hInst);
+	if (!this->UserInterface)
+	{
+		MessageBox(NULL, L"User Interface creation error!", L"Critical error", MB_OK | MB_ICONERROR);
+		ExitProcess(11);
+	}
+	this->pAppData = new APPLICATION_DATA;
+	if (this->pAppData)
+	{
+		SecureZeroMemory(this->pAppData, sizeof(APPLICATION_DATA));
+
+		if (!this->LoadNCSPath())
+		{
+			MessageBox(NULL, L"Cannot verify userpath location >> Position 0002.\nNo Appdata available.", L"Critical error", MB_OK | MB_ICONERROR);
+			ExitProcess(13);
+		}
+		else
+		{
+			if (!this->LoadUserData())
+			{
+				// ...
+
+				//MessageBox(NULL, L"Cannot load userdata >> Position 0003.\nNo Appdata available.", L"Critical error", MB_OK | MB_ICONERROR);
+			}
+		}
+	}
+	else
+	{
+		MessageBox(NULL, L"Objectcreation failed. Position 0001", L"Critical error", MB_OK | MB_ICONERROR);
+		ExitProcess(12);
+	}
+}
+
+Application::~Application()
+{
+	if (this->hMutex != NULL)
+		ReleaseMutex(this->hMutex);
+
+	if (this->pAppData != NULL)
+	{
+		if (this->pAppData->CmdLine != NULL)
+		{
+			delete[] this->pAppData->CmdLine;
+			this->pAppData->CmdLine = NULL;
+		}
+		if (this->pAppData->UserPath != NULL)
+		{
+			delete[] this->pAppData->UserPath;
+			this->pAppData->UserPath = NULL;
+		}
+		delete this->pAppData;
+		this->pAppData = NULL;
+	}
+	SafeRelease(&this->FileNavigator);
+	SafeRelease(&this->Tabcontrol);
+	SafeRelease(&this->UserInterface);
+
+}
+
+HRESULT Application::Init()
+{
+	HRESULT hr = this->Init_Mainframe();
+	if (SUCCEEDED(hr))
+	{
+		CSTMFRAME cFrame;
+		
+		hr = this->CollectFrameData(&cFrame);
+		if (SUCCEEDED(hr))
+		{
+			hr = this->UserInterface->Init(this->MainWindow, &cFrame);
+			if (SUCCEEDED(hr))
+			{
+				hr = this->Init_Components();
+			}
+		}
+	}
+	return hr;
+}
+
+int Application::Run()
+{
+	MSG msg;
+	BOOL bReturn;
+
+	while ((bReturn = GetMessage(&msg, NULL, 0, 0)) != 0)
+	{
+		if (bReturn == -1)
+		{
+			MessageBox(NULL, L"Messageloop failed.\nApp will be terminated !", L"Critical error", MB_OK | MB_ICONERROR);
+			ExitProcess((UINT)bReturn);
+		}
+		else
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+	return static_cast<int>(msg.wParam);
+}
+
+BOOL Application::CHK_Mutex(LPTSTR nCmdLine)
+{
+	HRESULT hr = S_OK;
+
+	this->hMutex = OpenMutex(MUTEX_ALL_ACCESS, 0, L"CnC Suite 3.0\0");
+
+	if (!this->hMutex)
+	{
+		this->hMutex = CreateMutex(NULL, 0, L"CnC Suite 3.0\0");
+
+		if (nCmdLine != NULL)
+		{
+			size_t len;
+
+			hr = StringCbLength(nCmdLine, sizeof(TCHAR), &len);
+			if (SUCCEEDED(hr))
+			{
+				this->pAppData->CmdLine = new WCHAR[len + sizeof(WCHAR)];
+
+				if (this->pAppData->CmdLine != NULL)
+				{
+					hr = StringCbCopy(this->pAppData->CmdLine, len + sizeof(WCHAR), nCmdLine);
+					if (SUCCEEDED(hr))
+					{
+						this->pAppData->AppStartedWithCmdLine = TRUE;
+					}
+				}
+			}
+		}
+		return TRUE;
+	}
+	else
+	{
+		HWND hWnd = FindWindow(L"CNCSUITECLASS", NULL);
+		if (hWnd)
+		{
+			size_t len;
+
+			SetForegroundWindow(hWnd);
+
+			hr = StringCbLength(nCmdLine, sizeof(TCHAR), &len);
+			if (SUCCEEDED(hr))
+			{
+				COPYDATASTRUCT cds;
+				cds.cbData = (len + sizeof(WCHAR));
+				cds.dwData = 0;
+				cds.lpData = nCmdLine;
+
+				SendMessage(hWnd, WM_COPYDATA, 0, (LPARAM)&cds);
+			}
+		}
+		return FALSE;
+	}
+}
+
+HRESULT Application::Init_Mainframe()
+{
+	HRESULT hr;
+	WCHAR Appclass[100] = { 0 };
+
+	hr = (LoadString(this->hInstance, IDS_APPLICATIONCLASS, Appclass, MAX_LOADSTRING) == 0) ? E_FAIL : S_OK;
+	if( SUCCEEDED(hr))
+	{
+		WCHAR Appname[100] = { 0 };
+
+		hr = (LoadString(this->hInstance, IDS_APPLICATIONNAME, Appname, MAX_LOADSTRING) == 0) ? E_FAIL : S_OK;
+		if(SUCCEEDED(hr))
+		{
+			WNDCLASSEX wcx;
+			wcx.cbSize = sizeof(WNDCLASSEX);
+			wcx.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
+			wcx.cbClsExtra = 0;
+			wcx.cbWndExtra = sizeof(LONG_PTR);
+			wcx.lpfnWndProc = Application::WndProc;
+			wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+			wcx.hbrBackground = this->UserInterface->GetBkgndBrush();
+			wcx.hIcon = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_CNCSUITE_NORM), IMAGE_ICON, 128, 128, LR_DEFAULTCOLOR);
+			wcx.hInstance = this->hInstance;
+			wcx.lpszMenuName = NULL;
+			wcx.lpszClassName = Appclass;
+			wcx.hIconSm = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_CNCSUITE_SMLL), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
+			
+			hr = (RegisterClassEx(&wcx) == 0) ? E_FAIL : S_OK;
+			if(SUCCEEDED(hr))
+			{
+				int x, y, cx, cy;
+
+				if (this->pAppData->WndSizeData.valid)
+				{
+					if (this->pAppData->WndSizeData.valid == MAXIMIZENORMAL)
+					{
+						RECT rc;
+
+						this->pAppData->WndSizeData.nCmdShow = SW_SHOW;
+
+						if (this->UserInterface->GetMaximizeRect(&rc))
+						{
+							x = rc.left;
+							y = rc.top;
+							cx = rc.right;
+							cy = rc.bottom;
+						}
+					}
+					else
+					{
+						x = this->pAppData->WndSizeData.rc_Window.left;
+						y = this->pAppData->WndSizeData.rc_Window.top;
+						cx = this->pAppData->WndSizeData.rc_Window.right - this->pAppData->WndSizeData.rc_Window.left;
+						cy = this->pAppData->WndSizeData.rc_Window.bottom - this->pAppData->WndSizeData.rc_Window.top;
+					}
+				}
+				else
+				{
+					int sys_x = GetSystemMetrics(SM_CXSCREEN);
+					int sys_y = GetSystemMetrics(SM_CYSCREEN);
+
+					x = 100;
+					y = 100;
+					
+					cx = sys_x - 200;
+					if (cx < 600)
+						cx = 600;
+					cy = sys_y - 200;
+					if (sys_y < 400)
+						sys_y = 400;
+
+					this->pAppData->WndSizeData.nCmdShow = SW_SHOW;
+				}
+				this->MainWindow = CreateWindow( Appclass, Appname, WS_POPUP|WS_BORDER|WS_CLIPCHILDREN, x, y, cx, cy, NULL, NULL, this->hInstance, reinterpret_cast<LPVOID>(this));
+
+				hr = (this->MainWindow != nullptr) ? S_OK : E_FAIL;
+				if (SUCCEEDED(hr))
+				{
+					// ...
+					
+				}
+			}
+		}
+	}
+	return hr;
+}
+
+HRESULT Application::Init_Components()
+{
+	HRESULT hr;
+
+	this->Tabcontrol = CreateTabcontrol();
+	
+	hr = (this->Tabcontrol == nullptr) ? E_FAIL : S_OK;
+	if (SUCCEEDED(hr))
+	{
+		hr = this->Tabcontrol->Init(
+			this->UserInterface->GetFrameHandles(GFWH_EDITFRAME));
+
+		if (SUCCEEDED(hr))
+		{
+			this->FileNavigator = CreateFileNavigator(this->hInstance, this->MainWindow);
+
+			hr = (this->FileNavigator == nullptr) ? E_FAIL : S_OK;
+			if (SUCCEEDED(hr))
+			{
+				hr = this->FileNavigator->Init(
+					this->UserInterface->GetFrameHandles(GFWH_TVFRAME), this->pAppData->UserPath);
+
+				if (SUCCEEDED(hr))
+				{
+					// ...
+
+					ShowWindow(this->MainWindow, this->pAppData->WndSizeData.nCmdShow);
+					UpdateWindow(this->MainWindow);
+
+				}
+			}
+		}
+	}
+	return hr;
+}
+
+LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	Application* pApp = NULL;
+
+	if (message == WM_CREATE)
+	{
+		LPCREATESTRUCT lpc = reinterpret_cast<LPCREATESTRUCT>(lParam);
+		pApp = reinterpret_cast<Application*>(lpc->lpCreateParams);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, PtrToUlong(pApp));
+
+		return 1;
+	}
+	else
+	{
+		pApp = reinterpret_cast<Application*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+
+		if (pApp != NULL)
+		{
+			switch( message )
+			{
+				case WM_COMMAND:
+					return pApp->OnCommand(hWnd, wParam, lParam);
+				case WM_FRAMECHANGED:
+					return pApp->OnFrameChanged(hWnd, lParam);
+				case WM_GETAPPLICATIONDATA:
+					return pApp->OnGetAppData(lParam);
+				case WM_QUERYENDSESSION:
+					return pApp->OnSessionEnd(lParam);
+				case WM_DESTROY:
+					PostQuitMessage(0);
+				default:
+					if(pApp->UserInterface != NULL)
+						return pApp->UserInterface->DefaultHandler(hWnd, message, wParam, lParam);
+					else
+						break;
+			}
+		}
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+}
+
+LRESULT Application::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	switch (LOWORD(wParam))
+	{
+	case IDM_CLOSE:
+		SendMessage(hWnd, WM_DESTROY, 0, 0);
+		break;
+	case IDM_MAIN:
+		this->UserInterface->SetStatusbarInfo(0, L"Programmeigenschaften", 0);
+		break;
+	case IDM_OPEN:
+		break;
+	case NAVIGATOR_SETNEWFOLDER:
+		//MessageBox(hWnd, reinterpret_cast<LPCWSTR>(lParam), L"set folder", MB_OK | MB_ICONINFORMATION);
+		break;
+	case NAVIGATOR_OPENPATHREQUEST:
+		//MessageBox(hWnd, reinterpret_cast<LPCWSTR>(lParam), L"open path", MB_OK | MB_ICONINFORMATION);
+		break;
+	default:
+		break;
+	}
+	return static_cast<LRESULT>(0);
+}
+
+LRESULT Application::OnFrameChanged(HWND hWnd, LPARAM lParam)
+{
+	BOOL result = TRUE;
+
+	LPCSTMFRAME pCframe = reinterpret_cast<LPCSTMFRAME>(lParam);
+	if (pCframe != NULL)
+	{
+		this->pAppData->WndSizeData.valid = pCframe->valid;
+		this->pAppData->WndSizeData.EditFrameHeight = pCframe->EditFrameHeight;
+		this->pAppData->WndSizeData.TVFrame_width = pCframe->TVFrameWidth;
+		this->pAppData->WndSizeData.nCmdShow = pCframe->nCmdShow;
+
+		if ((pCframe->nCmdShow != SW_SHOWMAXIMIZED) && (pCframe->valid != MAXIMIZENORMAL))
+		{
+			GetWindowRect(hWnd, &this->pAppData->WndSizeData.rc_Window);
+		}
+		if (!this->SaveUserData())
+		{
+			result = FALSE;
+		}
+	}
+	else
+		result = FALSE;
+
+	return static_cast<LRESULT>(result);
+}
+
+LRESULT Application::OnSessionEnd(LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	// SAVE ALL, STOP ALL RUNNING PROCESSES AND CLOSE THE APP !
+
+	PostQuitMessage(0);
+
+	return static_cast<LRESULT>(TRUE);
+}
+
+LRESULT Application::OnGetAppData(LPARAM lParam)
+{
+	BOOL result;
+
+	LPAPPLICATION_DATA pAdata = reinterpret_cast<LPAPPLICATION_DATA>(lParam);
+
+	result = (pAdata == nullptr) ? FALSE : TRUE;
+	if (result)
+	{
+		HRESULT hr = S_OK;
+		size_t len;
+
+		SecureZeroMemory(pAdata, sizeof(APPLICATION_DATA));
+
+		pAdata->AppStartedWithCmdLine = this->pAppData->AppStartedWithCmdLine;
+
+		if (this->pAppData->CmdLine != nullptr)
+		{
+			hr = StringCbLength(this->pAppData->CmdLine, STRSAFE_MAX_CCH* sizeof(TCHAR), &len);
+			if (SUCCEEDED(hr))
+			{
+				pAdata->CmdLine = new WCHAR[len + sizeof(WCHAR)];
+
+				hr = (pAdata->CmdLine == nullptr) ? E_OUTOFMEMORY : S_OK;
+				if (SUCCEEDED(hr))
+				{
+					hr = StringCbCopy(pAdata->CmdLine, len + sizeof(WCHAR), this->pAppData->CmdLine);
+				}
+			}
+		}
+		result = SUCCEEDED(hr) ? TRUE : FALSE;
+		if (result)
+		{
+			if (this->pAppData->UserPath != nullptr)
+			{
+				hr = StringCbLength(this->pAppData->UserPath, STRSAFE_MAX_CCH* sizeof(TCHAR), &len);
+				if (SUCCEEDED(hr))
+				{
+					pAdata->UserPath = new WCHAR[len + sizeof(WCHAR)];
+
+					hr = (pAdata->UserPath == nullptr) ? E_OUTOFMEMORY : S_OK;
+					if (SUCCEEDED(hr))
+					{
+						hr = StringCbCopy(pAdata->UserPath, len + sizeof(WCHAR), this->pAppData->UserPath);
+					}
+				}
+			}
+		}
+		result = SUCCEEDED(hr) ? TRUE : FALSE;
+		if (result)
+		{
+			pAdata->WndSizeData.EditFrameHeight = this->pAppData->WndSizeData.EditFrameHeight;
+			pAdata->WndSizeData.nCmdShow = this->pAppData->WndSizeData.nCmdShow;
+			pAdata->WndSizeData.TVFrame_width = this->pAppData->WndSizeData.TVFrame_width;
+			pAdata->WndSizeData.valid = this->pAppData->WndSizeData.valid;
+
+			SetRect(&pAdata->WndSizeData.rc_Window,
+				this->pAppData->WndSizeData.rc_Window.left,
+				this->pAppData->WndSizeData.rc_Window.top,
+				this->pAppData->WndSizeData.rc_Window.right,
+				this->pAppData->WndSizeData.rc_Window.bottom);
+		}
+	}
+	return static_cast<LRESULT>(result);
+}
+
+BOOL Application::LoadUserData()
+{
+	BOOL result = TRUE;
+
+	BasicFPO* pFPO = CreateBasicFPO();
+	if (pFPO != NULL)
+	{
+		WCHAR* path = NULL;
+		AppendStringToString(this->pAppData->UserPath, L"\\CnC Suite\\AppData\\wnduser.sys\0", &path);
+
+		if (path != NULL)
+		{
+			WCHAR* buffer = NULL;
+
+			result = pFPO->LoadBufferFmFile(&buffer, path);
+			if (result)
+			{
+				if (buffer != NULL)
+				{
+					__try
+					{
+						int i = 0, j = 0, int_num = 0;
+						DWORD counter = 0;
+						WCHAR number[32] = { 0 };
+
+						while (buffer[counter] != L'\0')
+						{
+							while (!IsNumber(buffer[counter]))
+							{
+								if (buffer[counter] == L'\0')
+									break;
+
+								counter++;
+							}
+							if (buffer[counter] == L'\0')
+								break;
+
+							while (IsNumber(buffer[counter]))
+							{
+								if (buffer[counter] == L'\0')
+									break;
+								
+								number[i] = buffer[counter];
+
+								i++;
+								counter++;
+							}
+							number[i] = L'\0';
+							i = 0;
+
+							int_num = _wtoi(number);
+
+							switch (j)
+							{
+							case 0:
+								this->pAppData->WndSizeData.valid = int_num;
+								break;
+							case 1:
+								this->pAppData->WndSizeData.EditFrameHeight = int_num;
+								break;
+							case 2:
+								this->pAppData->WndSizeData.TVFrame_width = int_num;
+								break;
+							case 3:
+								this->pAppData->WndSizeData.nCmdShow = int_num;
+								break;
+							case 4:
+								this->pAppData->WndSizeData.rc_Window.bottom = int_num;
+								break;
+							case 5:
+								this->pAppData->WndSizeData.rc_Window.left = int_num;
+								break;
+							case 6:
+								this->pAppData->WndSizeData.rc_Window.right = int_num;
+								break;
+							case 7:
+								this->pAppData->WndSizeData.rc_Window.top = int_num;
+								break;
+							default:
+								break;
+							}
+							j++;
+							SecureZeroMemory(number, sizeof(number));
+						}
+					}
+					__except (GetExceptionCode() == EXCEPTION_ARRAY_BOUNDS_EXCEEDED ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+					{
+						result = FALSE;
+					}
+					delete[] buffer;
+				}
+				else
+					result = FALSE;
+			}
+			delete[] path;
+		}
+		else
+			result = FALSE;
+
+		SafeRelease(&pFPO);
+	}
+	else
+		result = FALSE;
+
+	return result;
+}
+
+BOOL Application::LoadNCSPath()
+{
+	BOOL result = TRUE;
+
+	BasicFPO* pFPO = CreateBasicFPO();
+
+	result = (pFPO != NULL) ? TRUE : FALSE;
+	if (result)
+	{
+		result = pFPO->GetKnownFolderPath(&this->pAppData->UserPath, FOLDERID_Documents);
+
+		SafeRelease(&pFPO);
+	}
+	return result;
+}
+
+BOOL Application::SaveUserData()
+{
+	BOOL result = TRUE;
+
+	BasicFPO* pFPO = CreateBasicFPO();
+	if (pFPO != NULL)
+	{
+		WCHAR* path = NULL;
+		AppendStringToString(this->pAppData->UserPath, L"\\CnC Suite\\AppData\\wnduser.sys\0", &path);
+
+		if (path != NULL)
+		{
+			HRESULT hr;
+			WCHAR buffer[256] = { 0 };
+
+			hr = StringCbPrintf(buffer, sizeof(buffer), L"%i|%i|%i|%i|%i|%i|%i|%i|\0",
+				this->pAppData->WndSizeData.valid,
+				this->pAppData->WndSizeData.EditFrameHeight,
+				this->pAppData->WndSizeData.TVFrame_width,
+				this->pAppData->WndSizeData.nCmdShow,
+				this->pAppData->WndSizeData.rc_Window.bottom,
+				this->pAppData->WndSizeData.rc_Window.left,
+				this->pAppData->WndSizeData.rc_Window.right,
+				this->pAppData->WndSizeData.rc_Window.top);
+
+			if (!pFPO->SaveBufferToFile(buffer, path))
+				result = FALSE;
+
+			delete[] path;
+		}
+		else
+			result = FALSE;
+
+		SafeRelease(&pFPO);
+	}
+	else
+		result = FALSE;
+
+	return result;
+}
+
+HRESULT Application::CollectFrameData(LPCSTMFRAME FrameData)
+{
+	if (FrameData == NULL)
+		return E_FAIL;
+	else
+	{
+		SecureZeroMemory(FrameData, sizeof(CSTMFRAME));
+
+		if (this->pAppData->WndSizeData.valid)
+		{
+			FrameData->valid = this->pAppData->WndSizeData.valid;
+			FrameData->nCmdShow = this->pAppData->WndSizeData.nCmdShow;
+			FrameData->EditFrameHeight = this->pAppData->WndSizeData.EditFrameHeight;
+			FrameData->TVFrameWidth = this->pAppData->WndSizeData.TVFrame_width;
+		}
+		else
+			FrameData->valid = FALSE;
+	}
+	return S_OK;
+}

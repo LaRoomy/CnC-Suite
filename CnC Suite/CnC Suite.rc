@@ -1,0 +1,370 @@
+#pragma once
+#include"Windows.h"
+#include"Resource.h"
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//  IMAGE RESOURCE >>  ///////////////////////////////////////////////////////////////
+IDI_CNCSUITE_NORM			ICON		"res\\CnC_Suite_mIcon.ico"
+IDI_CNCSUITE_SMLL			ICON		"res\\CnC_Suite_mIcon_small.ico"
+/**** Titlebar/System icons: *********************************************************/
+IDI_APPSYSICON				ICON		"res\\Systembuttons\\appIcon.ico"
+IDI_APPSETTINGS				ICON		"res\\Systembuttons\\settings_norm.ico"
+IDI_APPSETTINGS_MARKED		ICON		"res\\Systembuttons\\settings_mark.ico"
+IDI_APPSETTINGS_PRESSED		ICON		"res\\Systembuttons\\settings_pres.ico"
+
+IDI_HELPMARK				ICON		"res\\Systembuttons\\help_norm2.ico"
+IDI_HELPMARK_MARKED			ICON		"res\\Systembuttons\\help_mark2.ico"
+IDI_HELPMARK_PRESSED		ICON		"res\\Systembuttons\\help_pres2.ico"
+
+IDI_MAXIMIZE				ICON		"res\\Systembuttons\\maximize_norm.ico"
+IDI_MAXIMIZE_MARKED			ICON		"res\\Systembuttons\\maximize_mark.ico"
+IDI_MAXIMIZE_PRESSED		ICON		"res\\Systembuttons\\maximize_pres.ico"
+IDI_MAXIMIZE_MIN			ICON		"res\\Systembuttons\\maximize_min_norm.ico"
+IDI_MAXIMIZE_MARKED_MIN		ICON		"res\\Systembuttons\\maximize_min_mark.ico"
+IDI_MAXIMIZE_PRESSED_MIN	ICON		"res\\Systembuttons\\maximize_min_pres.ico"
+IDI_MINIMIZE				ICON		"res\\Systembuttons\\minimize_norm.ico"
+IDI_MINIMIZE_MARKED			ICON		"res\\Systembuttons\\minimize_mark.ico"
+IDI_MINIMIZE_PRESSED		ICON		"res\\Systembuttons\\minimize_pres.ico"
+
+
+IDI_WEB						ICON		"res\\Systembuttons\\web_norm.ico"
+IDI_WEB_MARKED				ICON		"res\\Systembuttons\\web_mark.ico"
+IDI_WEB_PRESSED				ICON		"res\\Systembuttons\\web_pres.ico"
+
+IDI_QUIT					ICON		"res\\Systembuttons\\quit_norm.ico"
+IDI_QUIT_MARKED				ICON		"res\\Systembuttons\\quit_mark.ico"
+IDI_QUIT_PRESSED			ICON		"res\\Systembuttons\\quit_pres.ico"
+
+IDI_SYS_SCROLLARROW_UP		ICON		"res\\Systembuttons\\tri_arrow_up.ico"
+IDI_SYS_SCROLLARROW_DOWN	ICON		"res\\Systembuttons\\tri_arrow_down.ico"
+IDI_SYS_SCROLLARROW_LEFT	ICON		"res\\Systembuttons\\tri_arrow_left.ico"
+IDI_SYS_SCROLLARROW_RIGHT	ICON		"res\\Systembuttons\\tri_arrow_right.ico"
+
+IDI_SYS_SCROLLARROW_UP_HGL		ICON		"res\\Systembuttons\\tri_arrow_up_hgl.ico"
+IDI_SYS_SCROLLARROW_DOWN_HGL	ICON		"res\\Systembuttons\\tri_arrow_down_hgl.ico"
+IDI_SYS_SCROLLARROW_UP_PRS		ICON		"res\\Systembuttons\\tri_arrow_up_prs.ico"
+IDI_SYS_SCROLLARROW_DOWN_PRS	ICON		"res\\Systembuttons\\tri_arrow_down_prs.ico"
+
+IDI_SYS_SCROLLARROW_UP_DSBL		ICON		"res\\Systembuttons\\tri_arrow_up_dsbl.ico"
+IDI_SYS_SCROLLARROW_DOWN_DSBL	ICON		"res\\Systembuttons\\tri_arrow_down_dsbl.ico"
+
+IDI_SYS_SCROLLARROW_LEFT_HGL	ICON		"res\\Systembuttons\\tri_arrow_left_hgl.ico"
+IDI_SYS_SCROLLARROW_RIGHT_HGL	ICON		"res\\Systembuttons\\tri_arrow_right_hgl.ico"
+IDI_SYS_SCROLLARROW_LEFT_PRS	ICON		"res\\Systembuttons\\tri_arrow_left_prs.ico"
+IDI_SYS_SCROLLARROW_RIGHT_PRS	ICON		"res\\Systembuttons\\tri_arrow_right_prs.ico"
+
+IDI_SYS_SCROLLARROW_LEFT_DSBL	ICON		"res\\Systembuttons\\tri_arrow_left_dsbl.ico"
+IDI_SYS_SCROLLARROW_RIGHT_DSBL	ICON		"res\\Systembuttons\\tri_arrow_right_dsbl.ico"
+
+/**************************************************************************************/
+IDI_SIZECROSS				ICON		"res\\size_cross.ico"
+
+// toolbar button images (48px (max dpi))
+IDI_CLOSEBUTTON				ICON		"res\\Systembuttons\\close_norm.ico"
+IDI_CLOSEBUTTON_MARKED		ICON		"res\\Systembuttons\\close_mark.ico"
+IDI_CLOSEBUTTON_PRESSED		ICON		"res\\Systembuttons\\close_pres.ico"
+IDI_SIZE_ARROW				ICON		"res\\size_arrow.ico"
+IDI_SIZE_ARROW_DISABLED		ICON		"res\\size_arrow_grayed.ico"
+IDI_TOOLBAR_NEW				ICON		"res\\MainToolbar\\new_norm.ico"
+IDI_TOOLBAR_NEW_MARKED		ICON		"res\\MainToolbar\\new_mark.ico"
+IDI_TOOLBAR_NEW_PRESSED		ICON		"res\\MainToolbar\\new_pres.ico"
+IDI_TOOLBAR_IMPORT			ICON		"res\\MainToolbar\\import_norm.ico"
+IDI_TOOLBAR_IMPORT_MARKED	ICON		"res\\MainToolbar\\import_mark.ico"
+IDI_TOOLBAR_IMPORT_PRESSED	ICON		"res\\MainToolbar\\import_pres.ico"
+IDI_TOOLBAR_OPEN			ICON		"res\\MainToolbar\\open_norm.ico"
+IDI_TOOLBAR_OPEN_MARKED		ICON		"res\\MainToolbar\\open_mark.ico"
+IDI_TOOLBAR_OPEN_PRESSED	ICON		"res\\MainToolbar\\open_pres.ico"
+IDI_TOOLBAR_SAVE			ICON		"res\\MainToolbar\\save_norm.ico"
+IDI_TOOLBAR_SAVE_MARKED		ICON		"res\\MainToolbar\\save_mark.ico"
+IDI_TOOLBAR_SAVE_PRESSED	ICON		"res\\MainToolbar\\save_pres.ico"
+IDI_TOOLBAR_SAVEALL			ICON		"res\\MainToolbar\\saveall_norm.ico"
+IDI_TOOLBAR_SAVEALL_MARKED	ICON		"res\\MainToolbar\\saveall_mark.ico"
+IDI_TOOLBAR_SAVEALL_PRESSED	ICON		"res\\MainToolbar\\saveall_pres.ico"
+IDI_TOOLBAR_SAVEAS			ICON		"res\\MainToolbar\\saveas_norm.ico"
+IDI_TOOLBAR_SAVEAS_MARKED	ICON		"res\\MainToolbar\\saveas_mark.ico"
+IDI_TOOLBAR_SAVEAS_PRESSED	ICON		"res\\MainToolbar\\saveas_pres.ico"
+IDI_TOOLBAR_COPY			ICON		"res\\MainToolbar\\copy_norm.ico"
+IDI_TOOLBAR_COPY_MARKED		ICON		"res\\MainToolbar\\copy_mark.ico"
+IDI_TOOLBAR_COPY_PRESSED	ICON		"res\\MainToolbar\\copy_pres.ico"
+IDI_TOOLBAR_PASTE			ICON		"res\\MainToolbar\\paste_norm.ico"
+IDI_TOOLBAR_PASTE_MARKED	ICON		"res\\MainToolbar\\paste_mark.ico"
+IDI_TOOLBAR_PASTE_PRESSED	ICON		"res\\MainToolbar\\paste_pres.ico"
+IDI_TOOLBAR_CUT				ICON		"res\\MainToolbar\\cut_norm.ico"
+IDI_TOOLBAR_CUT_MARKED		ICON		"res\\MainToolbar\\cut_mark.ico"
+IDI_TOOLBAR_CUT_PRESSED		ICON		"res\\MainToolbar\\cut_pres.ico"
+IDI_TOOLBAR_SELECTALL			ICON	"res\\MainToolbar\\selectall_norm.ico"
+IDI_TOOLBAR_SELECTALL_MARKED	ICON	"res\\MainToolbar\\selectall_mark.ico"
+IDI_TOOLBAR_SELECTALL_PRESSED	ICON	"res\\MainToolbar\\selectall_pres.ico"
+IDI_TOOLBAR_DELETE			ICON		"res\\MainToolbar\\delete_norm.ico"
+IDI_TOOLBAR_DELETE_MARKED	ICON		"res\\MainToolbar\\delete_mark.ico"
+IDI_TOOLBAR_DELETE_PRESSED	ICON		"res\\MainToolbar\\delete_pres.ico"
+IDI_TOOLBAR_EXPORT			ICON		"res\\MainToolbar\\export_norm.ico"
+IDI_TOOLBAR_EXPORT_MARKED	ICON		"res\\MainToolbar\\export_mark.ico"
+IDI_TOOLBAR_EXPORT_PRESSED	ICON		"res\\MainToolbar\\export_pres.ico"
+IDI_TOOLBAR_SEND			ICON		"res\\MainToolbar\\send_norm.ico"
+IDI_TOOLBAR_SEND_MARKED		ICON		"res\\MainToolbar\\send_mark.ico"
+IDI_TOOLBAR_SEND_PRESSED	ICON		"res\\MainToolbar\\send_pres.ico"
+IDI_TOOLBAR_RECEIVE			ICON		"res\\MainToolbar\\receive_norm.ico"
+IDI_TOOLBAR_RECEIVE_MARKED	ICON		"res\\MainToolbar\\receive_mark.ico"
+IDI_TOOLBAR_RECEIVE_PRESSED	ICON		"res\\MainToolbar\\receive_pres.ico"
+IDI_TOOLBAR_DROPDOWN			ICON	"res\\MainToolbar\\dropdown_norm.ico"
+IDI_TOOLBAR_DROPDOWN_MARKED		ICON	"res\\MainToolbar\\dropdown_mark.ico"
+IDI_TOOLBAR_DROPDOWN_PRESSED	ICON	"res\\MainToolbar\\dropdown_pres.ico"
+
+// explorer toolbar images
+IDI_EXP_SELECTROOT			ICON		"TVComp\\res\\Toolbar\\selectRoot.ico"
+IDI_EXP_ADDFILE				ICON		"TVComp\\res\\Toolbar\\addFile.ico"
+IDI_EXP_ADDFOLDER			ICON		"TVComp\\res\\Toolbar\\addFolder.ico"
+IDI_EXP_COPYELEMENT			ICON		"TVComp\\res\\Toolbar\\copyElement.ico"
+IDI_EXP_INSERTELEMENT		ICON		"TVComp\\res\\Toolbar\\insertElement.ico"
+IDI_EXP_DELETEELEMENT		ICON		"TVComp\\res\\Toolbar\\deleteElement.ico"
+IDI_EXP_CONVERTELEMENT		ICON		"TVComp\\res\\Toolbar\\convertElement.ico"
+IDI_EXP_IMPORTCONTENT		ICON		"TVComp\\res\\Toolbar\\importContent.ico"
+IDI_EXP_SEARCHFILE			ICON		"TVComp\\res\\Toolbar\\searchFile.ico"
+
+IDI_EXP_SELECTROOT_DISABLED			ICON		"TVComp\\res\\Toolbar\\selectRoot_disabled.ico"
+IDI_EXP_ADDFILE_DISABLED			ICON		"TVComp\\res\\Toolbar\\addFile_disabled.ico"
+IDI_EXP_ADDFOLDER_DISABLED			ICON		"TVComp\\res\\Toolbar\\addFolder_disabled.ico"
+IDI_EXP_COPYELEMENT_DISABLED		ICON		"TVComp\\res\\Toolbar\\copyElement_disabled.ico"
+IDI_EXP_INSERTELEMENT_DISABLED		ICON		"TVComp\\res\\Toolbar\\insertElement_disabled.ico"
+IDI_EXP_DELETEELEMENT_DISABLED		ICON		"TVComp\\res\\Toolbar\\deleteElement_disabled.ico"
+IDI_EXP_CONVERTELEMENT_DISABLED		ICON		"TVComp\\res\\Toolbar\\convertElement_disabled.ico"
+IDI_EXP_IMPORTCONTENT_DISABLED		ICON		"TVComp\\res\\Toolbar\\importContent_disabled.ico"
+IDI_EXP_SEARCHFILE_DISABLED			ICON		"TVComp\\res\\Toolbar\\searchFile_disabled.ico"
+
+IDI_EXP_RENAMEFILE					ICON		"TVComp\\res\\Toolbar\\renameFile.ico"
+IDI_EXP_RENAMEFILE_DISABLED			ICON		"TVComp\\res\\Toolbar\\renameFile_disabled.ico"
+
+IDI_SMP_INSERTSAMPLE				ICON		"TVComp\\res\\Toolbar\\insertSample.ico"
+IDI_SMP_INSERTSAMPLE_DISABLED		ICON		"TVComp\\res\\Toolbar\\insertSample_disabled.ico"
+
+
+IDI_TV_CNC3					ICON		"TVComp\\res\\CnC_Suite_Fileicon_sq48_red.ico"
+IDI_TV_FILE					ICON		"TVComp\\res\\file.ico"
+IDI_TV_FOLDEROPENED			ICON		"TVComp\\res\\folder_open.ico"
+IDI_TV_FOLDERCLOSED			ICON		"TVComp\\res\\folder_closed.ico"
+IDI_TV_NOCONTENT			ICON		"TVComp\\res\\empty_dir_item.ico"
+
+IDI_FN_SEARCH				ICON		"TVComp\\res\\search_sq18.ico"
+IDI_FN_OPENFOLDER			ICON		"TVComp\\res\\miniFolder_white.ico"
+
+IDI_SEARCH					ICON		"Searchcontrol\\res\\search.ico"
+IDI_FIND					ICON		"Searchcontrol\\res\\find.ico"
+IDI_OPENRESULT				ICON		"Searchcontrol\\res\\open_result.ico"
+
+IDI_SC_CNC3					ICON		"Searchcontrol\\res\\CnC_Suite_Fileicon_sq16_red.ico"
+
+IDI_CNC3_FILEICON_SQ32			ICON		"res\\cnc3_file_ico_sq32.ico"
+IDI_CNC3_FILEICON_SQ32_MARK		ICON		"res\\cnc3_file_ico_sq32_marked.ico"
+IDI_CNC3_FILEICON_SQ32_DSBL		ICON		"res\\cnc3_file_ico_sq32_disabled.ico"
+
+
+IDI_CBOX_ERROR				ICON		"CBox\\res\\error.ico"
+IDI_CBOX_WARNING			ICON		"CBox\\res\\warning.ico"
+IDI_CBOX_INFORMATION		ICON		"CBox\\res\\information.ico"
+
+IDI_TC_CLOSERED				ICON		"Tabcontrol\\res\\tabclose_red.ico"
+IDI_TC_CLOSEGREEN			ICON		"Tabcontrol\\res\\tabclose_green.ico"
+IDI_TC_CLOSEMARKED			ICON		"Tabcontrol\\res\\tabclose_marked.ico"
+
+IDI_TC_TABMENU_RESET		ICON		"Tabcontrol\\res\\TabMenu\\reset.ico"
+IDI_TC_TABMENU_EXPAND		ICON		"Tabcontrol\\res\\TabMenu\\expand.ico"
+IDI_TC_TABMENU_COPYTOTAB	ICON		"Tabcontrol\\res\\TabMenu\\copytoTab.ico"
+IDI_TC_TABMENU_OPENINWIN	ICON		"Tabcontrol\\res\\TabMenu\\openinWin.ico"
+IDI_TC_TABMENU_ADDASTEMPL	ICON		"Tabcontrol\\res\\TabMenu\\addAsTemplate.ico"
+
+IDI_EDITTOOLBAR_UPPERCASE_RED			ICON	"Tabcontrol\\res\\EditToolbar\\uppercase_off.ico"
+IDI_EDITTOOLBAR_UPPERCASE_GREEN			ICON	"Tabcontrol\\res\\EditToolbar\\uppercase_on.ico"
+IDI_EDITTOOLBAR_AUTOCOMPLETE_RED		ICON	"Tabcontrol\\res\\EditToolbar\\autocomplete_off.ico"
+IDI_EDITTOOLBAR_AUTOCOMPLETE_GREEN		ICON	"Tabcontrol\\res\\EditToolbar\\autocomplete_on.ico"
+IDI_EDITTOOLBAR_AUTONUM_RED				ICON	"Tabcontrol\\res\\EditToolbar\\autonum_off.ico"
+IDI_EDITTOOLBAR_AUTONUM_GREEN			ICON	"Tabcontrol\\res\\EditToolbar\\autonum_on.ico"
+IDI_EDITTOOLBAR_TEXTCOLOR_RED			ICON	"Tabcontrol\\res\\EditToolbar\\autocolor_off.ico"
+IDI_EDITTOOLBAR_TEXTCOLOR_GREEN			ICON	"Tabcontrol\\res\\EditToolbar\\autocolor_on.ico"
+IDI_EDITTOOLBAR_FOCUSMARK_RED			ICON	"Tabcontrol\\res\\EditToolbar\\linefocus_off.ico"
+IDI_EDITTOOLBAR_FOCUSMARK_GREEN			ICON	"Tabcontrol\\res\\EditToolbar\\linefocus_on.ico"
+IDI_EDITTOOLBAR_SHOWDESC				ICON	"Tabcontrol\\res\\EditToolbar\\show_desc.ico"
+IDI_EDITTOOLBAR_HIDEDESC				ICON	"Tabcontrol\\res\\EditToolbar\\hide_desc.ico"
+
+IDI_EDITTOOLBAR_NUMSEQUENCE				ICON	"Tabcontrol\\res\\EditToolbar\\renumber.ico"
+IDI_EDITTOOLBAR_RECONVERT				ICON	"Tabcontrol\\res\\EditToolbar\\reconvert.ico"
+IDI_EDITTOOLBAR_ERRORCHECK				ICON	"Tabcontrol\\res\\EditToolbar\\errorscan.ico"
+IDI_EDITTOOLBAR_AUTOSYNTAX				ICON	"Tabcontrol\\res\\EditToolbar\\autosyntax.ico"
+IDI_EDITTOOLBAR_TEXTPROPERTIES			ICON	"Tabcontrol\\res\\EditToolbar\\textproperties.ico"
+
+IDI_GNRL_CANCEL_YELLOW		ICON		"res\\exit_24.ico"
+IDI_GNRL_BACK				ICON		"res\\back_48.ico"
+IDI_GNRL_ADD_CROSS_WHITE	ICON		"res\\Common\\addcross_white.ico"
+IDI_GNRL_LOADRUNNER_BLUE	ICON		"res\\splashScreen\\runner1_blue.ico"
+IDI_GNRL_ADD_CROSS_GREEN	ICON		"res\\Common\\add_48_green.ico"
+IDI_GNRL_DELETE_BIN			ICON		"res\\Common\\delete_48_red.ico"
+IDI_GNRL_ARROW_UP			ICON		"res\\gnrl_arrow_up.ico"
+
+
+IDI_S_CONFIG				ICON		"DataExchange\\res\\exchange.ico"
+IDI_EXPAND_WND				ICON		"DataExchange\\res\\arrowdownright.ico"
+IDI_IMPAND_WND				ICON		"DataExchange\\res\\arrowupleft.ico"
+IDI_SYNC					ICON		"DataExchange\\res\\sync.ico"
+
+
+// old sample images -> obsolete????
+IDI_SMP_ADDSAMPLE			ICON		"SampleManager\\res\\document_add.ico"
+IDI_SMP_ADDFILTER			ICON		"SampleManager\\res\\add_filter.ico"
+IDI_SMP_REMOVEELEMENT		ICON		"SampleManager\\res\\remove_element.ico"
+IDI_SMP_CLOSEMANAGER		ICON		"SampleManager\\res\\close_manager.ico"
+IDI_SMP_SAVESAMPLE			ICON		"SampleManager\\res\\save_sample.ico"
+IDI_SMP_CHANGEELEMENT		ICON		"SampleManager\\res\\change_element.ico"
+IDI_SMP_COPYTOCLIPBOARD		ICON		"SampleManager\\res\\copy_to_clipboard.ico"
+
+IDI_SMP_TV_FOLDEROPEN		ICON		"SampleManager\\res\\smp_folder_open.ico"
+IDI_SMP_TV_FOLDERCLOSED		ICON		"SampleManager\\res\\smp_folder_closed.ico"
+IDI_SMP_TV_SAMPLEFILE		ICON		"SampleManager\\res\\sample_file.ico"
+IDI_SMP_TV_FOLDEROPEN_SEL	ICON		"SampleManager\\res\\smp_folder_open_sel.ico"
+IDI_SMP_TV_FOLDERCLOSED_SEL	ICON		"SampleManager\\res\\smp_folder_closed_sel.ico"
+IDI_SMP_TV_SAMPLEFILE_SEL	ICON		"SampleManager\\res\\sample_file_sel.ico"
+
+IDI_WKI_ORANGE_DOT			ICON		"res\\orange_dot_sq16.ico"
+IDI_WKI_BLUE_DOT			ICON		"res\\blue_dot_sq16.ico"
+
+IDI_WKI_MOVER_SQ5_BLUE		ICON		"res\\mover\\mover_sq5_blue.ico"
+IDI_WKI_MOVER_SQ5_ORANGE	ICON		"res\\mover\\mover_sq5_orange.ico"
+
+IDI_TRACKBARBUTTON_NORMAL	ICON		"res\\trackButtonOrangeNormal.ico"
+IDI_TRACKBARBUTTON_PRESSED	ICON		"res\\trackButtonOrangePressed.ico"
+
+IDI_PROP_SETTINGS			ICON		"res\\PropertyWindow\\settings.ico"
+IDI_PROP_TABCTRL			ICON		"res\\PropertyWindow\\tabcontrol.ico"
+IDI_PROP_FILENAV			ICON		"res\\PropertyWindow\\filenavigator.ico"
+IDI_PROP_EDITOR				ICON		"res\\PropertyWindow\\editor.ico"
+IDI_PROP_EXCHANGE			ICON		"res\\PropertyWindow\\exchange.ico"
+IDI_PROP_INFO				ICON		"res\\PropertyWindow\\info.ico"
+IDI_PROP_CHOOSECOLOR		ICON		"res\\PropertyWindow\\chooseColor.ico"
+IDI_PROP_SCEMEMANAGER				ICON		"res\\PropertyWindow\\sceme_manager.ico"
+IDI_PROP_AUTOCOMPLETEMANAGER		ICON		"res\\PropertyWindow\\autocomplete_manager.ico"
+
+IDI_PROPCHECKBOX_CHECKED			ICON		"res\\PropertyWindow\\checkbox_checked_16.ico"
+IDI_PROPCHECKBOX_UNCHECKED			ICON		"res\\PropertyWindow\\checkbox_unchecked_16.ico"
+IDI_PROPCHECKBOX_CHECKED_DISABLED	ICON		"res\\PropertyWindow\\checkbox_checked_16_disabled.ico"
+IDI_PROPCHECKBOX_UNCHECKED_DISABLED	ICON		"res\\PropertyWindow\\checkbox_unchecked_16_disabled.ico"
+IDI_PROPRADIOBUTTON_CHECKED			ICON		"res\\PropertyWindow\\radio_button_checked_16.ico"
+IDI_PROPRADIOBUTTON_UNCHECKED		ICON		"res\\PropertyWindow\\radio_button_unchecked_16.ico"
+
+IDI_TCVT_UNDO				ICON	"Tabcontrol\\res\\EditToolbar\\undo.ico"
+IDI_TCVT_REDO				ICON	"Tabcontrol\\res\\EditToolbar\\redo.ico"
+
+IDI_DESCTOOLBAR_DELETE		ICON	"Tabcontrol\\res\\descToolbar\\delete_desc.ico"
+IDI_DESCTOOLBAR_COPY		ICON	"Tabcontrol\\res\\descToolbar\\copy_desc.ico"
+IDI_DESCTOOLBAR_INSERT		ICON	"Tabcontrol\\res\\descToolbar\\insert_desc.ico"
+
+IDI_PROP_UPDATEARROWS		ICON	"res\\PropertyWindow\\updateArrows.ico"
+IDI_PROP_UPDATEARROWS_DSBL	ICON	"res\\PropertyWindow\\updateArrows_disabled.ico"
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// BITMAP >> ////////////////////////////////////////////////////////////////////////////////////////////////////
+IDB_SPLASHSCREEN				BITMAP		"res\\splashScreen\\new cover.bmp"
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CURSOR >> ////////////////////////////////////////////////////////////////////////////////////////////////////
+IDC_CNC3CURSOR				CURSOR		"TVComp\\res\\Cursors\\CnCFile.cur"
+IDC_FILECURSOR				CURSOR		"TVComp\\res\\Cursors\\file.cur"
+IDC_FOLDERCURSOR			CURSOR		"TVComp\\res\\Cursors\\Folder.cur"
+IDC_FORBIDDEN				CURSOR		"TVComp\\res\\Cursors\\forbidden.cur"
+IDC_INSERT					CURSOR		"TVComp\\res\\Cursors\\insert.cur"
+IDC_SAMPLE					CURSOR		"SampleManager\\res\\sample.cur"
+
+//IDF_PROFONTWINDOWS		FONT		"res\\Fonts\\ProFontWindowsEdit.ttf"
+//IDF_CODENEWROMAN			FONT		"res\\Fonts\\Code New Roman.otf"
+//IDF_INCONSOLATA			FONT		"res\\Fonts\\Inconsolata-Bold.ttf"
+//IDF_COURIERPRIMECODE		FONT		"res\\Fonts\\Courier Prime Code.ttf"
+//IDF_COURIERPRIMESANS		FONT		"res\\Fonts\\Courier Prime Sans.ttf"
+//IDF_VERAMONO				FONT		"res\\Fonts\\VeraMono.ttf"
+//IDF_SVBASICMANUAL			FONT		"res\\Fonts\\SVBasicManual.ttf"
+//IDF_PTMONO				FONT		"res\\Fonts\\PTM55FT.ttf"
+
+//////////////////////////////////////////////////////////////////////////////////////
+//  STRINGTABLE >>  //////////////////////////////////////////////////////////////////
+STRINGTABLE
+BEGIN
+	//IDS_APPLICATIONCLASS					"EPLEXSTUDIOCLASS"
+	//IDS_APPLICATIONNAME						"CnC Suite 3.0"
+	IDS_APPLICATIONCLASS					"CNCSUITECLASS"
+	IDS_APPLICATIONNAME						"CnC Suite"
+END
+/////////////////////////////////////////////////////////////////////////////////////
+// MENUS >>  ////////////////////////////////////////////////////////////////////////
+IDM_SEARCHMENU_G		MENU
+BEGIN
+	POPUP	"&Optionen"
+	BEGIN
+		MENUITEM	"&Einstellungen"		IDM_SEARCHSETTINGS
+		MENUITEM	SEPARATOR
+		MENUITEM	"&Beenden"				IDM_SEARCHCLOSE
+	END
+END
+/////////////////////////////////////////////////////////////////////////////////////
+IDM_SEARCHMENU_E		MENU
+BEGIN
+	POPUP	"&Options"
+	BEGIN
+		MENUITEM	"&Settings"				IDM_SEARCHSETTINGS
+		MENUITEM	SEPARATOR
+		MENUITEM	"&Close"				IDM_SEARCHCLOSE
+	END
+END
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DATA EXCHANGE WINDOW MENU >>
+IDM_S_CONFIG_MENU_G MENU
+BEGIN
+POPUP "&Optionen"
+BEGIN
+MENUITEM "&Zurücksetzen"	IDM_DEX_RESET
+MENUITEM "&Beenden"			IDM_DEX_CLOSE
+END
+END
+
+IDM_S_CONFIG_MENU_E MENU
+BEGIN
+POPUP "&Options"
+BEGIN
+MENUITEM "&Reset"			IDM_DEX_RESET
+MENUITEM "&Close"			IDM_DEX_CLOSE
+END
+END
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+// DIALOGBOXES >>   ////////////////////////////////////////////////////////////////
+IDD_SETUPDIALOG_G DIALOGEX 0, 0, 170, 190
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Einstellungen"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+	CHECKBOX		"Öffnen mehrerer Dateien erlauben", ID_SRCHCKBX1, 20, 10, 200, 10, BS_AUTOCHECKBOX
+	CHECKBOX		"Pfad zur Datei expandieren", ID_SRCHCKBX2, 20, 25, 200, 10, BS_AUTOCHECKBOX
+	CHECKBOX		"Fenster nach dem Öffnen schliessen", ID_SRCHCKBX3, 20, 40, 200, 10, BS_AUTOCHECKBOX
+	GROUPBOX		"Suchen nach...", 0, 10, 60, 150, 95, BS_GROUPBOX
+	CHECKBOX		"Projektname", ID_SRCHCKBX4, 30, 75, 120, 10, BS_AUTOCHECKBOX
+	CHECKBOX		"Dateiname", ID_SRCHCKBX5, 30, 90, 120, 10, BS_AUTOCHECKBOX
+	CHECKBOX		"Zeichnungsnummer", ID_SRCHCKBX6, 30, 105, 120, 10, BS_AUTOCHECKBOX
+	CHECKBOX		"Kunde", ID_SRCHCKBX7, 30, 120, 120, 10, BS_AUTOCHECKBOX
+	CHECKBOX		"Bezeichnung", ID_SRCHCKBX8, 30, 135, 120, 10, BS_AUTOCHECKBOX
+	DEFPUSHBUTTON   "OK", IDOK, 75, 170, 30, 14
+	PUSHBUTTON      "Abbrechen", IDCANCEL, 110, 170, 50, 14
+END
+/////////////////////////////////////////////////////////////////////////////////////
+IDD_SETUPDIALOG_E DIALOGEX 0, 0, 170, 190
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Settings"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+	CHECKBOX		"Enable multiple file opening", ID_SRCHCKBX1, 20, 10, 200, 10, BS_AUTOCHECKBOX
+	CHECKBOX		"Expand path to file", ID_SRCHCKBX2, 20, 25, 200, 10, BS_AUTOCHECKBOX
+	CHECKBOX		"Close Window after opening", ID_SRCHCKBX3, 20, 40, 200, 10, BS_AUTOCHECKBOX
+	GROUPBOX		"Search for...", 0, 10, 60, 150, 95, BS_GROUPBOX
+	CHECKBOX		"Projectname", ID_SRCHCKBX4, 30, 75, 120, 10, BS_AUTOCHECKBOX
+	CHECKBOX		"Filename", ID_SRCHCKBX5, 30, 90, 120, 10, BS_AUTOCHECKBOX
+	CHECKBOX		"Drawing number", ID_SRCHCKBX6, 30, 105, 120, 10, BS_AUTOCHECKBOX
+	CHECKBOX		"Customer", ID_SRCHCKBX7, 30, 120, 120, 10, BS_AUTOCHECKBOX
+	CHECKBOX		"Description", ID_SRCHCKBX8, 30, 135, 120, 10, BS_AUTOCHECKBOX
+	DEFPUSHBUTTON   "OK", IDOK, 75, 170, 30, 14
+	PUSHBUTTON      "Cancel", IDCANCEL, 110, 170, 50, 14
+END
+

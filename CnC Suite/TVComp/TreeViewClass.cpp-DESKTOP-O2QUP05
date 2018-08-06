@@ -1,0 +1,3875 @@
+#include"TreeViewClass.h"
+
+TreeViewCTRL::TreeViewCTRL(HWND TVFrame_, HINSTANCE hInst, int language, LPTSTR Working_Directory)
+	: hInstance(hInst),
+	TVFrame(TVFrame_),
+	Root_Folder(nullptr),
+	Root_Name(nullptr),
+	hwndTV(nullptr),
+	Working_Dir(nullptr),
+	language_(language),
+	cSuccess(TRUE),
+	_cRef(1)
+{
+	SecureZeroMemory(&this->FOPInfo, sizeof(FOPCLIPBOARDINFO));
+	SecureZeroMemory(&this->DynamicLevel, sizeof(HDYNAMICLEVEL));
+
+	HRESULT hr = (TVFrame_ == NULL) ? E_FAIL : S_OK;
+	if (SUCCEEDED(hr))
+	{
+		size_t len;
+
+		hr = StringCbLength(Working_Directory, STRSAFE_MAX_CCH, &len);
+		if (SUCCEEDED(hr))
+		{
+
+			this->Working_Dir = new TCHAR[len + sizeof(TCHAR)];
+
+			hr = (this->Working_Dir == NULL) ? E_FAIL : S_OK;
+			if (SUCCEEDED(hr))
+			{
+				hr = StringCbCopy(this->Working_Dir, len + sizeof(TCHAR), Working_Directory);
+				if (SUCCEEDED(hr))
+				{
+					
+
+				}
+			}
+		}
+	}
+	if (FAILED(hr))cSuccess = FALSE;
+}
+
+TreeViewCTRL::~TreeViewCTRL( void )
+{
+	if( !this->SaveRoot() )
+	{
+		this->DisplayErrorBox( L"SaveRoot" );// disable ??
+	}
+
+	if( this->Root_Folder != NULL )
+	{
+		delete [] this->Root_Folder;
+		this->Root_Folder = NULL;
+	}
+	if( this->Working_Dir != NULL )
+	{
+		delete [] this->Working_Dir;
+		this->Working_Dir = NULL;
+	}
+	if( this->Root_Name != NULL )
+	{
+		delete [] this->Root_Name;
+		this->Root_Name = NULL;
+	}
+}
+
+HRESULT TreeViewCTRL::InitTreeView( COLORREF BkColor, HFONT Clientfont, COLORREF Textcolor, LPRECT rc )
+{
+	HRESULT hr = (this->cSuccess) ? S_OK : E_FAIL;
+	if (SUCCEEDED(hr))
+	{
+		InitCommonControls();
+
+		this->hwndTV = CreateWindowEx(
+			/*WS_EX_COMPOSITED*/0,//only use composited style when the ownderwindow doesn't has it
+			WC_TREEVIEW,
+			L"Tree View",
+			WS_CHILD | WS_VISIBLE | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_TRACKSELECT | TVS_EDITLABELS,
+			rc->left, rc->top,
+			rc->right, rc->bottom,
+			this->TVFrame,
+			reinterpret_cast<HMENU>(ID_FILENAVIGATOR),
+			this->hInstance, NULL);
+
+		hr = (this->hwndTV == nullptr) ? E_FAIL : S_OK;
+		if(SUCCEEDED(hr))
+		{
+			SendMessage(this->hwndTV, WM_SETFONT, reinterpret_cast<WPARAM>(Clientfont), static_cast<LPARAM>(TRUE));
+
+			TreeView_SetBkColor(this->hwndTV, BkColor);
+			TreeView_SetTextColor(this->hwndTV, Textcolor);
+
+			hr = this->InitTreeViewImageLists(this->hwndTV) ? S_OK : E_FAIL;
+			if (SUCCEEDED(hr))
+			{
+				hr = this->LoadRoot() ? S_OK : E_FAIL;
+				if(FAILED(hr))
+				{
+					hr = this->GenerateRoot();
+				}
+				if (SUCCEEDED(hr))
+				{
+					hr = this->InitTreeViewItems(this->Root_Folder, INIT_MODE) ? S_OK : E_FAIL;
+				}
+			}
+		}
+	}
+	return hr;
+}
+
+BOOL TreeViewCTRL::InitTreeViewImageLists( HWND TV )
+{
+	BOOL result = TRUE;
+	HIMAGELIST	himl; 
+	HICON		hicon;
+
+	result = ((himl = ImageList_Create(CX_ICON, CY_ICON, ILC_COLOR32, NUM_ICONS, 0)) == NULL) ? FALSE : TRUE;
+	if(result)
+	{
+		hicon = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_TV_FILE), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
+
+		result = (hicon) ? TRUE : FALSE;
+		if (result)
+		{
+			this->ico_index[0] = ImageList_AddIcon(himl, hicon);
+			DestroyIcon(hicon);
+
+			hicon = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_TV_FOLDERCLOSED), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
+
+			result = (hicon) ? TRUE : FALSE;
+			if (result)
+			{
+				this->ico_index[1] = ImageList_AddIcon(himl, hicon);
+				DestroyIcon(hicon);
+
+				hicon = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_TV_FOLDEROPENED), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
+
+				result = (hicon) ? TRUE : FALSE;
+				if (result)
+				{
+					this->ico_index[2] = ImageList_AddIcon(himl, hicon);
+					DestroyIcon(hicon);
+
+					hicon = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_TV_CNC3), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
+
+					result = (hicon) ? TRUE : FALSE;
+					if (result)
+					{
+						this->ico_index[3] = ImageList_AddIcon(himl, hicon);
+						DestroyIcon(hicon);
+
+						hicon = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_TV_NOCONTENT), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
+
+						result = (hicon) ? TRUE : FALSE;
+						if (result)
+						{
+							this->ico_index[4] = ImageList_AddIcon(himl, hicon);
+							DestroyIcon(hicon);
+
+							result = (ImageList_GetImageCount(himl) < 5) ? FALSE : TRUE;
+							if (result)
+							{
+								TreeView_SetImageList(TV, himl, TVSIL_NORMAL);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return result;
+}
+
+BOOL TreeViewCTRL::InitTreeViewItems( LPTSTR Root, int Init_Mode )
+{
+	if (Root == nullptr)
+		return FALSE;
+
+	int C_Items = 0, count = 1, type = 0, level = 1;
+
+	HRESULT hr;
+	WIN32_FIND_DATA ffd;
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+
+	hr = TreeView_DeleteAllItems(this->hwndTV) ? S_OK : E_FAIL;
+	if (SUCCEEDED(hr))
+	{
+		// ROOT SUB
+		size_t buffer_len, fName_len;
+
+		hr = StringCbLength(Root, STRSAFE_MAX_CCH *sizeof(TCHAR), &buffer_len);
+		if (SUCCEEDED(hr))
+		{
+			if (Init_Mode != INIT_MODE)
+			{
+				if (this->Root_Folder != nullptr)
+				{
+					delete[] this->Root_Folder;
+					this->Root_Folder = nullptr;
+				}
+				this->Root_Folder = new TCHAR[buffer_len + sizeof(TCHAR)];
+
+				hr = (this->Root_Folder != nullptr) ? S_OK : E_OUTOFMEMORY;
+				if (SUCCEEDED(hr))
+				{
+					hr = StringCbCopy(this->Root_Folder, buffer_len + sizeof(TCHAR), Root);// Save root folder.
+					if (FAILED(hr))
+					{
+						return FALSE;
+					}
+				}
+			}
+			TCHAR* path_buffer = new TCHAR[buffer_len + 15];
+
+			hr = (path_buffer != nullptr) ? S_OK : E_OUTOFMEMORY;
+			if (SUCCEEDED(hr))
+			{
+				hr = StringCbPrintf(path_buffer, sizeof(TCHAR) * (buffer_len + 1), L"\\\\?\\%s\\*", Root);
+				if (SUCCEEDED(hr))
+				{
+					C_Items = this->CountItems(Root);
+					if (C_Items < 0)
+					{
+						if (C_Items == -1)
+						{
+							hr = E_FAIL;
+							MessageBox(this->TVFrame, L"Folder loading failed. Position tv-#006.", L"Internal error", MB_OK | MB_ICONERROR);
+						}
+						else
+						{
+							hr = E_UNEXPECTED;
+							MessageBox(this->TVFrame, L"Folder loading failed. Unknown error occured.\nPosition tv-#007.", L"Internal error", MB_OK | MB_ICONERROR);
+						}
+					}
+					else
+					{
+						LPHEADING items = new HEADING[C_Items + 1];
+
+						hr = (items == nullptr) ? E_OUTOFMEMORY : S_OK;
+						if (SUCCEEDED(hr))
+						{
+							items[0].Level = 0;
+							items[0].type = ROOT_DIR;
+							this->LeachRootName(Root, items[0].Heading);
+
+							if (this->Root_Name != nullptr)
+							{
+								delete [] this->Root_Name;
+								this->Root_Name = nullptr;
+							}
+							this->Root_Name = new TCHAR[MAX_HEADING_LEN];
+
+							hr = (this->Root_Name == nullptr) ? E_OUTOFMEMORY : S_OK;
+							if (SUCCEEDED(hr))
+							{
+								hr = StringCbCopy(this->Root_Name, sizeof(TCHAR) * MAX_HEADING_LEN, items[0].Heading);
+								if (SUCCEEDED(hr))
+								{
+									hFind = FindFirstFile(path_buffer, &ffd);
+
+									hr = (hFind == INVALID_HANDLE_VALUE) ? E_HANDLE : S_OK;
+									if (SUCCEEDED(hr))
+									{
+										while (ffd.cFileName[0] == '.')
+										{
+											if (FindNextFile(hFind, &ffd) == 0)
+											{
+												type = EMPTY_DIR;
+												break;
+											}
+										}
+
+										do// SUB
+										{
+											if (type == EMPTY_DIR)// root directory is empty...
+											{
+												type = 0;
+
+												// set empty child item
+												items[count].Level = level + 1;
+												items[count].type = A__EMPTYITEM;
+												StringCbCopy(items[count].Heading, sizeof(TCHAR)*MAX_HEADING_LEN, L"< . . . >\0");
+												count++;
+
+												break;
+											}
+											if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+											{
+												items[count].Level = level;
+												items[count].type = A__FOLDER;
+
+												hr = StringCbCopy(items[count].Heading, sizeof(TCHAR) * MAX_HEADING_LEN, ffd.cFileName);
+												if (SUCCEEDED(hr))
+												{
+													count++;
+
+													WIN32_FIND_DATA ffd_sub;
+													HANDLE hFind_sub = INVALID_HANDLE_VALUE;
+
+													hr = StringCbLength(ffd.cFileName, STRSAFE_MAX_CCH * sizeof(TCHAR), &fName_len);
+													if (SUCCEEDED(hr))
+													{
+														TCHAR* subitem1 = new TCHAR[(buffer_len + fName_len + 1)];
+
+														hr = (subitem1 == nullptr) ? E_OUTOFMEMORY : S_OK;
+														if (SUCCEEDED(hr))
+														{
+															hr = StringCbPrintf(subitem1, sizeof(TCHAR) * (buffer_len + fName_len + 1), L"\\\\?\\%s\\%s\\*", Root, ffd.cFileName);
+															if (SUCCEEDED(hr))
+															{
+																hFind_sub = FindFirstFile(subitem1, &ffd_sub);
+
+																hr = (hFind_sub == INVALID_HANDLE_VALUE) ? E_HANDLE : S_OK;
+																if (SUCCEEDED(hr))
+																{
+																	while (ffd_sub.cFileName[0] == '.')
+																	{
+																		if (FindNextFile(hFind_sub, &ffd_sub) == 0)
+																		{
+																			type = EMPTY_DIR;
+																			break;
+																		}
+																	}
+																	if (type != EMPTY_DIR)
+																	{
+																		// next level ....
+																		hr = this->InitNextLevelItems(hFind_sub, &ffd_sub, items, subitem1, type, level + 1, count);
+																	}
+																	else
+																	{
+																			type = 0;
+																			// set empty child item
+																			items[count].Level = level + 1;
+																			items[count].type = A__EMPTYITEM;
+																			StringCbCopy(items[count].Heading, sizeof(TCHAR)*MAX_HEADING_LEN, L"< . . . >\0");
+																			count++;
+																	}
+																	FindClose(hFind_sub);
+																}
+															}
+															delete[] subitem1;
+														}
+													}
+												}
+											}
+											else
+											{
+												items[count].Level = level;
+												items[count].type = A__FILE;
+												StringCbCopy(items[count].Heading, sizeof(TCHAR) * MAX_HEADING_LEN, ffd.cFileName);
+												count++;
+											}
+										} while (FindNextFile(hFind, &ffd) != 0);
+
+										FindClose(hFind);
+
+										LPHEADING a_items = new HEADING[count];
+
+										hr = (a_items != NULL) ? S_OK : E_OUTOFMEMORY;
+										if(SUCCEEDED(hr))
+										{
+											hr = this->Sequencing(a_items, items, count) ? S_OK : E_FAIL;
+											if (SUCCEEDED(hr))
+											{
+												HTREEITEM hti;
+
+												for (int k = 0; k < count; k++)
+												{
+													hti = this->AddItemToTree(this->hwndTV, a_items[k].Heading, a_items[k].Level, a_items[k].type);
+
+													if (!hti)
+													{
+														return FALSE;
+													}
+												}
+												TreeView_Expand(this->hwndTV, TreeView_GetRoot(this->hwndTV), TVE_EXPAND);
+												TreeView_SelectItem(this->hwndTV, TreeView_GetRoot(this->hwndTV));
+											}
+											delete a_items;
+										}													
+									}
+								}
+							}
+							delete items;
+						}
+					}								
+				}
+				delete[] path_buffer;
+			}
+		}
+	}
+	return SUCCEEDED(hr) ? TRUE : FALSE;
+}
+
+HRESULT TreeViewCTRL::InitNextLevelItems(HANDLE hFind_sub, LPWIN32_FIND_DATA ffd_sub, LPHEADING items, TCHAR* subitem, int type, int level, int& count)
+{
+	HRESULT hr = S_OK;
+	size_t buffer_len, fName_len;
+
+	do
+	{
+		if (ffd_sub->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			items[count].Level = level;
+			items[count].type = A__FOLDER;
+
+			hr = StringCbCopy(items[count].Heading, sizeof(TCHAR) * MAX_HEADING_LEN, ffd_sub->cFileName);
+			if (SUCCEEDED(hr))
+			{
+				count++;
+
+				WIN32_FIND_DATA ffd_sub_new;
+				HANDLE hFind_new = INVALID_HANDLE_VALUE;
+
+				hr = this->RemoveWildcard(subitem) ? S_OK : E_FAIL;
+				if (SUCCEEDED(hr))
+				{
+					hr = StringCbLength(subitem, STRSAFE_MAX_CCH * sizeof(TCHAR), &buffer_len);
+					if (SUCCEEDED(hr))
+					{
+						hr = StringCbLength(ffd_sub->cFileName, STRSAFE_MAX_CCH * sizeof(TCHAR), &fName_len);
+						if (SUCCEEDED(hr))
+						{
+							TCHAR* subitem_new = new TCHAR[(buffer_len + fName_len + 1)];
+
+							hr = (subitem_new == nullptr) ? E_OUTOFMEMORY : S_OK;
+							if (SUCCEEDED(hr))
+							{
+								hr = StringCbPrintf(subitem_new, sizeof(TCHAR) * (buffer_len + fName_len + 1),
+									L"%s\\%s\\*",
+									subitem,
+									ffd_sub->cFileName);
+								if (SUCCEEDED(hr))
+								{
+
+									hFind_new = FindFirstFile(subitem_new, &ffd_sub_new);
+
+									hr = (hFind_new == INVALID_HANDLE_VALUE) ? E_HANDLE : S_OK;
+									if (SUCCEEDED(hr))
+									{
+										while (ffd_sub_new.cFileName[0] == '.')
+										{
+											if (FindNextFile(hFind_new, &ffd_sub_new) == 0)
+											{
+												type = EMPTY_DIR;
+												break;
+											}
+										}
+										if (type != EMPTY_DIR)
+										{
+											// next level ....
+											hr = this->InitNextLevelItems(hFind_new, &ffd_sub_new, items, subitem_new, type, level + 1, count);
+										}
+										else
+										{
+											type = 0;
+											// Add empty item ...
+											items[count].Level = level + 1;
+											items[count].type = A__EMPTYITEM;
+											StringCbCopy(items[count].Heading, sizeof(TCHAR)*MAX_HEADING_LEN, L"< . . . >\0");
+											count++;
+										}
+										FindClose(hFind_new);
+									}
+								}
+								delete[] subitem_new;
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			items[count].Level = level;
+			items[count].type = A__FILE;
+
+			hr = StringCbCopy(items[count].Heading, sizeof(TCHAR) * MAX_HEADING_LEN, ffd_sub->cFileName);
+			count++;
+		}
+	} while (FindNextFile(hFind_sub, ffd_sub) != 0);
+
+	return hr;
+}
+
+int TreeViewCTRL::CountItems( LPTSTR Root_Dir )
+{
+	int items = 0;
+
+	if (Root_Dir == nullptr)
+		return -1;
+	else
+	{
+		HRESULT hr = S_OK;
+
+		int type = 0;
+
+		size_t buffer_len, fName_len;
+
+		WIN32_FIND_DATA ffd_count;
+		HANDLE hFind_c = INVALID_HANDLE_VALUE;
+
+		// ROOT - SUB0
+		hr = StringCbLength(Root_Dir, STRSAFE_MAX_CCH *sizeof(TCHAR), &buffer_len);
+		if (SUCCEEDED(hr))
+		{
+			TCHAR* path_buffer = new TCHAR[buffer_len + 15];
+
+			hr = (path_buffer == nullptr) ? E_OUTOFMEMORY : S_OK;
+			if (SUCCEEDED(hr))
+			{
+				hr = StringCbPrintf(path_buffer, sizeof(TCHAR) * (buffer_len + 15), L"\\\\?\\%s\\*", Root_Dir);
+				if (SUCCEEDED(hr))
+				{
+					hFind_c = FindFirstFile(path_buffer, &ffd_count);
+
+					hr = (hFind_c == INVALID_HANDLE_VALUE) ? E_HANDLE : S_OK;
+					if(SUCCEEDED(hr))					
+					{
+						while (ffd_count.cFileName[0] == '.')
+						{
+							if (FindNextFile(hFind_c, &ffd_count) == 0)
+							{
+								type = EMPTY_DIR;
+								break;
+							}
+						}
+						do// SUB
+						{
+							if (type == EMPTY_DIR)// Root is empty
+							{
+								type = 0;
+								items++;
+							}
+							if (ffd_count.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+							{
+								WIN32_FIND_DATA ffd_count_sub;
+								HANDLE hFind_sub = INVALID_HANDLE_VALUE;
+
+								hr = StringCbLength(path_buffer, STRSAFE_MAX_CCH *sizeof(TCHAR), &buffer_len);
+								if (SUCCEEDED(hr))
+								{
+									hr = StringCbLength(ffd_count.cFileName, STRSAFE_MAX_CCH *sizeof(TCHAR), &fName_len);
+									if (SUCCEEDED(hr))
+									{
+										TCHAR* subitem = new TCHAR[(buffer_len + fName_len)];
+
+										hr = (subitem == nullptr) ? E_OUTOFMEMORY : S_OK;
+										if (SUCCEEDED(hr))
+										{
+
+											hr = StringCbPrintf(subitem, sizeof(TCHAR) * (buffer_len + fName_len), L"\\\\?\\%s\\%s\\*", Root_Dir, ffd_count.cFileName);
+											if (SUCCEEDED(hr))
+											{
+												hFind_sub = FindFirstFile(subitem, &ffd_count_sub);
+												hr = (hFind_sub == INVALID_HANDLE_VALUE) ? E_HANDLE : S_OK;
+												if (SUCCEEDED(hr))
+												{
+													while (ffd_count_sub.cFileName[0] == '.')
+													{
+														if (FindNextFile(hFind_sub, &ffd_count_sub) == 0)
+														{
+															type = EMPTY_DIR;
+															break;
+														}
+													}
+													if (type != EMPTY_DIR)
+													{
+														// next level ...
+														hr = this->CountItemsNextLevel(hFind_sub, &ffd_count_sub, subitem, items);
+
+														//items++;
+													}
+													else
+													{
+														// count one for the empty item ...
+														items++;
+													}
+													FindClose(hFind_sub);
+												}
+											}
+											delete[] subitem;
+										}
+									}
+								}
+								items++;
+							}
+							else
+							{
+								items++;
+							}
+						} while (FindNextFile(hFind_c, &ffd_count) != 0);
+
+						FindClose(hFind_c);
+					}					
+				}
+				delete[] path_buffer;
+			}
+		}
+		if (FAILED(hr))
+			items = -1;
+	}	
+	return items;
+}
+
+HRESULT TreeViewCTRL::CountItemsNextLevel(HANDLE hFind_sub, LPWIN32_FIND_DATA ffd_count_sub, TCHAR* subitem, int &items)
+{
+	HRESULT hr = S_OK;
+	size_t buffer_len, fName_len;
+
+	do
+	{
+		if (ffd_count_sub->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			WIN32_FIND_DATA ffd_count_sub_new;
+			HANDLE hFind_sub_new = INVALID_HANDLE_VALUE;
+
+			hr = StringCbLength(subitem, STRSAFE_MAX_CCH *sizeof(TCHAR), &buffer_len);
+			if (SUCCEEDED(hr))
+			{
+				hr = StringCbLength(ffd_count_sub->cFileName, STRSAFE_MAX_CCH *sizeof(TCHAR), &fName_len);
+				if (SUCCEEDED(hr))
+				{
+					hr = this->RemoveWildcard(subitem) ? S_OK : E_FAIL;
+					if (SUCCEEDED(hr))
+					{
+						TCHAR* subitem_new = new TCHAR[(buffer_len + fName_len)];
+
+						hr = (subitem_new == nullptr) ? E_FAIL : S_OK;
+						if (SUCCEEDED(hr))
+						{
+							hr = StringCbPrintf(subitem_new, sizeof(TCHAR) * (buffer_len + fName_len),
+									L"%s\\%s\\*",
+									subitem,
+									ffd_count_sub->cFileName);
+							if (SUCCEEDED(hr))
+							{
+								hFind_sub_new = FindFirstFile(subitem_new, &ffd_count_sub_new);
+
+								hr = (hFind_sub_new == INVALID_HANDLE_VALUE) ? E_HANDLE : S_OK;
+								if (SUCCEEDED(hr))
+								{
+									int type = 0;
+
+									while (ffd_count_sub_new.cFileName[0] == '.')
+									{
+										if (FindNextFile(hFind_sub_new, &ffd_count_sub_new) == 0)
+										{
+											type = EMPTY_DIR;
+											break;
+										}
+									}
+									if (type != EMPTY_DIR)
+									{
+										// next level ...
+										hr = this->CountItemsNextLevel(hFind_sub_new, &ffd_count_sub_new, subitem_new, items);
+									}
+									else
+									{
+										// count one for the empty item ...
+										items++;
+									}
+									FindClose(hFind_sub_new);
+								}
+							}
+							delete[] subitem_new;
+						}
+					}
+				}
+			}
+			items++;
+		}
+		else
+		{
+			items++;
+		}
+	} while (FindNextFile(hFind_sub, ffd_count_sub) != 0);
+
+	return hr;
+}
+
+int TreeViewCTRL::CompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+{
+	int type1 = (int)lParam1;
+	int type2 = (int)lParam2;
+
+	////show_integer(type1, type2);
+
+	if ((type1 == CHILD__ITEM) || (type1 == CNC3__ITEM))
+	{
+		if ((type2 == CHILD__ITEM) || (type2 == CNC3__ITEM))
+		{
+			return 1;
+		}
+		else
+			return -1;
+	}
+	else
+		return 1;
+}
+
+HTREEITEM TreeViewCTRL::AddItemToTree( HWND TV, LPTSTR lpszItem, int nLevel, int type )
+{
+	TVITEM tvi;
+	TVINSERTSTRUCT tvins;
+	static HTREEITEM hPrev = reinterpret_cast< HTREEITEM >( TVI_FIRST );
+	HTREEITEM hti;
+
+	tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+	// Set the text of the item. 
+	tvi.pszText = lpszItem;
+	tvi.cchTextMax = sizeof( tvi.pszText ) / sizeof( tvi.pszText[ 0 ] );
+
+    // Assume the item is not a parent item, so give it a document image.
+	if( type == A__CNC3FILE )
+	{
+		tvi.iImage = this->ico_index[ 3 ];
+		tvi.iSelectedImage = this->ico_index[ 3 ];
+	}
+	else if (type == A__EMPTYITEM)
+	{
+		//show_integer(0, nLevel);
+
+		tvi.iImage = this->ico_index[4];
+		tvi.iSelectedImage = this->ico_index[4];
+	}
+	else
+	{
+		tvi.iImage = this->ico_index[ 0 ];
+		tvi.iSelectedImage = this->ico_index[ 0 ];
+	}
+
+	// Handle parent items without child items.
+	if( ( type == EMPTY_DIR ) || ( type == ROOT_DIR ) )
+	{
+		tvi.iImage = this->ico_index[ 1 ];
+		tvi.iSelectedImage = this->ico_index[ 1 ];
+	}
+
+	// Save the heading level in the item's application-defined data area. 
+	tvi.lParam = (LPARAM)nLevel;
+	tvins.item = tvi;
+	tvins.hInsertAfter = hPrev;
+
+	// Set the parent item based on the specified level.
+	tvins.hParent = this->_dynamic_level_provider_(DYNAMICMODE_GETPARENTITEMFROMLEVEL, nLevel, hPrev);
+
+	// Add the item to the tree-view control.
+	hPrev = reinterpret_cast< HTREEITEM >( SendMessage(	TV,
+														TVM_INSERTITEM,
+														static_cast< WPARAM >( 0 ),
+														reinterpret_cast< LPARAM >( &tvins ) ) );
+	if( hPrev == NULL )
+		return NULL;
+
+    // Save the handle to the item.
+	this->_dynamic_level_provider_(DYNAMICMODE_SAVEITEMHANDLE, nLevel, hPrev);
+
+	// The new item is a child item. Give the parent item a closed folder bitmap to indicate it now has child items.
+	if( ( nLevel > 0 ) )
+	{
+		hti = TreeView_GetParent( TV, hPrev);
+		tvi.mask = TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+		tvi.hItem = hti;
+		tvi.iImage = this->ico_index[ 1 ];
+		tvi.iSelectedImage = this->ico_index[ 1 ];
+		TreeView_SetItem( TV, &tvi );
+	}
+	return hPrev;
+}
+
+HTREEITEM TreeViewCTRL::_dynamic_level_provider_(DWORD Mode, int nLevel, HTREEITEM hPrev)
+{
+	__try
+	{
+		if (Mode == DYNAMICMODE_GETPARENTITEMFROMLEVEL)
+		{
+			// return parent item ...
+
+			if (nLevel == 0)
+			{
+				return TVI_ROOT;
+			}
+			else if (nLevel == 1)
+			{
+				return this->DynamicLevel.dynamic_array->hPrev;
+			}
+			else
+			{
+				return this->DynamicLevel.dynamic_array[nLevel - 1].hPrev;
+			}
+		}
+		else if (Mode == DYNAMICMODE_SAVEITEMHANDLE)
+		{
+			if (nLevel == this->DynamicLevel.nCount)
+			{
+				// exceed array and save item ... !
+
+				if (this->DynamicLevel.nCount == 0)
+				{
+					this->DynamicLevel.dynamic_array = new HPREVITEM;
+					
+					if (this->DynamicLevel.dynamic_array != NULL)
+					{
+						this->DynamicLevel.dynamic_array->hPrev = hPrev;
+						this->DynamicLevel.nCount = 1;
+					}
+					else
+						return NULL;
+				}
+				else if (this->DynamicLevel.nCount == 1)
+				{
+					HPREVITEM item;
+					item.hPrev = this->DynamicLevel.dynamic_array->hPrev;
+
+					SafeDelete((void**)&this->DynamicLevel.dynamic_array);
+
+					this->DynamicLevel.dynamic_array = new HPREVITEM[2];
+
+					if (this->DynamicLevel.dynamic_array != NULL)
+					{
+						this->DynamicLevel.dynamic_array[0].hPrev = item.hPrev;
+						this->DynamicLevel.dynamic_array[1].hPrev = hPrev;
+						this->DynamicLevel.nCount = 2;
+					}
+					else
+						return NULL;
+				}
+				else if (this->DynamicLevel.nCount > 1)
+				{
+					LPHPREVITEM Pitem = new HPREVITEM[this->DynamicLevel.nCount];
+
+					if (Pitem != NULL)
+					{
+						for (int i = 0; i < this->DynamicLevel.nCount; i++)
+						{
+							Pitem[i].hPrev = this->DynamicLevel.dynamic_array[i].hPrev;
+						}
+						SafeDelete((void**)&this->DynamicLevel.dynamic_array);
+
+						this->DynamicLevel.nCount++;
+
+						this->DynamicLevel.dynamic_array = new HPREVITEM[this->DynamicLevel.nCount];
+
+						if (this->DynamicLevel.dynamic_array != NULL)
+						{
+							for (int i = 0; i < (this->DynamicLevel.nCount - 1); i++)
+							{
+								this->DynamicLevel.dynamic_array[i].hPrev = Pitem[i].hPrev;
+							}
+							this->DynamicLevel.dynamic_array[this->DynamicLevel.nCount - 1].hPrev = hPrev;
+						}
+						else
+							return NULL;
+
+						delete[] Pitem;
+					}
+					else
+						return NULL;
+				}
+				else
+					return NULL;
+			}
+			else
+			{
+				// save item ... !
+
+				if (this->DynamicLevel.nCount <= 1)
+				{
+					this->DynamicLevel.dynamic_array->hPrev = hPrev;
+				}
+				else
+				{
+					this->DynamicLevel.dynamic_array[nLevel].hPrev = hPrev;
+				}
+			}
+
+		}
+	}
+	__except (GetExceptionCode() == EXCEPTION_ARRAY_BOUNDS_EXCEEDED ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+	{
+		return NULL;
+	}
+	return NULL;
+}
+
+void TreeViewCTRL::DisplayErrorBox(LPTSTR lpszFunction) 
+{ 
+    // Retrieve the system error message for the last-error code
+    LPVOID lpMsgBuf;
+    LPVOID lpDisplayBuf;
+    DWORD dw = GetLastError(); 
+
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL );
+
+    // Display the error message and clean up
+    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
+        (lstrlen((LPCTSTR)lpMsgBuf)+lstrlen((LPCTSTR)lpszFunction)+40)*sizeof(TCHAR)); 
+    StringCchPrintf((LPTSTR)lpDisplayBuf, 
+        LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+        TEXT("%s failed with error %d: %s"), 
+        lpszFunction, dw, lpMsgBuf); 
+    MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK); 
+
+    LocalFree(lpMsgBuf);
+    LocalFree(lpDisplayBuf);
+}
+
+BOOL TreeViewCTRL::OnTreeViewNotify( LPARAM lParam )
+{
+	if( ((LPNMHDR)lParam)->idFrom == ID_FILENAVIGATOR )
+	{
+		switch(((LPNMHDR)lParam)->code)
+		{
+			case NM_DBLCLK:
+				return this->OnDblClick();
+			case NM_RCLICK:
+				return this->OnRgtClick();
+			case TVN_SELCHANGED:
+				return this->OnSelchanged(reinterpret_cast<LPNMTREEVIEW>(lParam));
+			case TVN_ITEMEXPANDED:
+				return this->OnItemExpanded(reinterpret_cast<LPNMTREEVIEW>(lParam));
+			case TVN_ITEMEXPANDING:
+				return this->OnItemExpanding(reinterpret_cast<LPNMTREEVIEW>(lParam));
+			default:
+				break;
+		}
+	}
+	return FALSE;
+}
+
+void TreeViewCTRL::PerformFileOperation(int mode)
+{
+	switch (mode)
+	{
+	case FOP_COPY:
+		this->PrepareForCopyOperation();
+		break;
+	case FOP_DELETE:
+		this->_executeDeleteOP();
+		break;
+	case FOP_MOVE:
+		break;
+	case FOP_RENAME:
+		break;
+	case FOP_NEWFILE:
+		break;
+	case FOP_NEWFOLDER:
+		break;
+	case FOP_INSERT:
+		this->_executeCopyOP();
+		break;
+	default:
+		break;
+	}
+}
+
+BOOL TreeViewCTRL::SaveRoot( void )
+{
+	BOOL result = TRUE;
+	size_t path_len, buffer_len, len;
+
+	if( (this->Working_Dir == NULL ) || ( this->Root_Folder == NULL ) || ( this->Root_Name == NULL ) )
+	{
+		return FALSE;
+	}
+
+	StringCbLength( this->Working_Dir, sizeof( TCHAR ) *STRSAFE_MAX_CCH, &path_len );
+
+	StringCbLength( this->Root_Folder, sizeof( TCHAR ) *STRSAFE_MAX_CCH, &buffer_len );
+	StringCbLength( this->Root_Name, sizeof( TCHAR ) *STRSAFE_MAX_CCH, &len );
+
+	TCHAR* path = new TCHAR[ ( path_len + ( 20 * sizeof( TCHAR ))) ];
+	TCHAR* save_buffer = new TCHAR[ (( buffer_len + len ) + ( 3* sizeof( TCHAR ))) ];
+
+	if( ( path == NULL ) || ( save_buffer == NULL ) )
+	{
+		return FALSE;
+	}
+	StringCbPrintf( path, sizeof( TCHAR ) *2048, L"%s\\CnC Suite\\AppData\\navroot.sys", this->Working_Dir );
+	StringCbPrintf( save_buffer, sizeof( TCHAR ) *4096, L"%s||%s||", this->Root_Folder, this->Root_Name );
+
+	HANDLE hFile = CreateFile( path, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+	if( hFile == INVALID_HANDLE_VALUE )
+	{
+		result = FALSE;
+		goto CleanUp2;
+	}
+	DWORD bytesWritten = 0;
+
+	StringCbLength( save_buffer, sizeof( TCHAR ) * STRSAFE_MAX_CCH, &len );
+
+	if( !WriteFile( hFile, save_buffer, len, &bytesWritten, NULL ) )
+	{
+		result = FALSE;
+		goto CleanUp;
+	}
+	if( bytesWritten == 0 )
+	{
+		result = FALSE;
+		goto CleanUp;
+	}
+CleanUp:
+	CloseHandle( hFile );
+CleanUp2:
+	delete [] save_buffer;
+	delete [] path;
+
+	return result;
+}
+
+BOOL TreeViewCTRL::LoadRoot( void )
+{
+	BOOL result = TRUE;
+	LARGE_INTEGER lg;
+	size_t path_len;
+	TCHAR* buffer = NULL;
+	DWORD bytesRead;
+
+	StringCbLength( this->Working_Dir, sizeof( TCHAR ) *STRSAFE_MAX_CCH, &path_len );
+
+	TCHAR* path = new TCHAR[ ( path_len + ( 20 * sizeof( TCHAR ))) ];
+	if( path == NULL )
+	{
+		return FALSE;
+	}
+	StringCbPrintf( path, sizeof( TCHAR ) *2048, L"%s\\CnC Suite\\AppData\\navroot.sys", this->Working_Dir );
+
+	HANDLE hFile = CreateFile( path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+	if( hFile == INVALID_HANDLE_VALUE )
+	{
+		result = FALSE;
+		goto Cleanup3;
+	}
+	if( !GetFileSizeEx( hFile, &lg ) )
+	{
+		result = FALSE;
+		goto Cleanup2;
+	}
+	buffer = new TCHAR[ ( lg.LowPart / sizeof( TCHAR )) + sizeof( TCHAR ) ];
+	if( buffer == NULL )
+	{
+		result = FALSE;
+		goto Cleanup2;
+	}
+	if( !ReadFile( hFile, buffer, lg.LowPart, &bytesRead, NULL ) )
+	{
+		result = FALSE;
+		goto Cleanup1;
+	}
+	if( bytesRead == 0 )
+	{
+		result = FALSE;
+		goto Cleanup1;
+	}
+
+	int i = 0, j = 0, z = 0;
+
+	while( buffer[ z ] != '|' )
+	{
+		i++;
+		z++;
+	}
+	z+=2;
+
+	while( buffer[ z ] != '|' )
+	{
+		j++;
+		z++;
+	}
+	this->Root_Folder = new TCHAR[ i + 1 ];
+	this->Root_Name = new TCHAR[ j + 1 ];
+	z = 0;
+	j = 0;
+	while( buffer[ z ] != '|' )
+	{
+		this->Root_Folder[ z ] = buffer[ z ];
+		z++;
+	}
+	this->Root_Folder[ z ] = '\0';
+	z+=2;
+	
+	while( buffer[ z ] != '|' )
+	{
+		this->Root_Name[ j ] = buffer[ z ];
+		j++;
+		z++;
+	}
+	this->Root_Name[ j ] = '\0';
+Cleanup1:
+	delete [] buffer;
+Cleanup2:
+	CloseHandle( hFile );
+Cleanup3:
+	delete [] path;
+
+	return result;
+}
+
+HRESULT TreeViewCTRL::GenerateRoot()
+{
+	HRESULT hr;
+	size_t len;
+
+	hr = StringCbLength(this->Working_Dir, sizeof(TCHAR)*STRSAFE_MAX_CCH, &len);
+	if (SUCCEEDED(hr))
+	{
+		len += sizeof(TCHAR);
+
+		this->Root_Folder = new TCHAR[len];
+		hr = (this->Root_Folder != nullptr) ? S_OK : E_FAIL;
+		if (SUCCEEDED(hr))
+		{
+			hr = StringCbCopy(this->Root_Folder, len, this->Working_Dir);
+		}
+	}
+	return hr;
+}
+
+void TreeViewCTRL::LeachRootName( LPTSTR path, LPTSTR name )
+{
+	if( path == NULL )
+		goto Fail1;
+	if( name == NULL )
+		goto Fail2;
+
+	int i = 0;
+
+	while( path[ i ] != '\0' )
+	{
+		i++;
+	}
+	while( path[ i ] != '\\' )
+	{
+		i--;
+		if( i == -1 )
+			break;
+	}
+	if( i == -1 )
+		goto Fail3;
+	i++;
+
+	int j = 0;
+
+	while( path[ i ] != '\0' )
+	{
+		name[ j ] = path[ i ];
+		i++;
+		j++;
+		if( j == MAX_HEADING_LEN )
+			break;
+	}
+	if( j == MAX_HEADING_LEN )
+		goto Fail4;
+	else
+		name[ j ] = '\0';
+	return;
+Fail1:
+	StringCbCopy( name, sizeof( TCHAR ) * MAX_HEADING_LEN, L"Fail: Invalid path buffer" );
+	return;
+Fail2:
+	StringCbCopy( name, sizeof( TCHAR ) * MAX_HEADING_LEN, L"Fail: Invalid name buffer" );
+	return;
+Fail3:
+	StringCbCopy( name, sizeof( TCHAR ) * MAX_HEADING_LEN, L"Fail: Counter fall below buffer" );
+	return;
+Fail4:
+	StringCbCopy( name, sizeof( TCHAR ) * MAX_HEADING_LEN, L"Fail: Max Heading length exeeded" );
+	return;
+}
+
+BOOL TreeViewCTRL::CompareHeading( LPTSTR Heading, LPTSTR sample )
+{
+	if( ( Heading == NULL ) || ( sample == NULL ) )
+	{
+		return FALSE;
+	}
+	__try
+	{
+		int i = 0;
+
+		while( i <= MAX_HEADING_LEN )
+		{
+			if( Heading[ i ] != sample[ i ] )
+			{
+				return FALSE;
+			}
+			else if( ( Heading[ i ] == L'\0' ) && ( sample[ i ] == L'\0' ) )
+			{
+				break;
+			}
+			i++;
+
+			if( i == MAX_HEADING_LEN )
+			{
+				return FALSE;
+			}
+		}
+	}
+	__except( GetExceptionCode( ) == EXCEPTION_ARRAY_BOUNDS_EXCEEDED ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH )
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
+int TreeViewCTRL::CheckItemType( HTREEITEM item )
+{
+	TVITEM tvi;
+	tvi.hItem = item;
+	tvi.mask = TVIF_CHILDREN | TVIF_HANDLE | TVIF_IMAGE;
+
+	if( !TreeView_GetItem( this->hwndTV, &tvi ) )
+	{
+		return -1;
+	}
+
+	if( ( tvi.cChildren == 0 ) && ( ( tvi.iImage == 0 ) || ( tvi.iImage == 3 ) || (tvi.iImage == 4)) )
+	{
+		if( tvi.iImage == 3 )
+		{
+			return CNC3__ITEM;
+		}
+		else if (tvi.iImage == 4)
+		{
+			return EMPTY__ITEM;
+		}
+		else
+		{
+			return CHILD__ITEM;
+		}
+	}
+	else
+	{
+		return PARENT__ITEM;
+	}
+}
+
+int TreeViewCTRL::GetSelectedItemPath( TCHAR** Ipath )
+{
+	int type = -1;
+	HRESULT hr;
+	HTREEITEM selection = TreeView_GetSelection(this->hwndTV);
+
+	hr = (selection) ? S_OK : E_FAIL;
+	if (SUCCEEDED(hr))
+	{
+		type = this->CheckItemType(selection);
+
+		hr = (type != -1) ? S_OK : E_FAIL;
+		if (SUCCEEDED(hr))
+		{
+			TCHAR* buffer = new TCHAR[MAX_HEADING_LEN];
+
+			hr = (buffer == NULL) ? E_OUTOFMEMORY : S_OK;
+			if (SUCCEEDED(hr))
+			{
+				TCHAR* root = new TCHAR[MAX_HEADING_LEN];
+
+				hr = (root == NULL) ? E_OUTOFMEMORY : S_OK;
+				if (SUCCEEDED(hr))
+				{
+					TCHAR* path = new TCHAR[(size_t)MAX_FILEPATH_LEN];
+
+					hr = (path == NULL) ? E_OUTOFMEMORY : S_OK;
+					if (SUCCEEDED(hr))
+					{
+						hr = StringCbCopy(path, MAX_FILEPATH_LEN, this->Root_Folder);
+						if (SUCCEEDED(hr))
+						{
+							TVITEM tv;
+							tv.hItem = TreeView_GetRoot(this->hwndTV);
+							tv.mask = TVIF_TEXT | TVIF_HANDLE | TVIF_IMAGE;
+							tv.cchTextMax = sizeof(TCHAR) * MAX_HEADING_LEN;
+							tv.pszText = root;
+
+							hr = TreeView_GetItem(this->hwndTV, &tv) ? S_OK : E_FAIL;
+							if (SUCCEEDED(hr))
+							{
+								HTREEITEM item = selection;
+
+								hr = (item) ? S_OK : E_FAIL;
+								if (SUCCEEDED(hr))
+								{
+									int ItemCount = 1;
+
+									while ((item = TreeView_GetParent(this->hwndTV, item)) != NULL)
+									{
+										// count the levels ...
+										ItemCount++;
+									}
+									HTREEITEM* cItems = new HTREEITEM[ItemCount];
+
+									hr = (cItems == NULL) ? E_OUTOFMEMORY : S_OK;
+									if (SUCCEEDED(hr))
+									{
+										cItems[0] = selection;
+
+										ItemCount = 1;
+
+										while ((cItems[ItemCount] = TreeView_GetParent(this->hwndTV, cItems[ItemCount - 1])) != NULL)
+										{
+											// fill the array ...
+											ItemCount++;
+										}
+										ItemCount--;
+
+										for (int j = ItemCount; j >= 0; j--)
+										{
+											// build the path ...
+											tv.hItem = cItems[j];
+											tv.pszText = buffer;
+
+											hr = TreeView_GetItem(this->hwndTV, &tv) ? S_OK : E_FAIL;
+											if (FAILED(hr))break;
+
+											if (this->CompareHeading(root, buffer) && (j == ItemCount))
+											{
+												continue;
+											}
+											hr = StringCbCat(path, MAX_FILEPATH_LEN, L"\\");
+											if (FAILED(hr))break;
+
+											hr = StringCbCat(path, MAX_FILEPATH_LEN, buffer);
+											if (FAILED(hr))break;
+										}
+										if (SUCCEEDED(hr))
+										{
+											if (type == CNC3__ITEM)
+											{
+												hr = StringCbCat(path, MAX_FILEPATH_LEN, L".cnc3\0");
+											}
+											if (SUCCEEDED(hr))
+											{
+												size_t buffer_len;
+
+												hr = StringCbLength(path, MAX_FILEPATH_LEN, &buffer_len);
+												if (SUCCEEDED(hr))
+												{
+													buffer_len += (size_t)(sizeof(TCHAR) * 100);
+
+													(*Ipath) = new TCHAR[buffer_len];
+
+													hr = ((*Ipath) == NULL) ? E_OUTOFMEMORY : S_OK;
+													if (SUCCEEDED(hr))
+													{
+														hr = StringCbCopy((*Ipath), buffer_len, path);
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						delete[] path;
+					}
+					delete[] root;
+				}
+				delete[] buffer;
+			}
+		}
+	}
+	if (FAILED(hr))
+		type = -2;
+
+	return type;
+}
+
+BOOL TreeViewCTRL::InsertNewFile( LPTSTR Filename/*IN*/, LPTSTR new_path/*OUT [ 4096 ]*/ )
+{
+	// don't use a dialog, insert the file an then edit it, when complete, create the file !!!!!!!!!!!!!!!!!!!!!!
+
+	int Level;
+	BOOL result = TRUE;
+	TVITEM tvi, tv_cur;
+	TVINSERTSTRUCT tvins;
+	TCHAR* Currentpath = NULL;
+
+	tv_cur.mask = TVIF_PARAM | TVIF_HANDLE | TVIF_IMAGE;
+	tv_cur.hItem = TreeView_GetSelection( this->hwndTV );
+
+	TreeView_GetItem( this->hwndTV, &tv_cur );
+
+	int type = this->GetSelectedItemPath( &Currentpath );// delete currentpath !!!!!!!!!!!!!!!!!!!!!
+
+	if( ( type == CHILD__ITEM ) || ( type == CNC3__ITEM ) || (type == EMPTY__ITEM) )
+	{
+		Level = static_cast< int >( tv_cur.lParam );
+		tvins.hParent = TreeView_GetParent( this->hwndTV, tv_cur.hItem );
+		// eliminate childname....
+		int i = 0;
+		while( Currentpath[ i ] != L'\0' )
+		{	i++;	}
+		while( Currentpath[ i ] != L'\\' )
+		{
+			Currentpath[ i ] = L'\0';
+			i--;
+		}
+		StringCbPrintf( new_path, sizeof( TCHAR ) * 4096, L"%s%s.cnc3", Currentpath, Filename );
+	}
+	else if( type == PARENT__ITEM )
+	{
+		Level = static_cast< int >( tv_cur.lParam ) + 1;
+		tvins.hParent = tv_cur.hItem;
+		StringCbPrintf( new_path, sizeof( TCHAR ) * 4096, L"%s\\%s.cnc3", Currentpath, Filename );
+	}
+	else
+	{
+		result = FALSE;
+		goto End;
+	}
+
+	HTREEITEM hPrev;
+
+	tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+	tvi.pszText = Filename;
+	tvi.cchTextMax = sizeof( tvi.pszText ) / sizeof( tvi.pszText[ 0 ] );
+	tvi.iImage = this->ico_index[ 3 ];
+	tvi.iSelectedImage = this->ico_index[ 3 ];
+	tvi.lParam = Level;
+	tvins.item = tvi;
+	tvins.hInsertAfter = TVI_LAST;
+
+	HANDLE hFile = CreateFile( new_path, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL );
+	if( hFile == INVALID_HANDLE_VALUE )
+	{
+		if( GetLastError() == ERROR_FILE_EXISTS )
+		{
+			if( this->language_ == GERMAN )
+				MessageBox( this->TVFrame, L"Datei existiert bereits !", L"Neues Programm", MB_OK | MB_ICONERROR );
+			else if( this->language_ == ENGLISH )
+				MessageBox( this->TVFrame, L"File already exists !", L"Create File", MB_OK | MB_ICONERROR );
+		}
+		else if( GetLastError() == ERROR_ACCESS_DENIED )
+		{
+			if( this->language_ == GERMAN )
+				MessageBox( this->TVFrame, L"Zugriff verwehrt !", L"Neues Programm", MB_OK | MB_ICONERROR );
+			else if( this->language_ == ENGLISH )
+				MessageBox( this->TVFrame, L"Access denied !", L"Create File", MB_OK | MB_ICONERROR );
+		}
+		else
+			MessageBox( this->TVFrame, L"File creation error !", L"Create File", MB_OK | MB_ICONERROR );
+
+		result = FALSE;
+		goto End;
+	}
+	else
+	{
+		CloseHandle( hFile );
+
+		hPrev = reinterpret_cast< HTREEITEM >( SendMessage(	hwndTV,
+															TVM_INSERTITEM,
+															static_cast< WPARAM >( 0 ),
+															reinterpret_cast< LPARAM >( ( LPTVINSERTSTRUCT )&tvins ) ) );
+		if( hPrev == NULL )
+		{
+			result = FALSE;
+			goto End;
+		}
+	}
+
+	if( type == PARENT__ITEM )
+		TreeView_Expand( this->hwndTV, tv_cur.hItem, TVE_EXPAND );
+End:
+	delete Currentpath;
+
+	return result;;
+}
+
+BOOL TreeViewCTRL::InsertNewFolder( LPTSTR Foldername/*IN*/, LPTSTR new_path/*OUT [ 4096 ]*/ )
+{
+	int Level;
+	BOOL result = TRUE;
+	TVITEM tvi, tv_cur;
+	TVINSERTSTRUCT tvins;
+	TCHAR* Currentpath = NULL;
+
+	tv_cur.mask = TVIF_PARAM | TVIF_HANDLE | TVIF_IMAGE;
+	tv_cur.hItem = TreeView_GetSelection( this->hwndTV );
+
+	//if( tv_cur.hItem == NULL )
+		//tv_cur.hItem = TreeView_GetRoot( this->hwndTV );
+
+	TreeView_GetItem( this->hwndTV, &tv_cur );
+
+	if( ( static_cast< int >( tv_cur.lParam ) == 11 ) && ( tv_cur.iImage == 1 ) )
+	{
+		if( this->language_ == ENGLISH )
+		{
+			MessageBox( this->TVFrame, L"Not possible >> The maximum of levels is reached.", L"Level overrun", MB_OK | MB_ICONINFORMATION );
+		}
+		else if( this->language_ ==	GERMAN )
+		{
+			MessageBox( this->TVFrame, L"Nicht möglich >> Die maximale Levelanzahl ist erreicht.", L"Level überschritten", MB_OK | MB_ICONINFORMATION );
+		}
+		result = FALSE;
+		goto End;
+	}
+	int type = this->GetSelectedItemPath(&Currentpath);// delete currentpath !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	if( ( type == CHILD__ITEM ) || ( type == CNC3__ITEM ) )
+	{
+		Level = static_cast< int >( tv_cur.lParam );
+		tvins.hParent = TreeView_GetParent( this->hwndTV, tv_cur.hItem );
+		// eliminate childname....
+		int i = 0;
+		while( Currentpath[ i ] != '\0' )
+		{	i++;	}
+		while( Currentpath[ i ] != '\\' )
+		{
+			Currentpath[ i ] = '\0';
+			i--;
+		}
+		StringCbPrintf( new_path, sizeof( TCHAR ) * 4096, L"%s%s", Currentpath, Foldername );
+	}
+	else if( type == PARENT__ITEM )
+	{
+		Level = static_cast< int >( tv_cur.lParam ) + 1;
+		if( Level > 11 )
+			Level = 11;
+		tvins.hParent = tv_cur.hItem;
+		StringCbPrintf( new_path, sizeof( TCHAR ) * 4096, L"%s\\%s", Currentpath, Foldername );
+	}
+	else
+	{
+		// no selection ??????
+		result = FALSE;
+		goto End;
+	}
+	HTREEITEM hPrev;
+
+	tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+	tvi.pszText = Foldername;
+	tvi.cchTextMax = sizeof( tvi.pszText ) / sizeof( tvi.pszText[ 0 ] );
+	tvi.iImage = this->ico_index[ 1 ];
+	tvi.iSelectedImage = this->ico_index[ 1 ];
+	tvi.lParam = Level;
+	tvins.item = tvi;
+	tvins.hInsertAfter = TVI_FIRST;
+
+	if( !CreateDirectory( new_path, NULL ) )
+	{
+		if( GetLastError() == ERROR_ALREADY_EXISTS )
+		{
+			if( this->language_ == ENGLISH )
+				MessageBox( this->TVFrame, L"Directory already exists !", L"Create Directory", MB_OK | MB_ICONERROR );
+			else if( this->language_ == GERMAN )
+				MessageBox( this->TVFrame, L"Projektordner schon vorhanden !", L"Neues Projekt", MB_OK | MB_ICONERROR );
+		}
+		else if( GetLastError() == ERROR_PATH_NOT_FOUND )
+		{
+			MessageBox( this->TVFrame, L"Internal error #48956783\nPath not found !", L"Create Directory", MB_OK | MB_ICONERROR );
+		}
+		result = FALSE;
+		goto End;
+	}
+	else
+	{
+		hPrev = reinterpret_cast< HTREEITEM >( SendMessage(	hwndTV,
+															TVM_INSERTITEM,
+															static_cast< WPARAM >( 0 ),
+															reinterpret_cast< LPARAM >( ( LPTVINSERTSTRUCT )&tvins ) ) );
+		if( hPrev == NULL )
+		{
+			result = FALSE;
+			goto End;
+		}
+	}
+	if( type == PARENT__ITEM )
+		TreeView_Expand( this->hwndTV, tv_cur.hItem, TVE_EXPAND );
+End:
+	delete [] Currentpath;
+
+	return result;
+}
+
+BOOL TreeViewCTRL::Delete_FFObject( void )
+{
+	int type;
+	BOOL result = TRUE;
+	TCHAR* Itempath = NULL;
+	TCHAR* name = new TCHAR[ 1024 ];
+
+	if( ( Itempath == NULL ) || ( name == NULL ) )
+		return FALSE;
+
+	TVITEM tvi;
+	tvi.hItem = TreeView_GetSelection( this->hwndTV );
+	tvi.mask = TVIF_TEXT;
+	tvi.cchTextMax = sizeof( TCHAR ) * 1024;
+	tvi.pszText = name;
+
+	TreeView_GetItem( this->hwndTV, &tvi );
+
+	HTREEITEM par = TreeView_GetParent( this->hwndTV, tvi.hItem );
+
+	int res = 0;
+
+	if( this->language_ == GERMAN )
+	{
+		StringCbCat( name, sizeof( TCHAR ) * 1024, L" wirklich löschen ??" );
+		res = MessageBox( this->TVFrame, name, L"Datei löschen", MB_OKCANCEL | MB_ICONQUESTION );
+	}
+	else if( this->language_ == ENGLISH )
+	{
+		StringCbCat( name, sizeof( TCHAR ) * 1024, L" will be deleted, proceed ??" );
+		res = MessageBox( this->TVFrame, name, L"Delete file", MB_OKCANCEL | MB_ICONQUESTION );
+	}
+
+	if( res == IDCANCEL )
+	{
+		result = res;
+		goto End;
+	}
+	type = this->GetSelectedItemPath(&Itempath);// delete itempath !!!!!!!!!!!!!!!!!!!!!
+
+	if( type == CNC3__ITEM )
+	{
+		StringCbCat( Itempath, sizeof( TCHAR ) * 4096, L".cnc3\0" );
+	}
+	if( ( type == CHILD__ITEM ) || ( type == CNC3__ITEM ) )
+	{
+		if( !DeleteFileW( Itempath ) )
+		{
+			if( this->language_ == GERMAN )
+			{
+				MessageBox( this->TVFrame, L"Fehler beim löschen der Datei !", L"Datei entfernen", MB_OK | MB_ICONERROR );
+			}
+			if( this->language_ == ENGLISH )
+			{
+				MessageBox( this->TVFrame, L"File deleting error !", L"Remove file", MB_OK | MB_ICONERROR );
+			}
+			result = FALSE;
+			goto End;
+		}
+		else
+		{
+			if( !TreeView_DeleteItem( this->hwndTV, TreeView_GetSelection( this->hwndTV ) ) )
+			{
+				result = FALSE;
+				goto End;
+			}
+			else
+			{
+				if( NULL == TreeView_GetChild( this->hwndTV, par ) )
+				{
+					TVITEM htvi;
+					htvi.mask = TVIF_HANDLE | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+					htvi.hItem = par;
+					htvi.iImage = this->ico_index[ 1 ];
+					htvi.iSelectedImage = this->ico_index[ 1 ];
+					TreeView_SetItem( this->hwndTV, &htvi );
+				}
+			}
+		}
+	}
+	else if( type == PARENT__ITEM )
+	{
+		if( TreeView_GetChild( this->hwndTV, TreeView_GetSelection( this->hwndTV ) ) == NULL )
+		{
+			if( !RemoveDirectory( Itempath ) )
+			{
+				result = FALSE;
+				goto End;
+			}
+			else
+			{
+				if( !TreeView_DeleteItem( this->hwndTV, TreeView_GetSelection( this->hwndTV ) ) )
+				{
+					result = FALSE;
+					goto End;
+				}
+				else
+				{
+					if( NULL == TreeView_GetChild( this->hwndTV, par ) )
+					{
+						TVITEM htvi;
+						htvi.mask = TVIF_HANDLE | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+						htvi.hItem = par;
+						htvi.iImage = this->ico_index[ 1 ];
+						htvi.iSelectedImage = this->ico_index[ 1 ];
+						TreeView_SetItem( this->hwndTV, &htvi );
+					}
+				}
+			}
+		}
+		else// maybe include the function to delete subfiles- and directories !!!
+		{
+			if( this->language_ == GERMAN )
+			{
+				MessageBox( this->TVFrame, L"Dieser Ordner enthält Dateien oder Unterordner.\nNur leere Ordner können gelöscht werden.", L"Ordner entfernen", MB_OK | MB_ICONINFORMATION );
+			}
+			else
+			{
+				MessageBox( this->TVFrame, L"This folder contains files or subdirectories.\nOnly empty folders could be deleted.", L"Remove folder", MB_OK | MB_ICONINFORMATION );
+			}
+		}
+	}
+End:
+	delete Itempath;
+	delete name;
+
+	return result;
+}
+
+BOOL TreeViewCTRL::Sequencing( LPHEADING newItems, LPHEADING oldItems, int NUMitems )
+{
+    if( ( newItems == NULL ) || ( oldItems == NULL ) || ( NUMitems <= 0 ) )
+    {
+        return FALSE;
+    }
+    int i = 1;
+    int j = 1;
+	int holding = 1;
+
+    BOOL ffMode = TRUE;
+    /////////////Copy the Root Item >>
+    newItems[ 0 ].Level    = oldItems[ 0 ].Level;
+    newItems[ 0 ].type    = oldItems[ 0 ].type;
+    HRESULT hr = StringCbCopy( newItems[ 0 ].Heading, sizeof( TCHAR ) * MAX_HEADING_LEN, oldItems[ 0 ].Heading );
+    if( FAILED( hr ))
+        return FALSE;
+    /////////////Start sequencing >>
+    while( holding )
+    {
+        if( ffMode )//Process folders >>
+        {
+            if( oldItems[ i ].type == A__FOLDER )
+            {
+                newItems[ j ].Level    = oldItems[ i ].Level;
+                newItems[ j ].type    = oldItems[ i ].type;
+
+                hr = StringCbCopy( newItems[ j ].Heading, sizeof( TCHAR ) * MAX_HEADING_LEN, oldItems[ i ].Heading );
+                if( FAILED( hr ))
+                    return FALSE;
+
+                oldItems[ i ].type = 0;//mark the processed item
+
+                i++;
+                j++;
+
+                j = this->SequenceNextLevel( i, j, newItems, oldItems, NUMitems, 2 );//Process next level
+                if( j == -1 )
+                    return FALSE;
+            }
+            else if( oldItems[ i ].type == EMPTY_DIR )
+            {
+                newItems[ j ].Level    = oldItems[ i ].Level;
+                newItems[ j ].type    = oldItems[ i ].type;
+
+                hr = StringCbCopy( newItems[ j ].Heading, sizeof( TCHAR ) * MAX_HEADING_LEN, oldItems[ i ].Heading );
+                if( FAILED( hr ))
+                    return FALSE;
+
+                oldItems[ i ].type = 0;//mark the processed item
+
+                i++;
+                j++;
+            }
+            else
+                i++;
+
+            if( i == NUMitems )
+            {
+                i = 1;
+                ffMode = FALSE;
+            }
+            if( j == NUMitems )
+            {
+                return TRUE;
+            }
+        }
+        else//////////Process files >>
+        {
+            if( oldItems[ i ].type == A__FILE )
+            {
+                newItems[ j ].Level    = oldItems[ i ].Level;
+                newItems[ j ].type    = oldItems[ i ].type;
+
+                hr = StringCbCopy( newItems[ j ].Heading, sizeof( TCHAR ) * MAX_HEADING_LEN, oldItems[ i ].Heading );
+                if( FAILED( hr ))
+                    return FALSE;
+
+				if( this->CheckFileType( newItems[ j ].Heading ) == 1 )
+				{
+					newItems[ j ].type	= A__CNC3FILE;
+				}
+
+                oldItems[ i ].type = 0;//mark the processed item
+
+                i++;
+                j++;
+            }
+			else if (oldItems[i].type == A__EMPTYITEM)
+			{
+				newItems[j].Level = oldItems[i].Level;
+				newItems[j].type = oldItems[i].type;
+
+				hr = StringCbCopy(newItems[j].Heading, sizeof(TCHAR) * MAX_HEADING_LEN, oldItems[i].Heading);
+				if (FAILED(hr))
+					return FALSE;
+
+				oldItems[i].type = 0;//mark the processed item
+
+				i++;
+				j++;
+			}
+            else
+                i++;
+
+
+            if( i == NUMitems )
+            {
+                return TRUE;
+            }
+            if( j == NUMitems )
+            {
+                return TRUE;
+            }
+        }
+    }
+    return TRUE;
+}
+
+int TreeViewCTRL::SequenceNextLevel( int startPos, int counter, LPHEADING newItems, LPHEADING oldItems, int NUMitems, int ProcessLevel )
+{
+    if( counter < NUMitems )
+    {
+        int i = startPos;
+		int holding = 1;
+        BOOL ffMode = TRUE;
+        HRESULT hr;
+
+        while( holding )
+        {
+            if( ffMode )
+            {
+                if( oldItems[ i ].type == A__FOLDER )
+                {
+                    newItems[ counter ].Level    = oldItems[ i ].Level;
+                    newItems[ counter ].type    = oldItems[ i ].type;
+
+                    hr = StringCbCopy( newItems[ counter ].Heading, sizeof( TCHAR ) * MAX_HEADING_LEN, oldItems[ i ].Heading );
+                    if( FAILED( hr ))
+                        return -1;
+
+                    oldItems[ i ].type = 0;
+
+                    i++;
+                    counter++;
+
+                    counter = this->SequenceNextLevel( i, counter, newItems, oldItems, NUMitems, ProcessLevel + 1 );
+                    if( counter == -1 )
+                        return counter;
+                }
+                else if( oldItems[ i ].type == EMPTY_DIR )
+                {
+                    newItems[ counter ].Level    = oldItems[ i ].Level;
+                    newItems[ counter ].type    = oldItems[ i ].type;
+
+                    hr = StringCbCopy( newItems[ counter ].Heading, sizeof( TCHAR ) * MAX_HEADING_LEN, oldItems[ i ].Heading );
+                    if( FAILED( hr ))
+                        return -1;
+
+                    oldItems[ i ].type = 0;
+
+                    i++;
+                    counter++;
+                }
+                else
+                    i++;
+
+                if( ( oldItems[ i ].Level < ProcessLevel ) || ( i == NUMitems ) )
+                {
+                    i = startPos;
+                    ffMode = FALSE;
+                }
+                if( counter == NUMitems )
+                {
+                    break;
+                }
+            }
+            else
+            {
+                if( oldItems[ i ].type == A__FILE )
+                {
+                    newItems[ counter ].Level    = oldItems[ i ].Level;
+                    newItems[ counter ].type    = oldItems[ i ].type;
+
+                    hr = StringCbCopy( newItems[ counter ].Heading, sizeof( TCHAR ) * MAX_HEADING_LEN, oldItems[ i ].Heading );
+                    if( FAILED( hr ))
+                        return -1;
+
+					if( this->CheckFileType( newItems[ counter ].Heading ) == 1 )
+					{
+						newItems[ counter ].type = A__CNC3FILE;
+					}
+
+                    oldItems[ i ].type = 0;
+
+                    i++;
+                    counter++;
+                }
+				else if (oldItems[i].type == A__EMPTYITEM)
+				{
+					newItems[counter].Level = oldItems[i].Level;
+					newItems[counter].type = oldItems[i].type;
+
+					hr = StringCbCopy(newItems[counter].Heading, sizeof(TCHAR) * MAX_HEADING_LEN, oldItems[i].Heading);
+					if (FAILED(hr))
+						return FALSE;
+
+					oldItems[i].type = 0;//mark the processed item
+
+					i++;
+					counter++;
+				}
+                else
+                    i++;
+
+                if( ( oldItems[ i ].Level < ProcessLevel ) || ( i == NUMitems ) )
+                {
+                    break;
+                }
+                if( counter == NUMitems )
+                {
+                    break;
+                }
+            }
+        }
+    }
+    return counter;
+}
+
+int TreeViewCTRL::CheckFileType( LPTSTR filename )
+{
+	if( filename == NULL )
+		return 0;
+	else
+	{
+		__try
+		{
+			int i = 0;
+
+			while( filename[ i ] != L'\0' )
+			{
+				i++;
+			}
+			if( i > 5 )
+			{
+				if( ( filename[ i - 1 ] == L'3' ) &&
+					( filename[ i - 2 ] == L'c' ) &&
+					( filename[ i - 3 ] == L'n' ) &&
+					( filename[ i - 4 ] == L'c' ) &&
+					( filename[ i - 5 ] == L'.' ) )
+				{
+					filename[ i - 1 ] = L'\0';
+					filename[ i - 2 ] = L'\0';
+					filename[ i - 3 ] = L'\0';
+					filename[ i - 4 ] = L'\0';
+					filename[ i - 5 ] = L'\0';
+
+					return 1;
+				}
+				else
+					return 0;
+			}
+		}
+		__except( GetExceptionCode( ) == EXCEPTION_ARRAY_BOUNDS_EXCEEDED ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH )
+		{
+			return -1;
+		}
+	}
+	return 0;
+}
+
+BOOL TreeViewCTRL::ExpandPathToItem( LPTSTR ItemPath )
+{
+	BOOL result = TRUE;
+	int holding = 1;
+
+	if( ( ItemPath == NULL ) || ( this->Root_Folder == NULL ) )
+	{
+		return FALSE;
+	}
+	__try
+	{
+		size_t len;
+
+		HRESULT hr = StringCbLength( ItemPath, sizeof( TCHAR ) *4096, &len );
+		if( SUCCEEDED( hr ))
+		{
+			TCHAR* pathbuffer = new TCHAR[ len + sizeof( TCHAR ) ];
+
+			if( pathbuffer != NULL )
+			{
+				SecureZeroMemory( pathbuffer, ( len + sizeof( TCHAR )) );
+				int i = 0;
+
+				while( ItemPath[ i ] == this->Root_Folder[ i ] )
+				{
+					i++;	
+
+					if( this->Root_Folder[ i ] == L'\0' )
+					{
+						break;
+					}
+				}
+				i++;
+
+				int j = 0;
+
+				while( ItemPath[ i ] != L'\0' )
+				{
+					pathbuffer[ j ] = ItemPath[ i ];
+
+					i++;
+					j++;
+				}
+				pathbuffer[ j ] = L'\0';
+
+				int k = 0, cnt = 0;
+
+				while( pathbuffer[ k ] != L'\0' )
+				{
+					if( pathbuffer[ k ] == L'\\' )
+					{
+						cnt++;
+					}
+					k++;
+				}
+				if( cnt > 0 )// ????
+				{
+					LPMDA hdngName = new MDA[ cnt ];
+
+					if( hdngName != NULL )
+					{
+						SecureZeroMemory( hdngName, ( sizeof( MDA ) * cnt ));
+
+						i = 0;
+						j = 0;
+						k = 0;
+
+						while( k < cnt )
+						{
+							while( pathbuffer[ i ] != L'\\' )
+							{
+								if( pathbuffer[ i ] == L'\0' )
+								{
+									break;
+								}
+								hdngName[ k ].name[ j ] = pathbuffer[ i ];
+
+								j++;
+
+								if( j > ( MAX_HEADING_LEN - 1 ))
+								{
+									break;
+								}
+								i++;
+							}
+							i++;
+
+							hdngName[ k ].name[ j ] = L'\0';
+
+							if( pathbuffer[ i ] == L'\0' )
+							{
+								break;
+							}
+							k++;
+							j = 0;
+						}
+						TCHAR itembuffer[ MAX_HEADING_LEN ] = { 0 };
+
+						HTREEITEM root = TreeView_GetRoot( this->hwndTV );
+						if( root != NULL )
+						{
+							HTREEITEM Nitem = TreeView_GetChild( this->hwndTV, root );
+							if( Nitem != NULL )
+							{
+								i = 0;
+
+								TVITEM itv;
+								itv.mask = TVIF_TEXT | TVIF_HANDLE | TVIF_IMAGE;
+								itv.hItem = Nitem;
+								itv.pszText = itembuffer;
+								itv.cchTextMax = sizeof( itembuffer );
+
+								while( holding )
+								{
+									if( !TreeView_GetItem( this->hwndTV, &itv ))
+									{
+										result = FALSE;
+
+										break;
+									}
+									else
+									{
+										if(( itv.iImage == 0 ) || ( itv.iImage == 3 ))
+										{
+											result = FALSE;
+
+											break;
+										}
+										if( this->CompareHeading( itembuffer, hdngName[ i ].name ))
+										{
+											i++;
+
+											if( TreeView_Expand( this->hwndTV, Nitem, TVE_EXPAND ))
+											{
+												if( !this->ExpandNextLevel( Nitem, i, hdngName, cnt ))
+												{
+													result = FALSE;
+
+													break;
+												}
+											}
+										}
+										else
+										{
+											Nitem = TreeView_GetNextSibling( this->hwndTV, Nitem );
+											if( !Nitem )
+											{
+												result = FALSE;
+
+												break;
+											}
+											else
+											{
+												itv.hItem = Nitem;
+											}
+										}
+									}
+								}
+							}
+						}
+						delete hdngName;
+					}
+				}
+				delete pathbuffer;
+			}
+		}
+	}
+	__except( GetExceptionCode( ) == EXCEPTION_ARRAY_BOUNDS_EXCEEDED ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH )
+	{
+		return FALSE;
+	}
+	return result;
+}
+
+BOOL TreeViewCTRL::ExpandNextLevel( HTREEITEM root, int i, LPMDA hdngName, int max_level )
+{
+	if( i == max_level )
+	{
+		return TRUE;
+	}
+	TCHAR itembuffer[ MAX_HEADING_LEN ] = { 0 };
+
+	HTREEITEM Nitem = TreeView_GetChild( this->hwndTV, root );
+	if( Nitem != NULL )
+	{
+		int holding = 1;
+
+		TVITEM itv;
+		itv.mask = TVIF_TEXT | TVIF_HANDLE | TVIF_IMAGE;
+		itv.hItem = Nitem;
+		itv.pszText = itembuffer;
+		itv.cchTextMax = sizeof( itembuffer );
+
+		while( holding )
+		{
+			if( !TreeView_GetItem( this->hwndTV, &itv ))
+			{
+				return FALSE;
+			}
+			else
+			{
+				if(( itv.iImage == 0 ) || ( itv.iImage == 3 ))
+				{
+					return FALSE;
+				}
+				if( this->CompareHeading( itembuffer, hdngName[ i ].name ))
+				{
+					i++;
+
+					if( TreeView_Expand( this->hwndTV, Nitem, TVE_EXPAND ))
+					{
+						if( !this->ExpandNextLevel( Nitem, i, hdngName, max_level ))
+						{
+							return FALSE;
+						}
+					}
+				}
+				else
+				{
+					Nitem = TreeView_GetNextSibling( this->hwndTV, Nitem );
+					if( !Nitem )
+					{
+						return FALSE;
+					}
+					else
+					{
+						itv.hItem = Nitem;
+					}
+				}
+			}
+		}
+	}
+	return TRUE;
+}
+
+BOOL TreeViewCTRL::Reload( void )
+{
+	return this->InitTreeViewItems( this->Root_Folder, INIT_MODE );
+}
+
+BOOL TreeViewCTRL::SaveExpandImage( LPTSTR path )
+{
+	BOOL result = TRUE;
+	LPHEADING EXPimage = NULL;
+
+	int size = this->GetExpandImage( NULL, COUNT );
+
+	if( size == -1 )
+		return FALSE;
+	else
+	{
+		if( size > 0 )
+		{
+			if( size == 1 )
+			{
+				EXPimage = new HEADING;
+
+				if( EXPimage != NULL )
+				{
+					if( this->GetExpandImage( EXPimage, READ ) != -1 )
+					{
+						if( !this->SaveExpandImageToFile( path, EXPimage, size ))
+						{
+							result = FALSE;
+						}
+					}
+					else
+						result = FALSE;
+
+					delete EXPimage;
+				}
+				else
+					result = FALSE;
+			}
+			else
+			{
+				EXPimage = new HEADING[ size ];
+
+				if( EXPimage != NULL )
+				{
+					if( this->GetExpandImage( EXPimage, READ ) != -1 )
+					{
+						if( !this->SaveExpandImageToFile( path, EXPimage, size ))
+						{
+							result = FALSE;
+						}
+					}
+					else
+						result = FALSE;
+
+					delete [] EXPimage;
+				}
+				else
+					result = FALSE;
+			}
+		}
+		else
+			this->DeleteImageFile( path );
+	}
+	return result;
+}
+
+BOOL TreeViewCTRL::LoadExpandImage( LPTSTR path )
+{
+	BOOL result = TRUE;
+
+	int size = this->LoadExpandImageFromFile( path, NULL, COUNT );
+
+	if( size == -1 )
+		return FALSE;
+	else if( size == 0 )
+		return TRUE;
+	else
+	{
+		if( size == 1 )
+		{
+			LPHEADING EXPimage = new HEADING;
+
+			if( EXPimage != NULL )
+			{
+				if( this->LoadExpandImageFromFile( path, EXPimage, READ ) == -1 )
+				{
+					result = FALSE;
+				}
+				else
+				{
+					if( !this->SetExpandImage( EXPimage, (DWORD)size ))
+					{
+						result = FALSE;
+					}
+				}
+				delete EXPimage;
+			}
+			else
+				result = FALSE;
+		}
+		else
+		{
+			LPHEADING EXPimage = new HEADING[ size ];
+
+			if( EXPimage != NULL )
+			{
+				if( this->LoadExpandImageFromFile( path, EXPimage, READ ) == -1 )
+				{
+					result = FALSE;
+				}
+				else
+				{
+					if( !this->SetExpandImage( EXPimage, (DWORD)size ))
+					{
+						result = FALSE;
+					}
+				}
+				delete [] EXPimage;
+			}
+		}
+	}
+	return TRUE;
+}
+
+int TreeViewCTRL::GetExpandImage( LPHEADING EXPimage, DWORD Mode  )
+{
+	if( ( EXPimage == NULL ) && ( Mode == READ ) )
+		return -1;
+
+	int size = 0;
+
+	HTREEITEM root = TreeView_GetRoot( this->hwndTV );
+
+	if( root )
+	{
+		HTREEITEM item = TreeView_GetChild( this->hwndTV, root );
+
+		if( item )
+		{
+			TCHAR Text[ MAX_HEADING_LEN ] = { 0 };
+
+			TVITEM tvi;
+			tvi.mask = TVIF_PARAM | TVIF_STATE | TVIF_HANDLE | TVIF_TEXT | TVIF_IMAGE;
+			tvi.hItem = item;
+			tvi.pszText = Text;
+			tvi.cchTextMax = MAX_HEADING_LEN;
+
+			if( TreeView_GetItem( this->hwndTV, &tvi ))
+			{
+				if( ( tvi.iImage == this->ico_index[ 2 ] ) && ( tvi.state & TVIS_EXPANDED ) )
+				{
+					int temp = size;
+
+					if( Mode == COUNT )
+					{
+						if( !this->GetNextLevel_Image( NULL, item, COUNT, size ) )
+						{
+							size = -1;
+							goto End;
+						}
+					}
+					else
+					{
+						EXPimage[ size ].Level = tvi.lParam;
+						EXPimage[ size ].type = tvi.iImage;
+						StringCbCopy( EXPimage[ size ].Heading, sizeof( TCHAR )* MAX_HEADING_LEN, Text );
+
+						if( !this->GetNextLevel_Image( EXPimage, item, READ, size ) )
+						{
+							size = -1;
+							goto End;
+						}	
+					}
+					if( temp == size )
+						size++;
+				}
+				while( ( item = TreeView_GetNextSibling( this->hwndTV, item )) != NULL )
+				{
+					if( item )
+					{
+						tvi.hItem = item;
+
+						if( TreeView_GetItem( this->hwndTV, &tvi ))
+						{
+							if( ( tvi.iImage == this->ico_index[ 2 ] ) && ( tvi.state & TVIS_EXPANDED ) )
+							{
+								int temp = size;
+
+								if( Mode == COUNT )
+								{
+									if( !this->GetNextLevel_Image( NULL, item, COUNT, size ) )
+									{
+										size = -1;
+										break;
+									}
+								}
+								else
+								{
+									EXPimage[ size ].Level = tvi.lParam;
+									EXPimage[ size ].type = tvi.iImage;
+									StringCbCopy( EXPimage[ size ].Heading, sizeof( TCHAR )* MAX_HEADING_LEN, Text );
+
+									if( !this->GetNextLevel_Image( EXPimage, item, READ, size ) )
+									{
+										size = -1;
+										break;
+									}	
+								}
+								if( temp == size )
+									size++;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+		size = -1;
+End:
+	return size;
+}
+
+BOOL TreeViewCTRL::SetExpandImage( LPHEADING EXPimage, DWORD maxIndex  )
+{
+	if( EXPimage == NULL )
+		return FALSE;
+
+	DWORD index = 0;
+
+	HTREEITEM root = TreeView_GetRoot( this->hwndTV );
+
+	if( root )
+	{
+		HTREEITEM item = TreeView_GetChild( this->hwndTV, root );
+
+		if( item )
+		{
+			TCHAR Text[ MAX_HEADING_LEN ] = { 0 };
+
+			TVITEM tvi;
+			tvi.mask = TVIF_PARAM | TVIF_STATE | TVIF_HANDLE | TVIF_TEXT | TVIF_IMAGE;
+			tvi.hItem = item;
+			tvi.pszText = Text;
+			tvi.cchTextMax = MAX_HEADING_LEN;
+
+			if( TreeView_GetItem( this->hwndTV, &tvi ))
+			{
+				if( tvi.iImage == this->ico_index[ 1 ] )
+				{
+					if(index > maxIndex )
+						return TRUE;
+
+					DWORD Tmp_idx = index;
+
+					if( ( this->CompareHeading( Text, EXPimage[ index ].Heading ) &&
+						( tvi.lParam == EXPimage[ index ].Level ) ) )
+					{
+						if( !TreeView_Expand( this->hwndTV, tvi.hItem, TVE_EXPAND ))
+						{
+							return FALSE;
+						}
+						else
+						{
+							if( !this->SetNextLevel_Image( EXPimage, item, index, maxIndex ))
+							{
+								return FALSE;
+							}
+						}
+						if( Tmp_idx == index )
+							index++;
+					}
+				}
+				while( ( item = TreeView_GetNextSibling( this->hwndTV, item )) != NULL )
+				{
+					if( item )
+					{
+						tvi.hItem = item;
+
+						if( TreeView_GetItem( this->hwndTV, &tvi ))
+						{
+							if( tvi.iImage == this->ico_index[ 1 ] )
+							{
+								if( index > maxIndex )
+									return TRUE;
+
+								DWORD Tmp_idx = index;
+
+								if( ( this->CompareHeading( Text, EXPimage[ index ].Heading ) &&
+									( tvi.lParam == EXPimage[ index ].Level ) ) )
+								{
+									//MessageBox(NULL,L"123",L"",MB_OK);
+
+									if( !TreeView_Expand( this->hwndTV, tvi.hItem, TVE_EXPAND ))
+									{
+										return FALSE;
+									}
+									else
+									{
+										if( !this->SetNextLevel_Image( EXPimage, item, index, maxIndex ))
+										{
+											return FALSE;
+										}
+									}
+									if( Tmp_idx == index )
+										index++;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+		return FALSE;
+
+	return TRUE;
+}
+
+BOOL TreeViewCTRL::GetNextLevel_Image( LPHEADING EXPimage, HTREEITEM Parent, DWORD Mode, int& size )
+{
+	if( ( EXPimage == NULL ) && ( Mode == READ ) )
+		return FALSE;
+
+	BOOL result = TRUE;
+	size++;
+
+	if( Parent )
+	{
+		HTREEITEM item = TreeView_GetChild( this->hwndTV, Parent );
+
+		if( item )
+		{
+			TCHAR Text[ MAX_HEADING_LEN ] = { 0 };
+
+			TVITEM tvi;
+			tvi.mask = TVIF_PARAM | TVIF_STATE | TVIF_HANDLE | TVIF_TEXT | TVIF_IMAGE;
+			tvi.hItem = item;
+			tvi.pszText = Text;
+			tvi.cchTextMax = MAX_HEADING_LEN;
+
+			if( TreeView_GetItem( this->hwndTV, &tvi ))
+			{
+				if( ( tvi.iImage == this->ico_index[ 2 ] ) && ( tvi.state & TVIS_EXPANDED ) )
+				{
+					int temp = size;
+
+					if( Mode == COUNT )
+					{
+						if( !this->GetNextLevel_Image( NULL, item, COUNT, size ) )
+						{
+							result = FALSE;
+							goto End;
+						}
+					}
+					else
+					{
+						EXPimage[ size ].Level = tvi.lParam;
+						EXPimage[ size ].type = tvi.iImage;
+						StringCbCopy( EXPimage[ size ].Heading, sizeof( TCHAR )* MAX_HEADING_LEN, Text );
+
+						if( !this->GetNextLevel_Image( EXPimage, item, READ, size ) )
+						{
+							result = FALSE;
+							goto End;
+						}	
+					}
+					if( temp == size )
+						size++;
+				}
+				while( ( item = TreeView_GetNextSibling( this->hwndTV, item )) != NULL )
+				{
+					if( item )
+					{
+						tvi.hItem = item;
+
+						if( TreeView_GetItem( this->hwndTV, &tvi ))
+						{
+							if( ( tvi.iImage == this->ico_index[ 2 ] ) && ( tvi.state & TVIS_EXPANDED ) )
+							{
+								int temp = size;
+
+								if( Mode == COUNT )
+								{
+									if( !this->GetNextLevel_Image( NULL, item, COUNT, size ) )
+									{
+										result = FALSE;
+										break;
+									}
+								}
+								else
+								{
+									EXPimage[ size ].Level = tvi.lParam;
+									EXPimage[ size ].type = tvi.iImage;
+									StringCbCopy( EXPimage[ size ].Heading, sizeof( TCHAR )* MAX_HEADING_LEN, Text );
+
+									if( !this->GetNextLevel_Image( EXPimage, item, READ, size ) )
+									{
+										result = FALSE;
+										break;
+									}	
+								}
+								if( temp == size )
+									size++;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+		result = FALSE;
+End:
+	return result;
+}
+
+int TreeViewCTRL::LoadExpandImageFromFile( LPTSTR path, LPHEADING EXPimage, DWORD Mode )
+{
+	if( ( EXPimage == NULL ) && ( Mode == READ ) )
+		return -1;
+
+	int size = 0;
+
+	HRESULT hr;
+	size_t len;
+
+	hr = StringCbLength( path, STRSAFE_MAX_CCH, &len );
+	if( SUCCEEDED( hr ))
+	{
+		TCHAR *CMPL_PATH = new TCHAR[ len + ( 20*sizeof(TCHAR)) ];
+
+		if( CMPL_PATH != NULL )
+		{
+			hr = StringCbPrintf( CMPL_PATH, len + ( 20*sizeof(TCHAR)), L"%s\\TVimage.sys\0", path );
+			if( SUCCEEDED( hr ))
+			{
+				LARGE_INTEGER lg;
+				HANDLE hFile;
+
+				hFile = CreateFile( CMPL_PATH, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+
+				if( hFile != INVALID_HANDLE_VALUE )
+				{
+					if( GetFileSizeEx( hFile, &lg ))
+					{
+						TCHAR *buffer = new TCHAR[ (( size_t )lg.LowPart + sizeof( TCHAR )) ];
+
+						if( buffer != NULL )
+						{
+							DWORD bytesRead = 0;
+
+							if( ReadFile( hFile, buffer, lg.LowPart, &bytesRead, NULL ))
+							{
+								buffer[ (DWORD)(bytesRead/sizeof(TCHAR)) ] = L'\0';
+
+								//MessageBox(NULL,buffer, L"Monitor", MB_OK );/////////////////////////////////////////////////// !!!!!!!!!!!!!!!!!!!
+
+								if( !this->Read_Image_From_Buffer( EXPimage, buffer, size, Mode, ( bytesRead/sizeof(TCHAR)) ))
+								{
+									size = -1;
+								}
+							}
+							else
+								size = -1;
+							
+							delete [] buffer;
+						}
+						else
+							size = -1;
+					}
+					else
+						size = -1;
+
+					CloseHandle( hFile );
+				}
+				else
+					size = 0;// indicates that there is no file, so no expand action has to be done
+			}
+			else
+				size = -1;
+		}
+		else
+			size = -1;
+	}
+	else
+		size = -1;
+
+	return size;
+}
+
+BOOL TreeViewCTRL::SaveExpandImageToFile( LPTSTR path, LPHEADING EXPimage, int size )
+{
+	if( size == 0 )
+		return TRUE;
+
+	HRESULT hr;
+	size_t len;
+	BOOL result = TRUE;
+
+	hr = StringCbLength( path, STRSAFE_MAX_CCH, &len );
+	if( SUCCEEDED( hr ))
+	{
+		TCHAR *CMPL_PATH = new TCHAR[ len + ( 20*sizeof(TCHAR)) ];
+
+		if( CMPL_PATH != NULL )
+		{
+			hr = StringCbPrintf( CMPL_PATH, len + ( 20*sizeof(TCHAR)), L"%s\\TVimage.sys\0", path );
+			if( SUCCEEDED( hr ))
+			{
+				size_t buffer_size = ( size_t )( size * ( sizeof( TCHAR ) * ( MAX_HEADING_LEN + 10 )));
+
+				TCHAR *buffer = new TCHAR[ buffer_size ];
+
+				if( buffer != NULL )
+				{
+					SecureZeroMemory( buffer, buffer_size );
+
+					hr = StringCbPrintf( buffer, buffer_size, L"%i|%i|%s\r\n\0", EXPimage[ 0 ].type, EXPimage[ 0 ].Level, EXPimage[ 0 ].Heading );
+					if( SUCCEEDED( hr ))
+					{
+						if( size > 1 )
+						{
+							TCHAR cat_buf[ 280 ] = { 0 };
+
+							for( int i = 1; i < size; i++ )
+							{
+								hr = StringCbPrintf( cat_buf, sizeof( cat_buf ), L"%i|%i|%s\r\n\0", EXPimage[ i ].type, EXPimage[ i ].Level, EXPimage[ i ].Heading );
+								if( SUCCEEDED( hr ))
+								{
+									hr = StringCbCat( buffer, buffer_size, cat_buf );
+									if( FAILED( hr ))
+									{
+										result = FALSE;
+										break;
+									}
+								}
+								else
+								{
+									result = FALSE;
+									break;
+								}
+							}
+						}
+						HANDLE hFile = CreateFile( CMPL_PATH, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+
+						if( hFile == INVALID_HANDLE_VALUE )
+						{
+							result = FALSE;
+
+						}
+						else
+						{
+							size_t bytes;
+
+							hr = StringCbLength( buffer, buffer_size, &bytes );
+							if( SUCCEEDED( hr ))
+							{
+								DWORD bytesWritten = 0;
+								DWORD bytesToWrite = (DWORD)bytes;
+
+								if( !WriteFile( hFile, buffer, bytesToWrite, &bytesWritten, NULL ))
+								{
+									result = FALSE;
+								}
+								if( bytesWritten == 0 )
+								{
+									result = FALSE;
+								}
+							}
+							else
+								result = FALSE;
+
+							CloseHandle( hFile );
+						}
+					}
+					else
+						result = FALSE;
+
+					delete [] buffer;
+				}
+				else
+					result = FALSE;
+			}
+			else
+				result = FALSE;
+
+			delete [] CMPL_PATH;
+		}
+		else
+			result = FALSE;
+	}
+	else
+		result = FALSE;
+
+	return result;
+}
+
+BOOL TreeViewCTRL::DeleteImageFile( LPTSTR path )
+{
+	BOOL result = TRUE;
+	HRESULT hr;
+	size_t len;
+
+	hr = StringCbLength( path, STRSAFE_MAX_CCH, &len );
+	if( SUCCEEDED( hr ))
+	{
+		TCHAR *CMPL_PATH = new TCHAR[ len + ( 20*sizeof(TCHAR)) ];
+
+		if( CMPL_PATH != NULL )
+		{
+			hr = StringCbPrintf( CMPL_PATH, len + ( 20*sizeof(TCHAR)), L"%s\\TVimage.sys\0", path );
+			if( SUCCEEDED( hr ))
+			{
+				result = DeleteFile( CMPL_PATH );
+			}
+			else
+				result = FALSE;
+
+			delete [] CMPL_PATH;
+		}
+		else
+			result = FALSE;
+	}
+	else
+		result = FALSE;
+
+
+	return result;
+}
+
+BOOL TreeViewCTRL::Read_Image_From_Buffer( LPHEADING EXPimage, LPTSTR buffer, int& size, DWORD Mode, int max )
+{
+	if( max <= 0 )
+		return FALSE;
+
+	if( ( Mode == READ ) && ( EXPimage == NULL ) )
+		return FALSE;
+
+	__try
+	{
+		int i = 0;
+
+		while( ( i < max ) && ( buffer[ i ] != L'\0' ) )
+		{
+			if(( buffer[ i ] == 0x0D ))
+				size++;
+
+			i++;
+		}
+		i = 0;
+
+		if( Mode == READ )
+		{
+			// syntactic scan >>
+			for( int a = 0; a < size; a++ )
+			{
+				while( !this->CheckForNumber( buffer[ i ] ))
+				{
+					if( buffer[ i ] == L'\0' )
+						return TRUE;
+
+					i++;
+				}
+				while( ( i < max ) )
+				{
+					if( buffer[ i ] == L'\0' )
+						break;
+
+					TCHAR over[ MAX_HEADING_LEN ] = { 0 };
+					int j = 0;
+
+					while( this->CheckForNumber( buffer[ i ] ))
+					{
+						over[ j ] = buffer[ i ];
+						j++;
+						i++;
+					}
+					i++;
+					j++;
+					over[ j ] = L'\0';
+
+					//MessageBox( NULL,over,L"111",MB_OK);///////////////////////
+
+					if( swscanf_s( over, L"%i\0", &EXPimage[ a ].type ) == 0 )
+					{
+						return FALSE;
+					}
+					j = 0;
+					SecureZeroMemory( over, sizeof( over ));
+
+					while( this->CheckForNumber( buffer[ i ] ))
+					{
+						over[ j ] = buffer[ i ];
+						j++;
+						i++;
+					}
+					i++;
+					j++;
+					over[ j ] = L'\0';
+
+					//MessageBox( NULL,over,L"222",MB_OK);//////////////////////////////
+
+					if( swscanf_s( over, L"%i\0", &EXPimage[ a ].Level ) == 0 )
+					{
+						return FALSE;
+					}
+					j = 0;
+					SecureZeroMemory( over, sizeof( over ));
+
+					while( buffer[ i ] != 0x0D )
+					{
+						if( ( buffer[ i ] == L'\0' ) || ( buffer[ i ] == L'\n' ) )
+							break;
+
+						over[ j ] = buffer[ i ];
+						j++;
+						i++;
+					}
+					
+					j++;
+					over[ j ] = L'\0';
+
+					//MessageBox( NULL,over,L"333",MB_OK);//////////////////////////
+
+					if( FAILED( StringCbCopy( EXPimage[ a ].Heading, sizeof( TCHAR )* MAX_HEADING_LEN, over )))
+					{
+						return FALSE;
+					}
+					break;
+				}
+				i++;
+
+				if( buffer[ i ] == L'\0' )
+					break;
+			}
+		}
+	}
+	__except( GetExceptionCode( ) == EXCEPTION_ARRAY_BOUNDS_EXCEEDED ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH )
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL TreeViewCTRL::CheckForNumber( TCHAR LT )
+{
+	BOOL result = FALSE;
+
+	if( ( LT == '0' ) ||
+		( LT == '1' ) ||
+		( LT == '2' ) ||
+		( LT == '3' ) ||
+		( LT == '4' ) ||
+		( LT == '5' ) ||
+		( LT == '6' ) ||
+		( LT == '7' ) ||
+		( LT == '8' ) ||
+		( LT == '9' )	)
+	{
+		result = TRUE;
+	}
+	return result;
+}
+
+BOOL TreeViewCTRL::SetNextLevel_Image( LPHEADING EXPimage, HTREEITEM Parent, DWORD& index, DWORD maxIndex )
+{
+	if( EXPimage == NULL )
+		return FALSE;
+
+	index++;
+
+	if( Parent )
+	{
+		HTREEITEM item = TreeView_GetChild( this->hwndTV, Parent );
+
+		if( item )
+		{
+			TCHAR Text[ MAX_HEADING_LEN ] = { 0 };
+
+			TVITEM tvi;
+			tvi.mask = TVIF_PARAM | TVIF_STATE | TVIF_HANDLE | TVIF_TEXT | TVIF_IMAGE;
+			tvi.hItem = item;
+			tvi.pszText = Text;
+			tvi.cchTextMax = MAX_HEADING_LEN;
+
+			if( TreeView_GetItem( this->hwndTV, &tvi ))
+			{
+				if( tvi.iImage == this->ico_index[ 1 ] )
+				{
+					if( index > maxIndex )
+						return TRUE;
+
+					DWORD Tmp_idx = index;
+
+					if( ( this->CompareHeading( Text, EXPimage[ index ].Heading ) &&
+						( tvi.lParam == EXPimage[ index ].Level ) ) )
+					{
+						if( !TreeView_Expand( this->hwndTV, tvi.hItem, TVE_EXPAND ))
+						{
+							return FALSE;
+						}
+						else
+						{
+							if( !this->SetNextLevel_Image( EXPimage, item, index, maxIndex ))
+							{
+								return FALSE;
+							}
+						}
+						if( Tmp_idx == index )
+							index++;
+					}
+				}
+				while( ( item = TreeView_GetNextSibling( this->hwndTV, item )) != NULL )
+				{
+					if( item )
+					{
+						tvi.hItem = item;
+
+						if( TreeView_GetItem( this->hwndTV, &tvi ))
+						{
+							if( tvi.iImage == this->ico_index[ 1 ] )
+							{
+								if( index > maxIndex )
+									return TRUE;
+
+								DWORD Tmp_idx = index;
+
+								if( ( this->CompareHeading( Text, EXPimage[ index ].Heading ) &&
+									( tvi.lParam == EXPimage[ index ].Level ) ) )
+								{
+									if( !TreeView_Expand( this->hwndTV, tvi.hItem, TVE_EXPAND ))
+									{
+										return FALSE;
+									}
+									else
+									{
+										if( !this->SetNextLevel_Image( EXPimage, item, index, maxIndex ))
+										{
+											return FALSE;
+										}
+									}
+									if( Tmp_idx == index )
+										index++;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+		return FALSE;
+
+	return TRUE;
+}
+
+BOOL TreeViewCTRL::RemoveWildcard(TCHAR *path)
+{
+	__try
+	{
+		int i = 0;
+
+		while (path[i] != L'*')
+		{
+			if (path[i] == L'\0')
+				return TRUE;
+
+			i++;
+		}
+		path[i] = L'\0';
+		path[i - 1] = L'\0';
+	}
+	__except (GetExceptionCode() == EXCEPTION_ARRAY_BOUNDS_EXCEEDED ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL TreeViewCTRL::RemoveFilename(TCHAR *destination)
+{
+	__try
+	{
+		int i = 0;
+
+		while (destination[i] != L'\0')
+		{
+			i++;
+		}
+		while (destination[i] != L'\\')
+		{
+			if (i == 0)
+				return FALSE;
+
+			destination[i] = L'\0';
+			i--;
+		}
+		destination[i] = L'\0';
+	}
+	__except (GetExceptionCode() == EXCEPTION_ARRAY_BOUNDS_EXCEEDED ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL TreeViewCTRL::RemoveFileExt(int type, WCHAR *buffer)
+{
+	if (type != CNC3__ITEM)
+		return TRUE;
+	else
+	{
+		__try
+		{
+			int i = 0;
+
+			while (buffer[i] != L'\0')
+			{
+				i++;
+			}
+			i--;
+
+			if (i < 5)
+				return FALSE;
+
+			if (buffer[i] != L'3')
+				return FALSE;
+			else
+			{
+				buffer[i] = L'\0';
+				i--;
+
+				if (buffer[i] != L'c')
+					return FALSE;
+				else
+				{
+					buffer[i] = L'\0';
+					i--;
+
+					if (buffer[i] != L'n')
+						return FALSE;
+					else
+					{
+						buffer[i] = L'\0';
+						i--;
+
+						if (buffer[i] != L'c')
+							return FALSE;
+						else
+						{
+							buffer[i] = L'\0';
+							i--;
+							
+							if (buffer[i] != L'.')
+								return FALSE;
+							else
+							{
+								buffer[i] = L'\0';
+								i--;
+
+								return TRUE;
+							}
+
+						}
+					}
+				}
+			}
+		}
+		__except (GetExceptionCode() == EXCEPTION_ARRAY_BOUNDS_EXCEEDED ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+		{
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+HTREEITEM TreeViewCTRL::FindInsertAfter(HTREEITEM parent, int type, LPTSTR name)
+{
+	TCHAR buffer[MAX_HEADING_LEN] = { 0 };
+	HTREEITEM insertAfter = NULL;
+	HTREEITEM child = TreeView_GetChild(this->hwndTV, parent);
+	int nCount = 0;
+
+	do
+	{
+		TVITEM tvi;
+		tvi.mask = TVIF_IMAGE | TVIF_HANDLE;
+		tvi.hItem = child;
+
+		if (TreeView_GetItem(this->hwndTV, &tvi))
+		{
+			if ((type == PARENT__ITEM) && ((tvi.iImage == this->ico_index[0]) || (tvi.iImage == this->ico_index[3])))
+			{
+				break;
+			}
+			else if (tvi.iImage == this->ico_index[4])
+			{
+				TreeView_DeleteItem(this->hwndTV, child);
+				insertAfter = TVI_FIRST;
+				break;
+			}
+			else if (((type == CHILD__ITEM)||(type == CNC3__ITEM)) && ((tvi.iImage == this->ico_index[1]) || (tvi.iImage == this->ico_index[2])))
+			{
+				nCount = 0;
+			}
+		}
+		nCount++;
+	} while ((child = TreeView_GetNextSibling(this->hwndTV, child)) != NULL);
+
+	if (insertAfter != TVI_FIRST)
+	{
+		insertAfter = TVI_FIRST;
+
+		child = TreeView_GetChild(this->hwndTV, parent);
+		if (child)
+		{
+			do
+			{
+				TVITEM tvi;
+				tvi.mask = TVIF_PARAM | TVIF_TEXT | TVIF_IMAGE | TVIF_HANDLE;
+				tvi.hItem = child;
+				tvi.pszText = buffer;
+				tvi.cchTextMax = MAX_HEADING_LEN;
+
+				if (TreeView_GetItem(this->hwndTV, &tvi))
+				{
+					if ((type == CHILD__ITEM) || (type == CNC3__ITEM))
+					{
+						if ((tvi.iImage == this->ico_index[0]) || (tvi.iImage == this->ico_index[3]))
+						{
+							int cmp = CompareStringsForSort(buffer, name);
+							if (cmp == -1)
+							{
+								break;
+							}
+						}
+					}
+					else if ((type == PARENT__ITEM) || (type == ROOT__ITEM))
+					{
+						if ((tvi.iImage == this->ico_index[0]) || (tvi.iImage == this->ico_index[3]))
+						{
+							break;
+						}
+						else
+						{
+							int cmp = CompareStringsForSort(buffer, name);
+							if (cmp == -1)
+							{
+								break;
+							}
+						}
+					}
+				}
+				insertAfter = child;
+			} while ((child = TreeView_GetNextSibling(this->hwndTV, child)) != NULL);
+		}
+	}
+	if (insertAfter == NULL)
+		insertAfter = TVI_FIRST;
+
+	return insertAfter;
+}
+
+BOOL TreeViewCTRL::InsertFolder(HTREEITEM Folderitem)
+{
+	BOOL result = TRUE;
+
+	TCHAR* destination = NULL;
+
+	int type = this->GetSelectedItemPath(&destination);
+
+	result = (type == -1) ? FALSE : TRUE;
+	if (result)
+	{
+
+
+
+	}
+	return result;
+}
+
+int TreeViewCTRL::OnItemExpanding(LPNMTREEVIEW ntv)
+{
+	if (ntv->itemNew.iImage == 1)
+	{
+		ntv->itemNew.iImage = this->ico_index[2];
+		ntv->itemNew.iSelectedImage = this->ico_index[2];
+
+		TreeView_SetItem(this->hwndTV, &ntv->itemNew);
+	}
+	else if (ntv->itemNew.iImage == 2)
+	{
+		ntv->itemNew.iImage = this->ico_index[1];
+		ntv->itemNew.iSelectedImage = this->ico_index[1];
+
+		TreeView_SetItem(this->hwndTV, &ntv->itemNew);
+	}
+	return 0;
+}
+
+int TreeViewCTRL::OnItemExpanded(LPNMTREEVIEW ntv)
+{
+	if (ntv->action == TVE_EXPAND)
+	{
+		TreeView_SelectItem(this->hwndTV, ntv->itemNew.hItem);
+	}
+	return 0;
+}
+
+int TreeViewCTRL::OnSelchanged(LPNMTREEVIEW ntv)
+{
+	int ir = -1;
+
+	int type = this->CheckItemType(ntv->itemNew.hItem);
+
+	ir = (type != PARENT__ITEM) ? 0 : 1;
+	if (ir)
+	{
+		int ItemCount = 0;
+		HTREEITEM cItems[12];
+
+		TCHAR* buffer = new TCHAR[MAX_HEADING_LEN];
+
+		ir = (buffer == NULL) ? 0 : 1;
+		if (ir)
+		{
+			TCHAR* root = new TCHAR[MAX_HEADING_LEN];
+
+			ir = (root == NULL) ? 0 : 1;
+			if (ir)
+			{
+				TCHAR* path = new TCHAR[4096];
+
+				ir = (path == NULL) ? 0 : 1;
+				{
+					HRESULT hr = StringCbCopy(path, sizeof(TCHAR) * 4096, this->Root_Folder);
+
+					ir = SUCCEEDED(hr) ? 1 : 0;
+					if (ir)
+					{
+						TVITEM tv;
+						tv.hItem = TreeView_GetRoot(this->hwndTV);
+						tv.mask = TVIF_TEXT | TVIF_HANDLE;
+						tv.cchTextMax = sizeof(TCHAR) * MAX_HEADING_LEN;
+						tv.pszText = root;
+
+						ir = TreeView_GetItem(this->hwndTV, &tv);
+						if (ir)
+						{
+							cItems[ItemCount] = ntv->itemNew.hItem;// TreeView_GetSelection( this->hwndTV ); ??
+							ItemCount++;
+
+							while ((cItems[ItemCount] = TreeView_GetParent(this->hwndTV, cItems[ItemCount - 1])) != NULL)
+							{
+								if ((ItemCount == 11))
+								{
+									break;
+								}
+								ItemCount++;
+							}
+							ItemCount--;
+
+							for (int j = ItemCount; j >= 0; j--)
+							{
+								tv.hItem = cItems[j];
+								tv.pszText = buffer;
+
+								if (!TreeView_GetItem(this->hwndTV, &tv))
+								{
+									return -2;
+								}
+								if (this->CompareHeading(root, buffer) && (j == ItemCount))
+								{
+									continue;
+								}
+								hr = StringCbCat(path, sizeof(TCHAR) * 4096, L"\\");
+								if (FAILED(hr))
+									break;
+								hr = StringCbCat(path, sizeof(TCHAR) * 4096, buffer);
+								if (FAILED(hr))
+									break;
+							}
+
+							ir = SUCCEEDED(hr) ? 1 : 0;
+							if (ir)
+							{
+								SendMessage(this->TVFrame,
+									WM_COMMAND,
+									MAKEWPARAM(TV_CTRL_SET_FOLDER, 0),
+									reinterpret_cast<LPARAM>(path));
+							}
+						}
+					}
+					delete[] path;
+				}
+				delete[] root;
+			}
+			delete[] buffer;
+		}
+	}
+	return ir;
+}
+
+int TreeViewCTRL::OnDblClick()
+{
+	int type = this->CheckItemType(TreeView_GetSelection(this->hwndTV));
+
+	if ((type == PARENT__ITEM) || (type == EMPTY__ITEM))return 0;
+
+	HRESULT hr;
+	int ItemCount = 0;
+
+	TCHAR* buffer = new TCHAR[MAX_HEADING_LEN];
+
+	hr = (buffer == nullptr) ? E_OUTOFMEMORY : S_OK;
+	if (SUCCEEDED(hr))
+	{
+		TCHAR* root = new TCHAR[MAX_HEADING_LEN];
+
+		hr = (root == nullptr) ? E_OUTOFMEMORY : S_OK;
+		if (SUCCEEDED(hr))
+		{
+			TCHAR* path = new TCHAR[4096];
+
+			hr = (path == nullptr) ? E_OUTOFMEMORY : S_OK;
+			if (SUCCEEDED(hr))
+			{
+				hr = StringCbCopy(path, sizeof(TCHAR) * 4096, this->Root_Folder);
+				if (SUCCEEDED(hr))
+				{
+					TVITEM tv;
+					tv.hItem = TreeView_GetRoot(this->hwndTV);
+					tv.mask = TVIF_TEXT | TVIF_HANDLE;
+					tv.cchTextMax = sizeof(TCHAR) * MAX_HEADING_LEN;
+					tv.pszText = root;
+
+					hr = TreeView_GetItem(this->hwndTV, &tv) ? S_OK : E_FAIL;
+					if (SUCCEEDED(hr))
+					{
+						HTREEITEM cursel = TreeView_GetSelection(this->hwndTV);
+
+						hr = (cursel == nullptr) ? E_HANDLE : S_OK;
+						if (SUCCEEDED(hr))
+						{
+							ItemCount++;
+
+							HTREEITEM parent;
+
+							while ((parent = TreeView_GetParent(this->hwndTV, cursel)) != nullptr)
+							{
+								cursel = parent;
+
+								ItemCount++;
+							}
+							HTREEITEM* cItems = new HTREEITEM[ItemCount];
+
+							hr = (cItems == nullptr) ? E_OUTOFMEMORY : S_OK;
+							if(SUCCEEDED(hr))
+							{
+								cItems[ 0 ] = TreeView_GetSelection(this->hwndTV);
+
+								for (int i = 1; i < ItemCount; i++)
+								{
+									cItems[i] = TreeView_GetParent(this->hwndTV, cItems[i - 1]);
+
+									hr = (cItems[i] == nullptr) ? E_HANDLE : S_OK;
+									if (FAILED(hr))
+										break;
+								}
+								if (SUCCEEDED(hr))
+								{
+									ItemCount--;
+
+									for (int j = ItemCount; j >= 0; j--)
+									{
+										tv.hItem = cItems[ j ];
+										tv.pszText = buffer;
+
+										hr = TreeView_GetItem(this->hwndTV, &tv) ? S_OK : E_FAIL;
+										if (FAILED(hr))
+											break;
+
+										if (this->CompareHeading(root, buffer) && (j == ItemCount))
+										{
+											continue;
+										}
+										hr = StringCbCat(path, sizeof(TCHAR) * 4096, L"\\");
+										if (FAILED(hr))
+											break;
+										hr = StringCbCat(path, sizeof(TCHAR) * 4096, buffer);
+										if (FAILED(hr))
+											break;
+									}
+									if (SUCCEEDED(hr))
+									{
+
+										if (type == CNC3__ITEM)
+										{
+											hr = StringCbCat(path, sizeof(TCHAR) * 4096, L".cnc3");
+										}
+										if (SUCCEEDED(hr))
+										{
+											SendMessage(this->TVFrame,
+												WM_COMMAND,
+												MAKEWPARAM(TV_CTRL_OPEN_PATH, 0),
+												reinterpret_cast<LPARAM>(path));
+
+										}
+									}
+								}
+								delete [] cItems;
+							}
+						}
+					}
+				}
+				delete[] path;
+			}
+			delete[] root;
+		}
+		delete[] buffer;
+	}
+	return SUCCEEDED(hr) ? 1 : 0;
+}
+
+int TreeViewCTRL::OnRgtClick()
+{
+	POINT pt;
+	TVHITTESTINFO thi;
+
+	if (GetCursorPos(&pt))
+	{
+		if (ScreenToClient(this->hwndTV, &pt))
+		{
+			thi.pt.x = pt.x;
+			thi.pt.y = pt.y;
+
+			HTREEITEM item = TreeView_HitTest(this->hwndTV, &thi);
+			if (item)
+			{
+				if (TreeView_SelectItem(this->hwndTV, thi.hItem))
+				{
+					int type = this->CheckItemType(item);
+					if (type != -1)
+					{
+						if (item == TreeView_GetRoot(this->hwndTV))
+						{
+							type = ROOT__ITEM;
+						}
+						SendMessage(this->TVFrame, WM_COMMAND, MAKEWPARAM(TV_CTRL_CREATETOOLWND, type), 0);
+					}
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+BOOL TreeViewCTRL::PrepareForCopyOperation()
+{
+	BOOL result;
+	TCHAR* path = NULL;
+
+	this->FOPInfo.type = this->GetSelectedItemPath(&path);
+
+	result = (this->FOPInfo.type < 0) ? FALSE : TRUE;
+	if (result)
+	{
+		size_t len;
+		HRESULT hr = StringCbLength(path, sizeof(TCHAR) * 4096, &len);
+
+		result = SUCCEEDED(hr) ? TRUE : FALSE;
+		if(result)
+		{
+			len += sizeof(TCHAR);
+
+			if (this->FOPInfo.copypath != NULL)
+			{
+				delete[] this->FOPInfo.copypath;
+				this->FOPInfo.copypath = nullptr;
+			}
+
+			this->FOPInfo.copypath = new TCHAR[len];
+
+			result = (this->FOPInfo.copypath == NULL) ? FALSE : TRUE;
+			if (result)
+			{
+				hr = StringCbCopy(this->FOPInfo.copypath, len, path);
+
+				result = SUCCEEDED(hr) ? TRUE : FALSE;
+				if (result)
+				{
+					this->FOPInfo.copypath_valid = TRUE;
+					this->FOPInfo.lastaction = FOP_COPY;
+				}
+			}
+		}
+		delete[] path;
+	}
+	return result;
+}
+
+HRESULT TreeViewCTRL::_executeCopyOP()
+{
+	HRESULT hr = S_OK;
+
+	if (this->FOPInfo.copypath_valid)	
+	{
+		TCHAR* destination = NULL;
+
+		int type = this->GetSelectedItemPath(&destination);
+
+		hr = (type == -1) ? E_FAIL : S_OK;
+		if (SUCCEEDED(hr))
+		{
+			if ((type == CHILD__ITEM) || (type == CNC3__ITEM))
+			{
+				// eliminate filename to get the destination directory to copy in ...
+				hr = this->RemoveFilename(destination) ? S_OK : E_FAIL;
+			}
+			if (SUCCEEDED(hr))
+			{
+				hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+				if (SUCCEEDED(hr))
+				{
+					IFileOperation* pfo;
+
+					hr = CoCreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pfo));
+					if (SUCCEEDED(hr))
+					{
+						hr = pfo->SetOperationFlags(FOF_NO_UI | FOF_RENAMEONCOLLISION);
+						if (SUCCEEDED(hr))
+						{
+							IShellItem *psiFrom = NULL;
+
+							hr = SHCreateItemFromParsingName(this->FOPInfo.copypath, NULL, IID_PPV_ARGS(&psiFrom));
+							if (SUCCEEDED(hr))
+							{
+								IShellItem *psiTo = NULL;
+
+								hr = SHCreateItemFromParsingName(destination, NULL, IID_PPV_ARGS(&psiTo));
+								if (SUCCEEDED(hr))
+								{
+									hr = pfo->CopyItem(psiFrom, psiTo, NULL, (IFileOperationProgressSink*)this);
+									if (SUCCEEDED(hr))
+									{
+										hr = pfo->PerformOperations();
+										if (SUCCEEDED(hr))
+										{
+											HTREEITEM item;
+
+											if ((type == CHILD__ITEM) || (type == CNC3__ITEM))
+											{
+												item = TreeView_GetParent(this->hwndTV,
+													TreeView_GetSelection(this->hwndTV));
+											}
+											else
+											{
+												item = TreeView_GetSelection(this->hwndTV);
+											}
+
+											hr = (item) ? S_OK : E_HANDLE;
+											if (SUCCEEDED(hr))
+											{
+												TVITEM par_tvi;
+												par_tvi.mask = TVIF_HANDLE | TVIF_PARAM;
+												par_tvi.hItem = item;
+												TreeView_GetItem(this->hwndTV, &par_tvi);
+
+												if (this->FOPInfo.postOperationBuffer_valid)
+												{
+													TVITEM tvi;
+													tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+													tvi.pszText = this->FOPInfo.postOperationBuffer;
+													tvi.cchTextMax = MAX_HEADING_LEN;
+													tvi.lParam = (LPARAM)((int)par_tvi.lParam + 1);
+
+													// bei Ordnerkopierung unterdateien in treeview einfügen
+													// .cnc3 entfernen
+													// expand if it isn't
+
+
+													if (this->FOPInfo.type == CHILD__ITEM)
+													{
+														tvi.iImage = ico_index[0];
+														tvi.iSelectedImage = ico_index[0];
+													}
+													else if (this->FOPInfo.type == PARENT__ITEM)
+													{
+														tvi.iImage = ico_index[1];
+														tvi.iSelectedImage = ico_index[1];
+													}
+													else if (this->FOPInfo.type == CNC3__ITEM)
+													{
+														tvi.iImage = ico_index[3];
+														tvi.iSelectedImage = ico_index[3];
+													}
+													else
+													{
+														tvi.iImage = ico_index[0];
+														tvi.iSelectedImage = ico_index[0];
+													}
+
+													TVINSERTSTRUCT tvis;
+													tvis.hInsertAfter = this->FindInsertAfter(item, this->FOPInfo.type, this->FOPInfo.postOperationBuffer);
+													tvis.hParent = item;
+													tvis.item = tvi;
+
+													HTREEITEM newItem = TreeView_InsertItem(this->hwndTV, &tvis);
+
+													if (this->FOPInfo.type == PARENT__ITEM)
+													{
+														hr = this->InsertFolder(newItem) ? S_OK : E_FAIL;
+													}
+													SafeDelete((void**)&this->FOPInfo.postOperationBuffer);
+													this->FOPInfo.postOperationBuffer_valid = FALSE;
+												}
+											}
+										}
+									}
+									SafeRelease(&psiTo);
+								}
+								SafeRelease(&psiFrom);
+							}
+						}
+						SafeRelease(&pfo);
+					}
+					CoUninitialize();
+				}
+			}
+			SafeDelete((void**)&destination);
+		}
+	}
+	return hr;
+}
+
+HRESULT TreeViewCTRL::_executeDeleteOP()
+{
+	HRESULT hr = S_OK;
+
+	TCHAR* toDelete = NULL;
+
+	int type = this->GetSelectedItemPath(&toDelete);
+
+	hr = (type == -1) ? E_FAIL : S_OK;
+	if (SUCCEEDED(hr))
+	{
+		hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+		if (SUCCEEDED(hr))
+		{
+			IFileOperation* pfo;
+
+			hr = CoCreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pfo));
+			if (SUCCEEDED(hr))
+			{
+				hr = pfo->SetOperationFlags(FOFX_RECYCLEONDELETE);
+				if (SUCCEEDED(hr))
+				{
+					IShellItem* psi;
+
+					hr = SHCreateItemFromParsingName(toDelete, NULL, IID_PPV_ARGS(&psi));
+					if (SUCCEEDED(hr))
+					{
+						hr = pfo->DeleteItem(psi, (IFileOperationProgressSink*)this);
+						if (SUCCEEDED(hr))
+						{
+							hr = pfo->PerformOperations();
+							if (SUCCEEDED(hr))
+							{
+								HTREEITEM item = TreeView_GetSelection(this->hwndTV);
+								HTREEITEM parent = TreeView_GetParent(this->hwndTV, item);
+
+								hr = TreeView_DeleteItem(this->hwndTV, item) ? S_OK : E_FAIL;
+								if (SUCCEEDED(hr))
+								{
+									item = TreeView_GetChild(this->hwndTV, parent);
+									if (item == NULL)
+									{
+										TVITEM par_tvi;
+										par_tvi.mask = TVIF_PARAM | TVIF_HANDLE;
+										par_tvi.hItem = parent;
+										TreeView_GetItem(this->hwndTV, &par_tvi);
+
+										TVITEM tvi;
+										tvi.mask = TVIF_IMAGE | TVIF_TEXT | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+										tvi.pszText = L"< . . . >\0";
+										tvi.cchTextMax = 8;
+										tvi.iImage = this->ico_index[4];
+										tvi.iSelectedImage = this->ico_index[4];
+										tvi.lParam = (LPARAM)((int)par_tvi.lParam + 1);
+										
+										TVINSERTSTRUCT tvins;
+										tvins.hInsertAfter = TVI_FIRST;
+										tvins.hParent = parent;
+										tvins.item = tvi;
+
+										item = TreeView_InsertItem(this->hwndTV, &tvins);
+
+										hr = (item) ? S_OK : E_FAIL;
+									}
+								}
+							}
+						}
+						SafeRelease(&psi);
+					}
+				}
+				SafeRelease(&pfo);
+			}
+			CoUninitialize();
+		}
+		SafeDelete((void**)&toDelete);
+	}
+	return hr;
+}
+
+HRESULT TreeViewCTRL::ProcessPostCopyInfo(DWORD dwFlags, LPCWSTR newName)
+{
+	HRESULT hr;
+
+	hr = CopyStringToPtrW(newName, &this->FOPInfo.postOperationBuffer);
+	if (SUCCEEDED(hr))
+	{
+		hr = this->RemoveFileExt(this->FOPInfo.type, this->FOPInfo.postOperationBuffer) ? S_OK : E_FAIL;
+		if (SUCCEEDED(hr))
+		{
+			// ...
+			this->FOPInfo.postOperationBuffer_valid = TRUE;
+		}
+	}
+	return hr;
+}
+
+HRESULT TreeViewCTRL::ProcessPostDeleteInfo(DWORD dwFlags)
+{
+	return S_OK;
+}
+
+HRESULT TreeViewCTRL::ProcessPostMoveInfo(DWORD dwFlags, LPCWSTR newName)
+{
+	return S_OK;
+}
+
+HRESULT TreeViewCTRL::ProcessPostNewFile(DWORD dwFlags, LPCWSTR newName, DWORD fileAtttributes)
+{
+	return S_OK;
+}
+
+HRESULT TreeViewCTRL::ProcessPostRename(DWORD dwFlags, LPCWSTR newName)
+{
+	return S_OK;
+}
+

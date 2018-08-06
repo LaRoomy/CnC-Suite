@@ -1,0 +1,2152 @@
+#include"CnCS_UI.h"
+
+CnCS_UI::CnCS_UI(HINSTANCE hInst) :MainWindow(NULL), hInstance(hInst), startup_result(TRUE), pObj(NULL), iParam(NULL)
+{
+	this->pObj = new STATICOBJECTS;
+	if (this->pObj)
+	{
+		// LOAD BITMAPS
+		this->pObj->upperleft = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_BKGND_UPPERLEFT), IMAGE_BITMAP, 180, 80, LR_DEFAULTCOLOR);
+		this->pObj->upperright = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_BKGND_UPPERRIGHT), IMAGE_BITMAP, 126, 80, LR_DEFAULTCOLOR);
+		this->pObj->maximize_norm = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_MAXIMIZE), IMAGE_BITMAP, 54, 20, LR_DEFAULTCOLOR);
+		this->pObj->maximize_marked = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_MAXIMIZE_MARKED), IMAGE_BITMAP, 54, 20, LR_DEFAULTCOLOR);
+		this->pObj->maximize_pressed = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_MAXIMIZE_PRESSED), IMAGE_BITMAP, 54, 20, LR_DEFAULTCOLOR);
+		this->pObj->maximize_norm_min = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_MAXIMIZE_MIN), IMAGE_BITMAP, 54, 20, LR_DEFAULTCOLOR);
+		this->pObj->maximize_marked_min = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_MAXIMIZE_MARKED_MIN), IMAGE_BITMAP, 54, 20, LR_DEFAULTCOLOR);
+		this->pObj->maximize_pressed_min = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_MAXIMIZE_PRESSED_MIN), IMAGE_BITMAP, 54, 20, LR_DEFAULTCOLOR);
+		this->pObj->minimize_norm = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_MINIMIZE), IMAGE_BITMAP, 54, 20, LR_DEFAULTCOLOR);
+		this->pObj->minimize_marked = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_MINIMIZE_MARKED), IMAGE_BITMAP, 54, 20, LR_DEFAULTCOLOR);
+		this->pObj->minimize_pressed = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_MINIMIZE_PRESSED), IMAGE_BITMAP, 54, 20, LR_DEFAULTCOLOR);
+		this->pObj->titlebar = (HBITMAP)LoadImage(hInst, MAKEINTRESOURCE(IDB_TITLEBAR), IMAGE_BITMAP, 294, 80, LR_DEFAULTCOLOR);
+		// CREATE BRUSHES
+		this->pObj->background = CreateSolidBrush(RGB(150, 210, 210));
+		this->pObj->barColor = CreateSolidBrush(RGB(111,138,145));
+		this->pObj->sizeWndColor = CreateSolidBrush(RGB(0, 255, 0));
+		this->pObj->frameWndColor = CreateSolidBrush(RGB(80, 160, 160));
+		this->pObj->statusbarColor = CreateSolidBrush(RGB(111, 138, 145));
+		// LOAD ICONS
+		this->pObj->MainIcon = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_MAINBUTTON), IMAGE_ICON, 78, 78, LR_DEFAULTCOLOR);
+		this->pObj->MainIconMarked = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_MAINBUTTON_MARKED), IMAGE_ICON, 78, 78, LR_DEFAULTCOLOR);
+		this->pObj->MainIconPressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_MAINBUTTON_PRESSED), IMAGE_ICON, 78, 78, LR_DEFAULTCOLOR);
+		this->pObj->close_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_CLOSEBUTTON), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->close_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_CLOSEBUTTON_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->close_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_CLOSEBUTTON_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->size_arrow = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_SIZE_ARROW), IMAGE_ICON, 22, 22, LR_DEFAULTCOLOR);
+		this->pObj->size_arrow_disabled = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_SIZE_ARROW_DISABLED), IMAGE_ICON, 22, 22, LR_DEFAULTCOLOR);
+		this->pObj->new_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_NEW), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->new_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_NEW_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->new_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_NEW_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->open_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_OPEN), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->open_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_OPEN_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->open_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_OPEN_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->save_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SAVE), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->save_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SAVE_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->save_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SAVE_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->saveall_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SAVEALL), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->saveall_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SAVEALL_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->saveall_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SAVEALL_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->saveas_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SAVEAS), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->saveas_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SAVEAS_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->saveas_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SAVEAS_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->copy_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_COPY), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->copy_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_COPY_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->copy_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_COPY_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->dropdown_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_DROPDOWN), IMAGE_ICON, 22, 22, LR_DEFAULTCOLOR);
+		this->pObj->dropdown_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_DROPDOWN_MARKED), IMAGE_ICON, 22, 22, LR_DEFAULTCOLOR);
+		this->pObj->dropdown_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_DROPDOWN_PRESSED), IMAGE_ICON, 22, 22, LR_DEFAULTCOLOR);
+		this->pObj->paste_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_PASTE), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->paste_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_PASTE_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->paste_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_PASTE_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->cut_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_CUT), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->cut_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_CUT_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->cut_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_CUT_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->selectall_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SELECTALL), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->selectall_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SELECTALL_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->selectall_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SELECTALL_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->editdelete_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_DELETE), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->editdelete_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_DELETE_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->editdelete_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_DELETE_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->sample_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SAMPLE), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->sample_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SAMPLE_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->sample_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SAMPLE_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->import_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_IMPORT), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->import_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_IMPORT_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->import_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_IMPORT_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->send_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SEND), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->send_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SEND_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->send_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_SEND_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->receive_norm = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_RECEIVE), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->receive_mark = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_RECEIVE_MARKED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		this->pObj->receive_pressed = (HICON)LoadImage(hInst, MAKEINTRESOURCE(IDI_TOOLBAR_RECEIVE_PRESSED), IMAGE_ICON, 42, 42, LR_DEFAULTCOLOR);
+		// CREATE FONTS
+		this->pObj->titlefont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, L"Arial Black\0");
+		this->pObj->statusbarfont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, L"Segoe UI\0");
+		// LOAD CURSORS
+		this->pObj->size_nwso = LoadCursor(NULL, IDC_SIZENWSE);
+		this->pObj->arrow = LoadCursor(NULL, IDC_ARROW);
+		this->pObj->size_ns = LoadCursor(NULL, IDC_SIZENS);
+		this->pObj->size_we = LoadCursor(NULL, IDC_SIZEWE);
+	}
+	else
+		this->startup_result = FALSE;
+
+	this->iParam = new IPARAM;
+	if (this->iParam)
+	{
+		SecureZeroMemory(this->iParam, sizeof(IPARAM));
+
+		this->iParam->DRAW_MODE = DRAW_ALL_AREAS;
+	}
+	else
+		this->startup_result = FALSE;
+
+	if (FAILED(this->RegisterChildClasses()))
+	{
+		this->startup_result = FALSE;
+	}
+}
+
+CnCS_UI::~CnCS_UI()
+{
+	UnhookWindowsHookEx(this->iParam->MouseHook);
+
+	if (this->pObj != NULL)
+	{
+		// DELETE BITMAPS
+		DeleteObject(this->pObj->upperleft);
+		DeleteObject(this->pObj->upperright);
+		DeleteObject(this->pObj->maximize_norm);
+		DeleteObject(this->pObj->maximize_marked);
+		DeleteObject(this->pObj->maximize_pressed);
+		DeleteObject(this->pObj->maximize_norm_min);
+		DeleteObject(this->pObj->maximize_marked_min);
+		DeleteObject(this->pObj->maximize_pressed_min);
+		DeleteObject(this->pObj->minimize_norm);
+		DeleteObject(this->pObj->minimize_marked);
+		DeleteObject(this->pObj->minimize_pressed);
+		DeleteObject(this->pObj->titlebar);
+		// DELETE FONTS
+		DeleteObject(this->pObj->titlefont);
+		DeleteObject(this->pObj->statusbarfont);
+		// DELETE BRUSHES
+		DeleteObject(this->pObj->background);
+		DeleteObject(this->pObj->barColor);
+		DeleteObject(this->pObj->sizeWndColor);
+		DeleteObject(this->pObj->frameWndColor);
+		DeleteObject(this->pObj->statusbarColor);
+		// DESTROY ICONS
+		DestroyIcon(this->pObj->MainIcon);
+		DestroyIcon(this->pObj->MainIconMarked);
+		DestroyIcon(this->pObj->MainIconPressed);
+		DestroyIcon(this->pObj->close_norm);
+		DestroyIcon(this->pObj->close_mark);
+		DestroyIcon(this->pObj->close_pressed);
+		DestroyIcon(this->pObj->size_arrow);
+		DestroyIcon(this->pObj->size_arrow_disabled);
+		DestroyIcon(this->pObj->new_norm);
+		DestroyIcon(this->pObj->new_mark);
+		DestroyIcon(this->pObj->new_pressed);
+		DestroyIcon(this->pObj->open_norm);
+		DestroyIcon(this->pObj->new_mark);
+		DestroyIcon(this->pObj->new_pressed);
+		DestroyIcon(this->pObj->save_norm);
+		DestroyIcon(this->pObj->save_mark);
+		DestroyIcon(this->pObj->save_pressed);
+		DestroyIcon(this->pObj->saveall_norm);
+		DestroyIcon(this->pObj->saveall_mark);
+		DestroyIcon(this->pObj->saveall_pressed);
+		DestroyIcon(this->pObj->saveas_norm);
+		DestroyIcon(this->pObj->saveas_mark);
+		DestroyIcon(this->pObj->saveas_pressed);
+		DestroyIcon(this->pObj->copy_norm);
+		DestroyIcon(this->pObj->copy_mark);
+		DestroyIcon(this->pObj->copy_pressed);
+		DestroyIcon(this->pObj->dropdown_norm);
+		DestroyIcon(this->pObj->dropdown_mark);
+		DestroyIcon(this->pObj->dropdown_pressed);
+		DestroyIcon(this->pObj->paste_norm);
+		DestroyIcon(this->pObj->paste_mark);
+		DestroyIcon(this->pObj->paste_pressed);
+		DestroyIcon(this->pObj->cut_norm);
+		DestroyIcon(this->pObj->cut_mark);
+		DestroyIcon(this->pObj->cut_pressed);
+		DestroyIcon(this->pObj->selectall_norm);
+		DestroyIcon(this->pObj->selectall_mark);
+		DestroyIcon(this->pObj->selectall_pressed);
+		DestroyIcon(this->pObj->editdelete_norm);
+		DestroyIcon(this->pObj->editdelete_mark);
+		DestroyIcon(this->pObj->editdelete_pressed);
+		DestroyIcon(this->pObj->sample_norm);
+		DestroyIcon(this->pObj->sample_mark);
+		DestroyIcon(this->pObj->sample_pressed);
+		DestroyIcon(this->pObj->import_norm);
+		DestroyIcon(this->pObj->import_mark);
+		DestroyIcon(this->pObj->import_pressed);
+		DestroyIcon(this->pObj->send_norm);
+		DestroyIcon(this->pObj->send_mark);
+		DestroyIcon(this->pObj->send_pressed);
+		DestroyIcon(this->pObj->receive_norm);
+		DestroyIcon(this->pObj->receive_mark);
+		DestroyIcon(this->pObj->receive_pressed);
+		// DESTROY CURSORS
+		DestroyCursor(this->pObj->arrow);
+		DestroyCursor(this->pObj->size_ns);
+		DestroyCursor(this->pObj->size_nwso);
+		DestroyCursor(this->pObj->size_we);
+		// DELETE STRUCTURE
+		delete this->pObj;
+		this->pObj = NULL;
+	}
+	if (this->iParam != NULL)
+	{
+		delete this->iParam;
+		this->iParam = NULL;
+	}
+	// unregister classes
+}
+
+HRESULT CnCS_UI::Init_UI(HWND hWnd, LPCSTMFRAME cFrameSize)
+{
+	if (!hWnd || !this->startup_result)
+	{
+		return E_FAIL;
+	}
+	else
+	{
+		this->MainWindow = hWnd;
+
+		if (cFrameSize->valid)
+		{
+			this->iParam->WindowSizeUserdefined = TRUE;
+			this->iParam->TVFrameWidth = cFrameSize->TVFrameWidth;
+			this->iParam->EditFrameHeight = cFrameSize->EditFrameHeight;
+
+			if ((cFrameSize->nCmdShow == SW_SHOWMAXIMIZED) || (cFrameSize->valid == MAXIMIZENORMAL))
+			{
+				this->iParam->WindowIsMaximized = TRUE;
+			}
+		}
+		if (!SetWindowsHookEx(WH_MOUSE_LL, CnCS_UI::MouseProc, NULL, 0))
+		{
+			return E_FAIL;
+		}
+	}
+	return this->Init_Childs() ? S_OK : E_NOINTERFACE;
+}
+
+HRESULT CnCS_UI::RegisterChildClasses()
+{
+	HRESULT hr;
+
+	WNDCLASSEX wcx;
+	wcx.cbSize = sizeof(WNDCLASSEX);
+	wcx.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
+	wcx.cbClsExtra = 0;
+	wcx.cbWndExtra = sizeof(LONG_PTR);
+	wcx.lpfnWndProc = CnCS_UI::SizeWndProc;
+	wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wcx.hbrBackground = this->pObj->sizeWndColor;
+	wcx.hIcon = NULL;
+	wcx.hInstance = this->hInstance;
+	wcx.lpszMenuName = NULL;
+	wcx.lpszClassName = L"SIZE_CLASS";
+	wcx.hIconSm = NULL;
+
+	hr = (RegisterClassEx(&wcx) == 0) ? E_FAIL : S_OK;
+	if (SUCCEEDED(hr))
+	{
+		SecureZeroMemory(&wcx, sizeof(WNDCLASSEX));
+
+		wcx.cbSize = sizeof(WNDCLASSEX);
+		wcx.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
+		wcx.cbClsExtra = 0;
+		wcx.cbWndExtra = sizeof(LONG_PTR);
+		wcx.lpfnWndProc = CnCS_UI::FrameWndProc;
+		wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wcx.hbrBackground = this->pObj->frameWndColor;
+		wcx.hIcon = NULL;
+		wcx.hInstance = this->hInstance;
+		wcx.lpszMenuName = NULL;
+		wcx.lpszClassName = UNI_FRAME_CLASS;//L"UNIVERSALFRAMECLASS";
+		wcx.hIconSm = NULL;
+
+		hr = (RegisterClassEx(&wcx) == 0) ? E_FAIL : S_OK;
+		if (SUCCEEDED(hr))
+		{
+			// .....
+		}
+	}
+	return hr;
+}
+
+BOOL CnCS_UI::Init_Childs()
+{
+	BOOL res = TRUE;
+	RECT rc;
+	int X_pos = 160;
+	int i = 0;
+	GetClientRect(this->MainWindow, &rc);
+	// Create static buttons
+	if (!this->MakeButton(NULL, 15, 0, 78, 78, IDM_MAIN))
+		return FALSE;
+	if (!this->MakeButton(NULL, rc.right - 44, 2, 42, 42, IDM_CLOSE))
+		return FALSE;
+	if (!this->MakeButton(NULL, rc.right - 100, 2, 54, 20, IDM_MAXIMIZE))
+		return FALSE;
+	if (!this->MakeButton(NULL, rc.right - 100, 24, 54, 20, IDM_MINIMIZE))
+		return FALSE;
+	//////////////////////////////////////////////////////////////////////////////////
+	// Create toolbar-buttons :: amount depending on the window width
+	while ((X_pos < rc.right - 177) && ((IDM_NEW + i) < TBBUTTON_END))
+	{
+		if (!this->MakeButton(NULL, X_pos, 36, 42, 42, IDM_NEW + i))
+			return FALSE;
+
+		X_pos += 52;
+		i++;
+	}
+	// Save the toolbar condition >>
+	if ((IDM_NEW + i) < TBBUTTON_END)
+	{
+		if (!this->MakeButton(NULL, rc.right - 84, 55, 22, 22, IDM_TOOLBAR_DROPDOWN))
+			return FALSE;
+
+		this->iParam->LAST_TBBUTTON_ID = IDM_NEW + (i - 1);
+		this->iParam->DropdownbuttonIsVisible = TRUE;
+	}
+	else
+		this->iParam->LAST_TBBUTTON_ID = TBBUTTON_END;
+	///////////////////////////////////////////////////////////////////////////////////
+	// Create the Frames for the external controls >>
+	res = this->CreateStatusBar();
+	if (res)
+	{
+		res = this->CreateTVFrame();
+		if (res)
+		{
+			res = this->CreateEditFrame();
+			if (res)
+			{
+				res = this->CreateCBoxFrame();
+			}
+		}
+	}
+	return res;
+}
+
+BOOL CnCS_UI::CreateStatusBar()
+{
+	int parts[3] = { 0 };
+
+	RECT rc;
+	GetClientRect(this->MainWindow, &rc);
+
+	parts[0] = rc.right / 2;
+	parts[1] = (rc.right / 2) + 80;
+	parts[2] = rc.right;
+
+	InitCommonControls();
+
+	this->iParam->statusBar_WND = CreateWindowEx(WS_EX_COMPOSITED, STATUSCLASSNAME, NULL, WS_CHILD | WS_VISIBLE, 0, 0, 0, 0, this->MainWindow, (HMENU)ID_STATUSBAR, this->hInstance, NULL);
+	if (!this->iParam->statusBar_WND)
+		return FALSE;
+	else
+	{
+
+		SendMessage(this->iParam->statusBar_WND, SB_SETPARTS, (WPARAM)3, reinterpret_cast<LPARAM>(&parts));
+		SendMessage(this->iParam->statusBar_WND, SB_SETMINHEIGHT, (WPARAM)22, 0);
+		this->ChangeStatusbar(0, L"Bereit\0", 0);
+		this->ChangeStatusbar(1, NULL, 0);
+		this->ChangeStatusbar(2, L"Textinfo\0", 0);
+
+		return SetWindowSubclass(this->iParam->statusBar_WND, CnCS_UI::StatusbarSub, NULL, reinterpret_cast<DWORD_PTR>(this));
+	}
+}
+
+BOOL CnCS_UI::CreateTVFrame()
+{
+	RECT rc, rc_statusbar;
+	GetClientRect(this->MainWindow, &rc);
+	GetWindowRect(this->iParam->statusBar_WND, &rc_statusbar);
+
+	int cx;
+
+	if (this->iParam->WindowSizeUserdefined)
+		cx = this->iParam->TVFrameWidth;
+	else
+		cx = rc.right / 4;
+
+	this->iParam->TVFrame_WND = CreateWindowEx(
+		WS_EX_COMPOSITED,
+		UNI_FRAME_CLASS,
+		NULL,
+		WS_CHILD | WS_VISIBLE,
+		0, 80,
+		cx, rc.bottom - (80 + (rc_statusbar.bottom - rc_statusbar.top)),
+		this->MainWindow,
+		(HMENU)ID_TVFRAME,
+		this->hInstance,
+		NULL);
+
+	if (this->iParam->TVFrame_WND)
+		return TRUE;
+	else
+		return FALSE;
+}
+
+BOOL CnCS_UI::CreateEditFrame()
+{
+	RECT rc, rc_statusbar;
+	GetClientRect(this->MainWindow, &rc);
+	GetWindowRect(this->iParam->statusBar_WND, &rc_statusbar);
+
+	int x, cx, cy;
+
+	if (this->iParam->WindowSizeUserdefined)
+	{
+		x = this->iParam->TVFrameWidth + 5;
+		cx = rc.right - (this->iParam->TVFrameWidth + 5);
+		cy = this->iParam->EditFrameHeight;
+	}
+	else
+	{
+		x = (rc.right / 4) + 5;
+		cx = rc.right - x;
+		cy = rc.bottom - (80 + (rc_statusbar.bottom - rc_statusbar.top) + 105);
+	}
+	this->iParam->EditFrame_WND = CreateWindow(
+		UNI_FRAME_CLASS,
+		NULL,
+		WS_CHILD | WS_VISIBLE,
+		x, 80,
+		cx, cy,
+		this->MainWindow,
+		(HMENU)ID_EDITFRAME,
+		this->hInstance,
+		NULL);
+
+	if (this->iParam->EditFrame_WND)
+		return TRUE;
+	else
+		return FALSE;
+}
+
+BOOL CnCS_UI::CreateCBoxFrame()
+{
+	RECT rc, rc_statusbar;
+	GetClientRect(this->MainWindow, &rc);
+	GetWindowRect(this->iParam->statusBar_WND, &rc_statusbar);
+
+	int x, y, cx, cy;
+
+	if (this->iParam->WindowSizeUserdefined)
+	{
+		x = this->iParam->TVFrameWidth + 5;
+		y = 80 + this->iParam->EditFrameHeight + 5;
+		cx = rc.right - (this->iParam->TVFrameWidth + 5);
+		cy = rc.bottom - (this->iParam->EditFrameHeight + (rc_statusbar.bottom - rc_statusbar.top) + 80 + 5);
+	}
+	else
+	{
+		x = (rc.right / 4) + 5;
+		y = rc.bottom - ((rc_statusbar.bottom - rc_statusbar.top) + 100);
+		cx = rc.right - x;
+		cy = 100;
+	}
+	this->iParam->CBoxFrame_WND = CreateWindow(
+		UNI_FRAME_CLASS,
+		NULL,
+		WS_CHILD | WS_VISIBLE,
+		x, y,
+		cx, cy,
+		this->MainWindow,
+		(HMENU)ID_CBOXFRAME,
+		this->hInstance,
+		NULL);
+
+	if (this->iParam->CBoxFrame_WND)
+		return TRUE;
+	else
+		return FALSE;
+}
+
+BOOL CnCS_UI::CreateExtendedToolbar()
+{
+	RECT rc;
+	GetClientRect(this->MainWindow, &rc);
+
+	int num_buttons = (TBBUTTON_END - 1) - this->iParam->LAST_TBBUTTON_ID;
+	if (num_buttons > 0)
+	{
+		POINT pt;
+		pt.x = rc.right - 99;
+		pt.y = 80;
+		ClientToScreen(this->MainWindow, &pt);
+
+		this->iParam->extendedToolbar_WND = CreateWindowEx(
+			WS_EX_TOOLWINDOW,
+			L"STATIC", NULL,
+			WS_POPUP | WS_VISIBLE | WS_BORDER,
+			pt.x, pt.y,
+			52, 52 + (47 * (num_buttons - 1)),
+			this->MainWindow,
+			NULL,
+			this->hInstance, NULL);
+
+		if (this->iParam->extendedToolbar_WND)
+		{
+			this->iParam->ext_toolbar_exsisting = TRUE;
+
+			if (!SetWindowSubclass(this->iParam->extendedToolbar_WND, CnCS_UI::ExtendedToolbarSub, NULL, reinterpret_cast<DWORD_PTR>(this)))
+				return FALSE;
+
+			for (int i = 0; i < num_buttons; i++)
+			{
+				if (!MakeButton(this->iParam->extendedToolbar_WND, 5, 5 + (47 * i), 42, 42, (this->iParam->LAST_TBBUTTON_ID + 1) + i))
+					return FALSE;
+			}
+		}
+		else
+			return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL CnCS_UI::CreateSizeBeam(LPRECT rc_beam, int alignment)
+{
+	RECT rc;
+	GetWindowRect(this->MainWindow, &rc);
+
+	this->iParam->SizeBeam_WND = CreateWindowEx(
+		WS_EX_LAYERED,
+		L"SIZE_CLASS", NULL,
+		WS_POPUP | WS_VISIBLE,
+		rc_beam->left, rc_beam->top,
+		rc_beam->right - rc_beam->left,
+		rc_beam->bottom - rc_beam->top,
+		this->MainWindow,
+		NULL,
+		this->hInstance,
+		reinterpret_cast<LPVOID>(this));
+
+	if (this->iParam->SizeBeam_WND)
+	{
+		SetCapture(this->MainWindow);
+		SetLayeredWindowAttributes(this->iParam->SizeBeam_WND, 0, 150, LWA_ALPHA);
+		this->iParam->FrameSizeAreaActivated = alignment;
+
+		if (alignment == WE_SIZEAREA_SIZING)
+		{
+			rc.left += 80;
+			rc.top += 80;
+			rc.right -= 80;
+			rc.bottom -= 24;
+
+			ClipCursor(&rc);
+		}
+		else if (alignment == NS_SIZEAREA_SIZING)
+		{
+			rc.left = this->iParam->rc_multiU.left;
+			rc.top += 180;
+			rc.bottom -= 74;
+
+			ClipCursor(&rc);
+		}
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
+LRESULT CnCS_UI::_DefaultHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+		case WM_PAINT:
+			return this->OnPaint(hWnd);
+		case WM_DRAWITEM:
+			return this->OnDrawItem(hWnd, lParam);
+		case WM_NORMALIZE:
+			return this->OnNormalize(hWnd, wParam);
+		case WM_GETUIINSTANCE:
+			return reinterpret_cast<LRESULT>(this);
+		case WM_SIZE:
+			return this->OnSize(hWnd, wParam, lParam);
+		case WM_MOVE:
+			return this->OnMove(hWnd);
+		//case WM_WINDOWPOSCHANGED:
+		//	return this->OnWindowPosChanged(hWnd, lParam);
+		case WM_TIMER:
+			return this->OnTimer(hWnd, wParam);
+		case WM_GETMINMAXINFO:
+			return this->OnMinMaxInfo(lParam);
+		case WM_MOUSEMOVE:
+			return this->OnMouseMove(hWnd, wParam, lParam);
+		case WM_LBUTTONDOWN:
+			return this->OnLButtondown(hWnd, wParam, lParam);
+		case WM_LBUTTONUP:
+			return this->OnLButtonUp(hWnd, lParam);
+		case WM_ERASEBKGND:
+			return this->OnEraseBkgnd();
+		case WM_CTLCOLORSTATIC:
+			return reinterpret_cast<LRESULT>(this->pObj->barColor);
+		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+}
+
+LRESULT CnCS_UI::ButtonSub(HWND button, UINT message, WPARAM wParam, LPARAM lParam, UINT_PTR uID, DWORD_PTR refData)
+{
+	UNREFERENCED_PARAMETER(uID);	
+	
+	CnCS_UI* pUI = reinterpret_cast<CnCS_UI*>(refData);
+	if (pUI != NULL)
+	{
+		int ID_ = static_cast<int>(GetWindowLongPtr(button, GWLP_ID));
+
+		switch (message)
+		{
+			case WM_MOUSEMOVE:
+				pUI->DrawButtonFromID(button, NULL, ID_, BDRAW_MARKED);
+				return 0;
+			case WM_LBUTTONDOWN:
+				pUI->DrawButtonFromID(button, NULL, ID_, BDRAW_PRESSED);
+				return 0;
+			case WM_LBUTTONUP:
+				pUI->HandleSpecialActions(ID_);
+				pUI->DrawButtonFromID(button, NULL, ID_, BDRAW_MARKED);
+				SendMessage(pUI->MainWindow, WM_COMMAND, MAKEWPARAM(ID_, 0), 0);
+				return 0;
+			case WM_ERASEBKGND:
+				return pUI->OnEraseBkgnd();
+			default:
+				break;
+		}
+	}
+	return DefSubclassProc(button, message, wParam, lParam);
+}
+
+LRESULT CnCS_UI::StatusbarSub(HWND Statusbar, UINT message, WPARAM wParam, LPARAM lParam, UINT_PTR uID, DWORD_PTR refData)
+{
+	UNREFERENCED_PARAMETER(uID);
+
+	CnCS_UI* pUI = reinterpret_cast<CnCS_UI*>(refData);
+	if (pUI != NULL)
+	{
+		if (pUI->iParam->WindowIsMaximized)
+			return DefSubclassProc(Statusbar, message, wParam, lParam);
+
+		switch (message)
+		{
+			case WM_LBUTTONDOWN:
+			{
+				RECT rc;
+				GetClientRect(Statusbar, &rc);
+
+				int x = GET_X_LPARAM(lParam);
+				int y = GET_Y_LPARAM(lParam);
+
+				if ((x > (rc.right - 23)) && (x < (rc.right)) && (y > 0) && (y < (rc.bottom)))
+				{
+					if (wParam & MK_LBUTTON)
+					{
+						SetCapture(Statusbar);
+						SetCursor(pUI->pObj->size_nwso);
+
+						pUI->iParam->SizeAreaActivated = TRUE;
+						pUI->iParam->InitialPos_X = rc.right - x;
+						pUI->iParam->InitialPos_Y = rc.bottom - y;
+					}
+				}
+				return static_cast<LRESULT>(0);
+			}
+			case WM_LBUTTONUP:
+			{
+				if (pUI->iParam->SizeAreaActivated)
+				{
+					pUI->iParam->SizeAreaActivated = FALSE;
+					SetCursor(pUI->pObj->arrow);
+					ReleaseCapture();
+				}
+				return static_cast<LRESULT>(0);
+			}
+		}
+	}
+	return DefSubclassProc(Statusbar, message, wParam, lParam);
+}
+
+LRESULT CnCS_UI::ExtendedToolbarSub(HWND E_toolbar, UINT message, WPARAM wParam, LPARAM lParam, UINT_PTR uID, DWORD_PTR refData)
+{
+	UNREFERENCED_PARAMETER(uID);
+
+	CnCS_UI* pUI = reinterpret_cast<CnCS_UI*>(refData);
+	if (pUI != NULL)
+	{
+		if (message == WM_DRAWITEM)
+		{
+			SendMessage(pUI->MainWindow, message, wParam, lParam);
+		}
+	}
+	return DefSubclassProc(E_toolbar, message, wParam, lParam);
+}
+
+LRESULT CnCS_UI::SizeWndProc(HWND size, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	CnCS_UI* pUI = NULL;
+
+	if (message == WM_CREATE)
+	{
+		LPCREATESTRUCT pcr = reinterpret_cast<LPCREATESTRUCT>(lParam);
+		pUI = reinterpret_cast<CnCS_UI*>(pcr->lpCreateParams);
+		SetWindowLongPtr(size, GWLP_USERDATA, PtrToUlong(pUI));
+
+		return 1;
+	}
+	else
+	{
+		pUI = reinterpret_cast<CnCS_UI*>(GetWindowLongPtr(size, GWLP_USERDATA));
+		if (pUI != NULL)
+		{
+			// ....... ?
+		}
+		return DefWindowProc(size, message, wParam, lParam);
+	}
+}
+
+LRESULT CnCS_UI::FrameWndProc(HWND frame, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	CnCS_UI* pUI = NULL;
+
+	if (message == WM_CREATE)
+	{
+		LPCREATESTRUCT pcr = reinterpret_cast<LPCREATESTRUCT>(lParam);
+		pUI = reinterpret_cast<CnCS_UI*>(pcr->lpCreateParams);
+		SetWindowLongPtr(frame, GWLP_USERDATA, PtrToUlong(pUI));
+
+		return 1;
+	}
+	else
+	{
+		pUI = reinterpret_cast<CnCS_UI*>(GetWindowLongPtr(frame, GWLP_USERDATA));
+		if (pUI != NULL)
+		{
+			// ....... ?
+		}
+		return DefWindowProc(frame, message, wParam, lParam);
+	}
+}
+
+LRESULT CnCS_UI::OnMinMaxInfo(LPARAM lParam)
+{
+	LPMINMAXINFO pmmi = reinterpret_cast<LPMINMAXINFO>(lParam);
+	if(pmmi)
+	{ 
+		pmmi->ptMinTrackSize.x = 600;
+		pmmi->ptMinTrackSize.y = 400;
+	}
+	return static_cast<LRESULT>(0);
+}
+
+LRESULT CnCS_UI::OnPaint(HWND hWnd)
+{
+	if (this->iParam->DRAW_MODE == DRAW_ALL_AREAS)
+	{
+		this->DrawAll(hWnd);
+		this->iParam->DRAW_MODE = DRAW_NCS_AREAS;
+	}
+	else
+	{
+		this->DrawNeccessaryAreas(hWnd);
+	}
+	return static_cast<LRESULT>(0);
+}
+
+LRESULT CnCS_UI::OnDrawItem(HWND hWnd, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+
+	DRAWITEMSTRUCT* pdi = reinterpret_cast<DRAWITEMSTRUCT*>(lParam);
+	if (pdi != NULL)
+	{
+		ItemType type = this->WhatIsItem(pdi->CtlID);
+		switch (type)
+		{
+		case IS_BUTTON_ITEM:
+			this->DrawButtonFromID(pdi->hwndItem, pdi, pdi->CtlID, BDRAW_NORMAL);
+			break;
+		case IS_STATUSBAR_ITEM:
+			this->DrawStatusbar(pdi);
+			break;
+		default:
+			break;
+		}
+		
+	}
+	return static_cast<LRESULT>(0);
+}
+
+LRESULT CnCS_UI::OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	RECT rc, rc_tv, rc_ed, rc_cb;
+	GetWindowRect(hWnd, &rc);
+	GetWindowRect(this->iParam->TVFrame_WND, &rc_tv);
+	GetWindowRect(this->iParam->EditFrame_WND, &rc_ed);
+	GetWindowRect(this->iParam->CBoxFrame_WND, &rc_cb);
+
+	POINT pt;
+	GetCursorPos(&pt);
+
+	if (wParam & MK_LBUTTON)
+	{
+		if (this->iParam->MoveAreaActivated)
+		{
+			MoveWindow(hWnd, pt.x - this->iParam->InitialPos_X, pt.y - this->iParam->InitialPos_Y, rc.right-rc.left, rc.bottom-rc.top, TRUE);
+		}
+		if (this->iParam->FrameSizeAreaActivated)
+		{
+			if (this->iParam->FrameSizeAreaActivated == NS_SIZEAREA_SIZING)
+			{
+				this->iParam->rc_multiU.top = pt.y - this->iParam->add_val_y;
+
+				MoveWindow(this->iParam->SizeBeam_WND, this->iParam->rc_multiU.left, this->iParam->rc_multiU.top, this->iParam->rc_multiU.right - this->iParam->rc_multiU.left, 5, TRUE);
+
+			}
+			else if (this->iParam->FrameSizeAreaActivated == WE_SIZEAREA_SIZING)
+			{
+				this->iParam->rc_multiU.left = pt.x - this->iParam->add_val_x;
+
+				MoveWindow(this->iParam->SizeBeam_WND, this->iParam->rc_multiU.left, this->iParam->rc_multiU.top, 5, this->iParam->rc_multiU.bottom - this->iParam->rc_multiU.top, TRUE);
+			}
+		}
+	}
+	if ((pt.x < rc_ed.left) && (pt.x > rc_tv.right) && (pt.y > (rc.top + 80)) && (pt.y < (rc.bottom - 24)))
+	{
+		SetCursor(this->pObj->size_we);
+	}
+	if ((pt.x < rc_ed.right) && (pt.x > rc_ed.left) && (pt.y > rc_ed.bottom) && (pt.y < rc_cb.top))
+	{
+		if (this->iParam->FrameSizeAreaActivated != WE_SIZEAREA_SIZING)
+		{
+			SetCursor(this->pObj->size_ns);
+		}
+	}
+	return static_cast<LRESULT>(0);
+}
+
+LRESULT CnCS_UI::OnNormalize(HWND hWnd, WPARAM wParam)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	BOOL result = TRUE;
+
+	HWND wndToNorm = this->GetButtonHandle((int)wParam);
+	if (wndToNorm)
+	{
+		this->DrawButtonFromID(wndToNorm, NULL, static_cast<int>(wParam), BDRAW_NORMAL);
+	}
+	else
+		result = FALSE;
+
+	return static_cast<LRESULT>(result);
+}
+
+LRESULT CnCS_UI::OnSize(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	switch (wParam)
+	{
+	case SIZE_MAXIMIZED:
+		this->OnRestoreWindow(hWnd, lParam);
+		this->iParam->DRAW_MODE = DRAW_ALL_AREAS;
+		break;
+	case SIZE_MINIMIZED:
+		this->iParam->DRAW_MODE = DRAW_ALL_AREAS;
+		break;
+	case SIZE_RESTORED:
+		this->OnRestoreWindow(hWnd, lParam);
+		break;
+	default:
+		break;
+	}
+	return static_cast<LRESULT>(0);
+}
+
+LRESULT CnCS_UI::OnMove(HWND hWnd)
+{
+	if (this->iParam->WindowIsMaximized && !this->iParam->MaximizeWndToFullScreen)
+	{
+		SendMessage(this->MainWindow, WM_SIZE, 0, 0);
+	}
+	else
+		this->WindowChanged(hWnd);
+
+	return static_cast<LRESULT>(0);
+}
+
+LRESULT CnCS_UI::OnTimer(HWND hWnd, WPARAM wParam)
+{
+	if (wParam == TIMER_ID_15SEC)
+	{
+		if (this->iParam->SizeChanged)
+		{
+			CSTMFRAME ctm;
+
+			if (this->iParam->WindowIsMaximized)
+			{
+				if (this->iParam->MaximizeWndToFullScreen)
+				{
+					ctm.nCmdShow = SW_SHOWMAXIMIZED;
+					ctm.valid = TRUE;
+				}
+				else
+				{
+					ctm.nCmdShow = SW_SHOWNORMAL;
+					ctm.valid = MAXIMIZENORMAL;
+				}
+			}
+			else
+			{
+				ctm.nCmdShow = SW_SHOW;
+				ctm.valid = TRUE;
+			}
+
+			ctm.EditFrameHeight = this->iParam->EditFrameHeight;
+			ctm.TVFrameWidth = this->iParam->TVFrameWidth;
+
+			SendMessage(hWnd, WM_FRAMECHANGED, 0, reinterpret_cast<LPARAM>(&ctm));
+
+			KillTimer(hWnd, TIMER_ID_15SEC);
+			this->iParam->SizeChanged = FALSE;
+		}
+	}
+	return static_cast<LRESULT>(0);
+}
+
+LRESULT CnCS_UI::OnLButtondown(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(wParam);
+
+	RECT rc_client;
+	GetClientRect(hWnd, &rc_client);
+
+	RECT rc, rc_tv, rc_ed, rc_cb;
+	GetWindowRect(hWnd, &rc);
+	GetWindowRect(this->iParam->TVFrame_WND, &rc_tv);
+	GetWindowRect(this->iParam->EditFrame_WND, &rc_ed);
+	GetWindowRect(this->iParam->CBoxFrame_WND, &rc_cb);
+
+	POINT pt;
+	GetCursorPos(&pt);
+
+	int x = GET_X_LPARAM(lParam);
+	int y = GET_Y_LPARAM(lParam);
+
+	if ((x > 80) && (x < (rc_client.right - 80)) && (y > 0) && (y < 26))
+	{
+		if (this->iParam->WindowIsMaximized)
+			return static_cast<LRESULT>(0);
+
+		SetCapture(hWnd);
+
+		this->iParam->MoveAreaActivated = TRUE;
+		this->iParam->InitialPos_X = x;
+		this->iParam->InitialPos_Y = y;
+	}
+	if ((pt.x < rc_ed.left) && (pt.x > rc_tv.right) && (pt.y > (rc.top + 80)) && (pt.y < (rc.bottom - 24)))
+	{
+		SetRect(&this->iParam->rc_multiU, rc_tv.right, rc_tv.top, rc_ed.left, rc.bottom - 24);
+
+		this->iParam->add_val_x = pt.x - rc_tv.right;
+
+		this->CreateSizeBeam(&this->iParam->rc_multiU, WE_SIZEAREA_SIZING);
+	}
+	if ((pt.x < rc_ed.right) && (pt.x > rc_ed.left) && (pt.y > rc_ed.bottom) && (pt.y < rc_cb.top))
+	{
+		SetRect(&this->iParam->rc_multiU, rc_ed.left, rc_ed.bottom, rc_ed.right, rc_cb.top);
+
+		this->iParam->add_val_y = pt.y - rc_ed.bottom;
+
+		this->CreateSizeBeam(&this->iParam->rc_multiU, NS_SIZEAREA_SIZING);
+	}
+	return static_cast<LRESULT>(0);
+}
+
+LRESULT CnCS_UI::OnLButtonUp(HWND hWnd, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(lParam);
+
+	if (this->iParam->MoveAreaActivated)
+	{
+		this->iParam->MoveAreaActivated = FALSE;
+		ReleaseCapture();
+
+		this->iParam->InitialPos_X = 0;
+		this->iParam->InitialPos_Y = 0;
+	}
+	if (this->iParam->FrameSizeAreaActivated)
+	{
+		this->SetNewFrameAlignment();
+
+		if (this->iParam->SizeBeam_WND)
+		{
+			DestroyWindow(this->iParam->SizeBeam_WND);
+			this->iParam->SizeBeam_WND = NULL;
+		}
+		ClipCursor(NULL);
+		ReleaseCapture();
+		this->iParam->FrameSizeAreaActivated = FALSE;
+	}
+	return static_cast<LRESULT>(0);
+}
+
+LRESULT CnCS_UI::OnEraseBkgnd()
+{
+	return static_cast<LRESULT>(1);
+}
+
+LRESULT CnCS_UI::OnWindowPosChanged(HWND hWnd, LPARAM lParam)
+{
+	//this->OnRestoreWindow(hWnd, lParam);
+	//is more efficient but hard to handle all cases of windowmorping...
+
+	return static_cast<LRESULT>(0);
+}
+
+LRESULT CALLBACK CnCS_UI::MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	if (nCode < 0)
+		return CallNextHookEx(NULL, nCode, wParam, lParam);
+	else
+	{
+		HWND CnCSuite = FindWindow(L"CNCSUITECLASS", NULL);
+		if (CnCSuite)
+		{
+			LPMOUSEHOOKSTRUCT pmh = reinterpret_cast<LPMOUSEHOOKSTRUCT>(lParam);
+			if (pmh)
+			{
+				CnCS_UI* pUI = reinterpret_cast<CnCS_UI*>(SendMessage(CnCSuite,WM_GETUIINSTANCE,0,0));
+				if (pUI)
+				{
+					pUI->Global_Tracking(pmh, pUI);
+				}
+			}
+		}
+		return CallNextHookEx(NULL, nCode, wParam, lParam);
+	}
+}
+
+void CnCS_UI::OnRestoreWindow(HWND hWnd, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	if (this->iParam->WindowIsMaximized && !this->iParam->MaximizeWndToFullScreen)
+	{
+		RECT rc;
+
+		if (this->Get_MaximizeRect(&rc))
+		{
+			MoveWindow(hWnd, rc.left, rc.top, rc.right, rc.bottom, TRUE);
+		}
+	}
+	RECT rc_client;
+	GetClientRect(hWnd, &rc_client);
+
+	int cx = rc_client.right;
+
+	MoveWindow(
+		GetDlgItem(hWnd, IDM_CLOSE),cx - 44, 2, 42, 42, TRUE);
+	MoveWindow(
+		GetDlgItem(hWnd, IDM_MAXIMIZE), cx - 100, 2, 54, 20, TRUE);
+	MoveWindow(
+		GetDlgItem(hWnd, IDM_MINIMIZE), cx - 100, 24, 54, 20, TRUE);
+
+	if (this->iParam->DropdownbuttonIsVisible)
+	{
+		MoveWindow(
+			GetDlgItem(hWnd, IDM_TOOLBAR_DROPDOWN), cx - 84, 55, 22, 22, TRUE);
+	}
+	this->OnRestoreStatusbar();
+	this->OnRestoreToolbar();
+	this->OnRestoreFrames();
+
+	this->WindowChanged(hWnd);
+}
+
+void CnCS_UI::OnRestoreStatusbar()
+{
+	int parts[3] = { 0 };
+
+	RECT rc;
+	GetClientRect(this->MainWindow, &rc);
+
+	MoveWindow(
+		GetDlgItem(this->MainWindow, ID_STATUSBAR), 0, 0, 0, 0, TRUE);
+
+	parts[0] = rc.right / 2;
+	parts[1] = (rc.right / 2) + 80;
+	parts[2] = rc.right;
+
+	SendMessage(this->iParam->statusBar_WND, SB_SETPARTS, (WPARAM)3, reinterpret_cast<LPARAM>(&parts));
+}
+
+void CnCS_UI::OnRestoreToolbar()
+{
+	RECT rc;
+	GetClientRect(this->MainWindow, &rc);
+
+	if ((rc.right - 177) < (160 + (52 * (this->iParam->LAST_TBBUTTON_ID - IDM_NEW))))
+	{
+		//GET THE NUMBER OF BUTTONS TO HIDE
+		int num_buttons = -(((rc.right - 177) - (160 + (52 * ((this->iParam->LAST_TBBUTTON_ID - IDM_NEW) +1)))) / 52);
+
+		for (int i = 0; i < num_buttons; i++)
+		{
+			// HIDE EXISTING BUTTON(S)
+			HWND button = GetDlgItem(this->MainWindow, this->iParam->LAST_TBBUTTON_ID);
+			if (button)
+			{
+				if (IsWindowVisible(button))
+					ShowWindow(button, SW_HIDE);
+			}
+			if ((this->iParam->LAST_TBBUTTON_ID == (TBBUTTON_END - 1)) && !this->iParam->DropdownbuttonIsVisible)
+			{
+				// SHOW OR CREATE DROPDOWNBUTTON IF NECCESSARY
+				HWND dropdown = GetDlgItem(this->MainWindow, IDM_TOOLBAR_DROPDOWN);
+				if (dropdown)
+				{
+					MoveWindow(dropdown, rc.right - 84, 55, 22, 22, TRUE);
+					ShowWindow(dropdown, SW_SHOW);
+				}
+				else
+				{
+					this->MakeButton(NULL, rc.right - 84, 55, 22, 22, IDM_TOOLBAR_DROPDOWN);
+				}
+				this->iParam->DropdownbuttonIsVisible = TRUE;
+			}
+			this->iParam->LAST_TBBUTTON_ID--;
+		}
+
+	}
+	else
+	{
+		// RETURN IF ALL BUTTONS ARE VISIBLE
+		if (this->iParam->LAST_TBBUTTON_ID == (TBBUTTON_END - 1))
+		{
+			// MAKE SURE THE DROPDOWNBUTTON IS HIDDEN
+			if (this->iParam->DropdownbuttonIsVisible)
+			{
+				ShowWindow(
+					GetDlgItem(this->MainWindow, IDM_TOOLBAR_DROPDOWN), SW_HIDE );
+
+				this->iParam->DropdownbuttonIsVisible = FALSE;
+			}
+			return;
+		}
+		else
+		{
+			if ((rc.right - 177) > (160 + (52 * ((this->iParam->LAST_TBBUTTON_ID - IDM_NEW) + 1))))
+			{
+				//GET THE NUMBER OF BUTTONS TO SHOW
+				int num_buttons = ((rc.right - 177) - (160 + (52 * (this->iParam->LAST_TBBUTTON_ID - IDM_NEW)))) / 52;
+				if (num_buttons > ((TBBUTTON_END - 1) - this->iParam->LAST_TBBUTTON_ID))
+					num_buttons = ((TBBUTTON_END - 1) - this->iParam->LAST_TBBUTTON_ID);
+
+				for (int i = 0; i < num_buttons; i++)
+				{
+					// CREATE OR SHOW HIDDEN BUTTON(S)
+					HWND button = GetDlgItem(this->MainWindow, this->iParam->LAST_TBBUTTON_ID + 1);
+					if (button)
+					{
+						if (!IsWindowVisible(button))
+							ShowWindow(button, SW_SHOW);
+					}
+					else
+					{
+						this->MakeButton(NULL, (160 + (52 * ((this->iParam->LAST_TBBUTTON_ID - IDM_NEW) + 1))), 36, 42, 42, this->iParam->LAST_TBBUTTON_ID + 1);
+					}
+					if ((this->iParam->LAST_TBBUTTON_ID + 1) == (TBBUTTON_END - 1))
+					{
+						// HIDE DROPDOWNBUTTON IF NECCESSARY
+						ShowWindow(
+							GetDlgItem(this->MainWindow, IDM_TOOLBAR_DROPDOWN), SW_HIDE);
+
+						this->iParam->DropdownbuttonIsVisible = FALSE;
+					}
+					this->iParam->LAST_TBBUTTON_ID++;
+				}
+			}
+		}
+	}
+}
+
+void CnCS_UI::OnRestoreFrames()
+{
+	RECT rc, rc_statusbar;
+	GetClientRect(this->MainWindow, &rc);
+	GetWindowRect(this->iParam->statusBar_WND, &rc_statusbar);
+
+	// TreeToolbox Frame >>
+	int TVFrameWidth;
+
+	if (this->iParam->WindowSizeUserdefined)
+	{
+		////////
+		if (this->iParam->TVFrameWidth > (rc.right - 80))
+		{
+			this->iParam->TVFrameWidth = rc.right - 80;
+		}
+		////////
+		TVFrameWidth = this->iParam->TVFrameWidth;
+	}
+	else
+		TVFrameWidth = rc.right / 4;
+
+	MoveWindow(this->iParam->TVFrame_WND, 0, 80, TVFrameWidth, rc.bottom - (80 + (rc_statusbar.bottom - rc_statusbar.top)), TRUE);
+
+	// Edit Frame >>
+	int x, cx, cy;
+
+	if (this->iParam->WindowSizeUserdefined)
+	{
+		x = this->iParam->TVFrameWidth + 5;
+		cx = rc.right - (this->iParam->TVFrameWidth + 5);
+		/////////
+		if ((this->iParam->EditFrameHeight + 103) > (rc.bottom - 50))
+		{
+			this->iParam->EditFrameHeight = rc.bottom - 183;
+		}
+		///////////
+		cy = this->iParam->EditFrameHeight;
+	}
+	else
+	{
+		x = (rc.right / 4) + 5;
+		cx = rc.right - x;
+		cy = rc.bottom - (80 + (rc_statusbar.bottom - rc_statusbar.top) + 105);
+	}
+	MoveWindow(this->iParam->EditFrame_WND, x, 80, cx, cy, TRUE);
+
+	// Codebox Frame >>
+	int y;
+
+	if (this->iParam->WindowSizeUserdefined)
+	{
+		x = this->iParam->TVFrameWidth + 5;
+		y = 80 + this->iParam->EditFrameHeight + 5;
+		cx = rc.right - (this->iParam->TVFrameWidth + 5);
+		cy = rc.bottom - (this->iParam->EditFrameHeight + (rc_statusbar.bottom - rc_statusbar.top) + 80 + 5);
+	}
+	else
+	{
+		x = (rc.right / 4) + 5;
+		y = rc.bottom - ((rc_statusbar.bottom - rc_statusbar.top) + 100);
+		cx = rc.right - x;
+		cy = 100;
+	}
+	MoveWindow(this->iParam->CBoxFrame_WND, x, y, cx, cy, TRUE);
+}
+
+void CnCS_UI::Global_Tracking(LPMOUSEHOOKSTRUCT pmh, CnCS_UI* pUI)
+{
+	if (this->iParam->ACTIVE_BUTTON_ID != 0)
+	{
+		RECT rc_button;
+		GetWindowRect(
+			pUI->GetButtonHandle(this->iParam->ACTIVE_BUTTON_ID), &rc_button);
+
+		if ((pmh->pt.x < rc_button.left) || (pmh->pt.x > rc_button.right) || (pmh->pt.y < rc_button.top) || (pmh->pt.y > rc_button.bottom))
+		{
+			SendMessage(pUI->MainWindow, WM_NORMALIZE, (WPARAM)this->iParam->ACTIVE_BUTTON_ID, 0);
+		}
+	}
+	/////// DROPDOWN >>
+	if (pUI->iParam->dropdownbutton_active)
+	{
+		if (!pUI->iParam->ext_toolbar_exsisting)
+		{
+			RECT rc_button;
+			GetWindowRect(
+				pUI->GetButtonHandle(IDM_TOOLBAR_DROPDOWN), &rc_button);
+
+			if ((pmh->pt.x < rc_button.left) || (pmh->pt.x > rc_button.right) || (pmh->pt.y < rc_button.top) || (pmh->pt.y > rc_button.bottom))
+			{
+				SendMessage(pUI->MainWindow, WM_NORMALIZE, (WPARAM)IDM_TOOLBAR_DROPDOWN, 0);
+			}
+		}
+	}
+	if (pUI->iParam->ext_toolbar_exsisting)
+	{
+		RECT rc_Etoolbar, rc_button;
+		GetWindowRect(pUI->iParam->extendedToolbar_WND, &rc_Etoolbar);
+		GetWindowRect(
+			pUI->GetButtonHandle(IDM_TOOLBAR_DROPDOWN), &rc_button);
+
+		if (((pmh->pt.x < rc_Etoolbar.left) || (pmh->pt.x > rc_Etoolbar.right) || (pmh->pt.y < rc_Etoolbar.top) || (pmh->pt.y > rc_Etoolbar.bottom)) &&
+			((pmh->pt.x < rc_button.left) || (pmh->pt.x > rc_button.right) || (pmh->pt.y < rc_button.top) || (pmh->pt.y > rc_button.bottom)))
+		{
+			SHORT keystate1, keystate2;
+			keystate1 = GetAsyncKeyState(VK_LBUTTON);
+			keystate2 = GetAsyncKeyState(VK_RBUTTON);
+
+			if ((keystate1 & 0x8000) || (keystate2 & 0x8000))
+			{
+				DestroyWindow(pUI->iParam->extendedToolbar_WND);
+				pUI->iParam->extendedToolbar_WND = NULL;
+				pUI->iParam->ext_toolbar_exsisting = FALSE;
+				pUI->iParam->dropdownbutton_active = FALSE;
+				SendMessage(pUI->MainWindow, WM_NORMALIZE, (WPARAM)IDM_TOOLBAR_DROPDOWN, 0);
+			}
+		}
+	}
+	if (pUI->iParam->SizeAreaActivated)
+	{
+		SHORT keystate = GetAsyncKeyState(VK_LBUTTON);
+		if (keystate & 0x8000)
+		{
+			RECT rc;
+			GetWindowRect(pUI->MainWindow, &rc);
+
+			RECT rc_client;
+			POINT pt;
+			GetClientRect(pUI->iParam->statusBar_WND, &rc_client);
+			GetCursorPos(&pt);
+
+			int width, height;
+
+			if (((pt.x - rc.left) + pUI->iParam->InitialPos_X) < 600)
+				width = 600;
+			else
+				width = ((pt.x - rc.left) + pUI->iParam->InitialPos_X);
+
+			if (((pt.y - rc.top) + pUI->iParam->InitialPos_Y) < 400)
+				height = 400;
+			else
+				height = ((pt.y - rc.top) + pUI->iParam->InitialPos_Y);
+
+			MoveWindow(pUI->MainWindow, rc.left, rc.top, width, height, TRUE);
+		}
+		else
+			SendMessage(pUI->iParam->statusBar_WND, WM_LBUTTONUP, 0, 0);
+	}
+}
+
+void CnCS_UI::HandleSpecialActions(int ID)
+{
+	switch (ID)
+	{
+		case IDM_MAXIMIZE:
+		{
+			if (this->iParam->WindowIsMaximized)
+			{
+				this->iParam->WindowIsMaximized = FALSE;
+				this->iParam->DRAW_MODE = DRAW_ALL_AREAS;
+
+				if (!this->iParam->MaximizeWndToFullScreen)
+				{
+					APPLICATION_DATA Adata;
+					
+					SendMessage(this->MainWindow, WM_GETAPPLICATIONDATA, 0, reinterpret_cast<LPARAM>(&Adata));
+
+					if (Adata.WndSizeData.valid)
+					{
+						MoveWindow(	this->MainWindow,
+							Adata.WndSizeData.rc_Window.left,
+							Adata.WndSizeData.rc_Window.top,
+							Adata.WndSizeData.rc_Window.right - Adata.WndSizeData.rc_Window.left,
+							Adata.WndSizeData.rc_Window.bottom - Adata.WndSizeData.rc_Window.top,
+							TRUE);
+					}
+				}
+				else
+					ShowWindow(this->MainWindow, SW_RESTORE);
+			}
+			else
+			{
+				this->iParam->WindowIsMaximized = TRUE;
+
+				if (this->iParam->MaximizeWndToFullScreen)
+				{
+					ShowWindow(this->MainWindow, SW_SHOWMAXIMIZED);
+				}
+				else
+				{
+					RECT rc;
+
+					if(this->Get_MaximizeRect(&rc))
+					{
+						MoveWindow(this->MainWindow, rc.left, rc.top, rc.right, rc.bottom, TRUE);						
+					}
+				}
+			}
+		}
+		break;
+		case IDM_MINIMIZE:
+		{
+			ShowWindow(this->MainWindow, SW_SHOWMINIMIZED);
+		}
+		break;
+		case IDM_TOOLBAR_DROPDOWN:
+		{
+			if (this->iParam->ext_toolbar_exsisting)
+			{
+				DestroyWindow(this->iParam->extendedToolbar_WND);
+				this->iParam->extendedToolbar_WND = NULL;
+				this->iParam->ext_toolbar_exsisting = FALSE;
+				this->iParam->dropdownbutton_active = FALSE;
+				SendMessage(this->MainWindow, WM_NORMALIZE, (WPARAM)IDM_TOOLBAR_DROPDOWN, 0);
+			}
+			else
+				this->CreateExtendedToolbar();
+		}
+		break;
+		default:
+			if (this->iParam->ext_toolbar_exsisting)
+			{
+				if ((ID > this->iParam->LAST_TBBUTTON_ID) && (ID < TBBUTTON_END))
+				{
+					DestroyWindow(this->iParam->extendedToolbar_WND);
+					this->iParam->extendedToolbar_WND = NULL;
+					this->iParam->ext_toolbar_exsisting = FALSE;
+					this->iParam->ACTIVE_BUTTON_ID = 0;
+					SendMessage(this->MainWindow, WM_NORMALIZE, (WPARAM)IDM_TOOLBAR_DROPDOWN, 0);
+				}
+			}
+			break;
+	}
+}
+
+void CnCS_UI::ChangeStatusbar(int part, LPTSTR text, DWORD action)
+{
+	LPVOID plParam;
+
+	if (text != NULL && part != 1)
+	{
+		plParam = reinterpret_cast<LPVOID>(text);
+	}
+	else if (part == 1)
+	{
+		plParam = reinterpret_cast<LPVOID>(&action);
+	}
+	else
+		return;
+
+	SendMessage(this->iParam->statusBar_WND, SB_SETTEXT, MAKEWPARAM(part|SBT_OWNERDRAW, 0), reinterpret_cast<LPARAM>(plParam));
+}
+
+void CnCS_UI::DrawAll(HWND hWnd)
+{
+	PAINTSTRUCT ps;
+	SIZE sz;
+	HDC hdc, hdc_offscreen;
+	HGDIOBJ original_offscreen, original;
+	RECT rc, rc_fill, rc_status;
+	GetClientRect(hWnd, &rc);
+	GetWindowRect(this->iParam->statusBar_WND, &rc_status);
+
+	SetRect(&rc_fill, 0, 80, rc.right, rc.bottom);
+
+	hdc = BeginPaint(hWnd, &ps);
+	hdc_offscreen = CreateCompatibleDC(hdc);
+
+	original_offscreen = SelectObject(hdc_offscreen, this->pObj->upperright);
+	BitBlt(hdc, rc.right - 126, 0, 126, 80, hdc_offscreen, 0, 0, SRCCOPY);
+
+	SelectObject(hdc_offscreen, this->pObj->upperleft);
+	BitBlt(hdc, 0, 0, 180, 80, hdc_offscreen, 0, 0, SRCCOPY);
+
+	SelectObject(hdc_offscreen, this->pObj->titlebar);
+	StretchBlt(hdc, 180, 0, rc.right - (180 + 126), 80, hdc_offscreen, 0, 0, 294, 80, SRCCOPY);
+
+	original = SelectObject(hdc, this->pObj->titlefont);
+	SetBkMode(hdc, TRANSPARENT);
+	SetTextColor(hdc, RGB(255, 255, 255));
+
+	GetTextExtentPoint32(hdc, L"CnC Suite\0", 9, &sz);
+	TextOut(hdc, (rc.right / 2) - (sz.cx / 2), 2, L"CnC Suite\0", 9);
+
+	FillRect(hdc, &rc_fill, this->pObj->background);
+
+	SelectObject(hdc, original_offscreen);
+
+	DeleteDC(hdc_offscreen);
+	EndPaint(hWnd, &ps);
+}
+
+void CnCS_UI::DrawNeccessaryAreas(HWND hWnd)
+{
+	PAINTSTRUCT ps;
+	SIZE sz;
+	HDC hdc, hdc_offscreen;
+	HGDIOBJ original_offscreen, original;
+	RECT rc, rc_fill, rc_status;
+	GetClientRect(hWnd, &rc);
+	GetWindowRect(this->iParam->statusBar_WND, &rc_status);
+
+	SetRect(&rc_fill, 0, 80, rc.right, rc.bottom);
+
+	hdc = BeginPaint(hWnd, &ps);
+	hdc_offscreen = CreateCompatibleDC(hdc);
+
+	original_offscreen = SelectObject(hdc_offscreen, this->pObj->upperright);
+	BitBlt(hdc, rc.right - 126, 0, 126, 80, hdc_offscreen, 0, 0, SRCCOPY);
+
+	SelectObject(hdc_offscreen, this->pObj->titlebar);
+	StretchBlt(hdc, 180, 0, rc.right - (180 + 126), 80, hdc_offscreen, 0, 0, 294, 80, SRCCOPY);
+	
+	original = SelectObject(hdc, this->pObj->titlefont);
+	SetBkMode(hdc, TRANSPARENT);
+	SetTextColor(hdc, RGB(255, 255, 255));
+
+	GetTextExtentPoint32(hdc, L"CnC Suite\0", 9, &sz);
+	TextOut(hdc, (rc.right / 2) - (sz.cx / 2), 2, L"CnC Suite\0", 9);
+
+	FillRect(hdc, &rc_fill, this->pObj->background);
+
+	SelectObject(hdc, original_offscreen);
+
+	DeleteDC(hdc_offscreen);
+	EndPaint(hWnd, &ps);
+}
+
+void CnCS_UI::WindowChanged(HWND hWnd)
+{
+	if (!this->iParam->SizeChanged)
+	{
+		this->iParam->SizeChanged = TRUE;
+		SetTimer(hWnd, TIMER_ID_15SEC, 15000, (TIMERPROC)NULL);
+	}
+}
+
+void CnCS_UI::SetNewFrameAlignment()
+{
+	RECT rc_tv, rc_ed;
+	GetWindowRect(this->iParam->TVFrame_WND, &rc_tv);
+	GetWindowRect(this->iParam->EditFrame_WND, &rc_ed);
+
+	if (this->iParam->FrameSizeAreaActivated == WE_SIZEAREA_SIZING)
+	{
+		this->iParam->EditFrameHeight = rc_ed.bottom - rc_ed.top;
+		this->iParam->TVFrameWidth = this->iParam->rc_multiU.left - rc_tv.left;
+	}
+	else if (this->iParam->FrameSizeAreaActivated == NS_SIZEAREA_SIZING)
+	{
+		this->iParam->EditFrameHeight = this->iParam->rc_multiU.top - rc_ed.top;
+		this->iParam->TVFrameWidth = rc_tv.right - rc_tv.left;
+	}
+	this->iParam->WindowSizeUserdefined = TRUE;
+
+	RECT rc;
+	GetClientRect(this->MainWindow, &rc);
+
+	SendMessage(this->MainWindow, WM_SIZE,(WPARAM)SIZE_RESTORED ,MAKELPARAM(rc.right,rc.bottom));
+}
+
+BOOL CnCS_UI::MakeButton(HWND Parent_Special, int x, int y, int cx, int cy, DWORD ID)
+{
+	if (Parent_Special == NULL)
+		Parent_Special = this->MainWindow;
+
+	HWND button = CreateWindow(L"BUTTON", NULL, WS_CHILD | WS_VISIBLE | BS_OWNERDRAW, x, y, cx, cy, Parent_Special, (HMENU)ID, this->hInstance, NULL);
+	if (button)
+	{
+		if (!SetWindowSubclass(button, CnCS_UI::ButtonSub, NULL, reinterpret_cast<DWORD_PTR>(this)))
+			return FALSE;
+	}
+	else
+		return FALSE;
+
+	return TRUE;
+}
+
+BOOL CnCS_UI::DrawButtonWithIcon(HWND button, LPDRAWITEMSTRUCT pdi, HBRUSH bkgnd, HICON icon, int cx, int cy)
+{
+	BOOL cleanUpRequired = FALSE;
+	BOOL result = TRUE;
+
+	if (!pdi)
+	{
+		if (!button)
+			return FALSE;
+		else
+		{
+			pdi = new DRAWITEMSTRUCT;
+			if (!pdi)
+				return FALSE;
+			else
+			{
+				SecureZeroMemory(pdi, sizeof(DRAWITEMSTRUCT));
+
+				if (!GetClientRect(button, &pdi->rcItem))
+					return FALSE;
+				else
+				{
+					pdi->hDC = GetDC(button);
+					if (!pdi->hDC)
+						return FALSE;
+					else
+					{
+						cleanUpRequired = TRUE;
+					}
+				}
+			}
+		}
+	}
+	if (bkgnd)
+	{
+		FillRect(pdi->hDC, &pdi->rcItem, bkgnd);
+	}
+	if (!DrawIconEx(pdi->hDC, 0, 0, icon, cx, cy, 0, NULL, DI_NORMAL))
+		result = FALSE;
+
+	if (cleanUpRequired)
+	{
+		ReleaseDC(button, pdi->hDC);
+		delete pdi;
+	}
+	return result;
+}
+
+BOOL CnCS_UI::DrawButtonWithBitmap(HWND button, LPDRAWITEMSTRUCT pdi, HBITMAP bitmap, int cx, int cy)
+{
+	BOOL cleanUpRequired = FALSE;
+	BOOL result = TRUE;
+
+	if (!pdi)
+	{
+		if (!button)
+			return FALSE;
+		else
+		{
+			pdi = new DRAWITEMSTRUCT;
+			if (!pdi)
+				return FALSE;
+			else
+			{
+				SecureZeroMemory(pdi, sizeof(DRAWITEMSTRUCT));
+
+				if (!GetClientRect(button, &pdi->rcItem))
+					return FALSE;
+				else
+				{
+					pdi->hDC = GetDC(button);
+					if (!pdi->hDC)
+						return FALSE;
+					else
+					{
+						cleanUpRequired = TRUE;
+					}
+				}
+			}
+		}
+	}
+	HDC hdc_mem = CreateCompatibleDC(pdi->hDC);
+	if (hdc_mem)
+	{
+		HGDIOBJ original = SelectObject(hdc_mem, bitmap);
+
+		result=BitBlt(pdi->hDC, 0, 0, cx, cy, hdc_mem, 0, 0, SRCCOPY);
+
+		SelectObject(hdc_mem, original);
+		DeleteDC(hdc_mem);
+	}
+	if (cleanUpRequired)
+	{
+		ReleaseDC(button, pdi->hDC);
+		delete pdi;
+	}
+	return result;
+
+}
+
+BOOL CnCS_UI::DrawButtonFromID(HWND button, LPDRAWITEMSTRUCT pdi, int ID, int Status)
+{
+	if (!this->SwitchButtonActivationStatus(ID, Status))
+		return FALSE;
+
+	BUTTONDRAWINFO bdi;
+
+	if (this->GetButtonDrawInfo(ID, Status, &bdi))
+	{
+		if (bdi.bitmap == NULL)
+		{
+			return this->DrawButtonWithIcon(button, pdi, bdi.bkgnd, bdi.icon, bdi.cx, bdi.cy);
+		}
+		else
+		{
+			return this->DrawButtonWithBitmap(button, pdi, bdi.bitmap, bdi.cx, bdi.cy);
+		}
+	}
+	else
+		return FALSE;
+}
+
+BOOL CnCS_UI::GetButtonDrawInfo(int ID, int Status, LPBUTTONDRAWINFO pbdi)
+{
+	if (!pbdi)
+		return FALSE;
+
+	switch (ID)
+	{
+	case IDM_MAIN:
+		pbdi->cx = 78;
+		pbdi->cy = 78;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)		
+			pbdi->icon = this->pObj->MainIcon;
+		else if (Status == BDRAW_MARKED)		
+			pbdi->icon = this->pObj->MainIconMarked;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->MainIconPressed;
+		break;
+	case IDM_CLOSE:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->close_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->close_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->close_pressed;
+		break;
+	case IDM_MAXIMIZE:
+		pbdi->cx = 54;
+		pbdi->cy = 20;
+		pbdi->icon = NULL;
+		pbdi->bkgnd = NULL;
+
+		if(this->iParam->WindowIsMaximized)
+		{ 
+			if (Status == BDRAW_NORMAL)
+				pbdi->bitmap = this->pObj->maximize_norm_min;
+			else if (Status == BDRAW_MARKED)
+				pbdi->bitmap = this->pObj->maximize_marked_min;
+			else if (Status == BDRAW_PRESSED)
+				pbdi->bitmap = this->pObj->maximize_pressed_min;
+		}
+		else
+		{
+			if (Status == BDRAW_NORMAL)
+				pbdi->bitmap = this->pObj->maximize_norm;
+			else if (Status == BDRAW_MARKED)
+				pbdi->bitmap = this->pObj->maximize_marked;
+			else if (Status == BDRAW_PRESSED)
+				pbdi->bitmap = this->pObj->maximize_pressed;
+		}
+		break;
+	case IDM_MINIMIZE:
+		pbdi->cx = 54;
+		pbdi->cy = 20;
+		pbdi->icon = NULL;
+		pbdi->bkgnd = NULL;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->bitmap = this->pObj->minimize_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->bitmap = this->pObj->minimize_marked;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->bitmap = this->pObj->minimize_pressed;
+		break;
+	case IDM_NEW:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->new_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->new_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->new_pressed;
+		break;
+	case IDM_OPEN:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->open_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->open_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->open_pressed;
+		break;
+	case IDM_SAVE:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->save_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->save_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->save_pressed;
+		break;
+	case IDM_SAVEALL:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->saveall_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->saveall_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->saveall_pressed;
+		break;
+	case IDM_SAVEAS:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->saveas_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->saveas_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->saveas_pressed;
+		break;
+	case IDM_COPY:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->copy_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->copy_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->copy_pressed;
+		break;
+	case IDM_TOOLBAR_DROPDOWN:
+		pbdi->cx = 22;
+		pbdi->cy = 22;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->dropdown_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->dropdown_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->dropdown_pressed;
+		break;
+	case IDM_PASTE:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->paste_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->paste_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->paste_pressed;
+		break;
+	case IDM_CUT:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->cut_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->cut_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->cut_pressed;
+		break;
+	case IDM_SELECTALL:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->selectall_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->selectall_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->selectall_pressed;
+		break;
+	case IDM_EDITDELETE:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->editdelete_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->editdelete_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->editdelete_pressed;
+		break;
+	case IDM_SAMPLE:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->sample_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->sample_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->sample_pressed;
+		break;
+	case IDM_IMPORT:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->import_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->import_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->import_pressed;
+		break;
+	case IDM_SEND:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->send_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->send_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->send_pressed;
+		break;
+	case IDM_RECEIVE:
+		pbdi->cx = 42;
+		pbdi->cy = 42;
+		pbdi->bitmap = NULL;
+		pbdi->bkgnd = this->pObj->barColor;
+
+		if (Status == BDRAW_NORMAL)
+			pbdi->icon = this->pObj->receive_norm;
+		else if (Status == BDRAW_MARKED)
+			pbdi->icon = this->pObj->receive_mark;
+		else if (Status == BDRAW_PRESSED)
+			pbdi->icon = this->pObj->receive_pressed;
+		break;
+
+
+	default:
+		return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL CnCS_UI::DrawStatusbar(LPDRAWITEMSTRUCT pdi)
+{
+	FillRect(pdi->hDC, &pdi->rcItem, this->pObj->statusbarColor);
+
+	if (pdi->itemID == 1)
+	{
+		//draw icons
+	}
+	else
+	{
+		size_t len;
+
+		if (SUCCEEDED(StringCbLength(reinterpret_cast<LPCTSTR>(pdi->itemData), 1024 * sizeof(WCHAR), &len)))
+		{
+			int c = len / sizeof(WCHAR);
+			if (c > 0)
+			{
+				SIZE sz;
+				HGDIOBJ original;
+
+				SetTextColor(pdi->hDC, RGB(255, 255, 255));
+				SetBkMode(pdi->hDC, TRANSPARENT);
+
+				original = SelectObject(pdi->hDC, this->pObj->statusbarfont);
+
+				GetTextExtentPoint32(pdi->hDC, reinterpret_cast<LPCWSTR>(pdi->itemData), c, &sz);
+
+				TextOut(pdi->hDC, pdi->rcItem.left +10, ((pdi->rcItem.bottom/2)+1)-(sz.cy/2), reinterpret_cast<LPCWSTR>(pdi->itemData), c);
+
+				SelectObject(pdi->hDC, original);
+
+				if (pdi->itemID == 2)
+				{
+					if(this->iParam->WindowIsMaximized)
+					{ 
+						DrawIconEx(pdi->hDC, pdi->rcItem.right - 22, pdi->rcItem.bottom - 22, this->pObj->size_arrow_disabled, 22, 22, 0, NULL, DI_NORMAL);
+					}
+					else
+					{
+						DrawIconEx(pdi->hDC, pdi->rcItem.right - 22, pdi->rcItem.bottom - 22, this->pObj->size_arrow, 22, 22, 0, NULL, DI_NORMAL);
+					}
+				}
+			}
+		}
+	}
+	return TRUE;
+}
+
+BOOL CnCS_UI::SwitchButtonActivationStatus(int ID, int Status)
+{
+	if (Status == BDRAW_MARKED)
+	{
+		switch (ID)
+		{
+		case IDM_TOOLBAR_DROPDOWN:
+			if (this->iParam->dropdownbutton_active||this->iParam->ext_toolbar_exsisting)
+				return FALSE;
+			else
+				this->iParam->dropdownbutton_active = TRUE;
+			break;
+		default:
+			if (ID == this->iParam->ACTIVE_BUTTON_ID)
+			{
+				return FALSE;
+			}
+			else
+			{
+				this->iParam->ACTIVE_BUTTON_ID = ID;
+				return TRUE;
+			}
+		}
+	}
+	else if ((Status == BDRAW_NORMAL)|| (Status == BDRAW_PRESSED))
+	{
+		switch (ID)
+		{
+		case IDM_TOOLBAR_DROPDOWN:
+			if (this->iParam->ext_toolbar_exsisting)
+				return FALSE;
+			this->iParam->dropdownbutton_active = FALSE;
+			break;
+		default:
+			this->iParam->ACTIVE_BUTTON_ID = 0;
+			return TRUE;
+		}
+	}
+	return TRUE;
+}
+
+int CnCS_UI::WhatIsItem(int ID)
+{
+	if ((ID >= IDM_MAIN) && (ID < ID_LASTBUTTON))
+		return IS_BUTTON_ITEM;
+	else if (ID == ID_STATUSBAR)
+		return IS_STATUSBAR_ITEM;
+	else
+		return 0;
+}
+
+HWND CnCS_UI::GetButtonHandle(int ID)
+{
+	HWND button = NULL;
+
+	if (((ID > this->iParam->LAST_TBBUTTON_ID) && (ID < TBBUTTON_END)) && this->iParam->ext_toolbar_exsisting)
+	{
+		button = GetDlgItem(this->iParam->extendedToolbar_WND, ID);
+	}
+	else
+	{
+		button = GetDlgItem(this->MainWindow, ID);
+		if (!button)
+		{
+			if (this->iParam->ext_toolbar_exsisting)
+			{
+				button = GetDlgItem(this->iParam->extendedToolbar_WND, ID);
+			}
+			else
+			{
+				button = NULL;
+				//GET OTHER HANDLES HERE !
+			}
+		}
+	}
+	return button;
+}
+
+HWND CnCS_UI::Get_Frame_Handles(int RequestedFrame)
+{
+	switch (RequestedFrame)
+	{
+	case GFWH_TVFRAME:
+		return this->iParam->TVFrame_WND;
+	case GFWH_EDITFRAME:
+		return this->iParam->EditFrame_WND;
+	case GFWH_CBOXFRAME:
+		return this->iParam->CBoxFrame_WND;
+	default:
+		return NULL;
+	}
+}
+
+BOOL CnCS_UI::Get_MaximizeRect(LPRECT rc_out)
+{
+	HWND hwnd_tray = FindWindow(L"Shell_TrayWnd", NULL);
+	if (hwnd_tray)
+	{
+		RECT rc_tray;
+		GetWindowRect(hwnd_tray, &rc_tray);
+
+		int cx = GetSystemMetrics(SM_CXSCREEN);
+		int cy = GetSystemMetrics(SM_CYSCREEN);
+
+		this->iParam->DRAW_MODE = DRAW_ALL_AREAS;
+
+		if ((rc_tray.left == 0) && (rc_tray.top == 0) && (rc_tray.bottom == cy))// taskbar left aligned
+		{
+			rc_out->left = rc_tray.right;
+			rc_out->top = 0;
+			rc_out->right = cx - rc_tray.right;
+			rc_out->bottom = cy;
+		}
+		else if ((rc_tray.bottom == cy) && (rc_tray.left == 0) && (rc_tray.right == cx))// bottom aligned
+		{
+			rc_out->left = 0;
+			rc_out->top = 0;
+			rc_out->right = cx;
+			rc_out->bottom = cy - (rc_tray.bottom - rc_tray.top);
+		}
+		else if ((rc_tray.right == cx) && (rc_tray.top == 0) && (rc_tray.bottom == cy))// right aligned
+		{
+			rc_out->left = 0;
+			rc_out->top = 0;
+			rc_out->right = cx - (rc_tray.right - rc_tray.left);
+			rc_out->bottom = cy;
+		}
+		else if ((rc_tray.left == 0) && (rc_tray.top == 0) && (rc_tray.right == cx))// top aligned
+		{
+			rc_out->left = 0;
+			rc_out->top = rc_tray.bottom;
+			rc_out->right = cx;
+			rc_out->bottom = cy - rc_tray.bottom;
+		}
+		else// not visible... (hidden mode)
+		{
+			rc_out->left = 0;
+			rc_out->top = 0;
+			rc_out->bottom = cy;
+			rc_out->right = cx;
+		}
+	}
+	else
+		return FALSE;
+
+	return TRUE;
+}

@@ -1,0 +1,331 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{CB77E4B7-46A3-452F-ADE6-F0D25E1229CC}</ProjectGuid>
+    <RootNamespace>CnCSuite</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>false</CLRSupport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LibraryPath>C:\Users\hans-\Documents\Visual Studio 2017\Projects\CnC Suite\CnC Suite\CommonControls;$(LibraryPath)</LibraryPath>
+    <ExcludePath>C:\Users\CT 60\Documents\EigeneBibliotheken\Header;$(ExcludePath)</ExcludePath>
+    <IncludePath>C:\Users\hans-\Documents\Visual Studio 2017\Projects\CnC Suite\CnC Suite\CommonControls;$(IncludePath)</IncludePath>
+    <EmbedManifest>true</EmbedManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Users\hans-\Documents\Visual Studio 2017\Projects\CnC Suite\CnC Suite\CommonControls;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\hans-\Documents\Visual Studio 2017\Projects\CnC Suite\CnC Suite\CommonControls;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\hans-\Documents\Visual Studio 2017\Projects\CnC Suite\CnC Suite\CommonControls;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Users\CT 60\Documents\EigeneBibliotheken\Header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+      <AdditionalManifestFiles>C:\Users\hans-\Documents\Visual Studio 2017\Projects\CnC Suite\Debug\compatibility.debug.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+    <Link>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <MASM>
+      <UseSafeExceptionHandlers>true</UseSafeExceptionHandlers>
+    </MASM>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+      <AdditionalManifestFiles>C:\Users\hans-\Documents\Visual Studio 2017\Projects\CnC Suite\x64\Debug\compatibility.x64.debug.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
+    </Link>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+      <AdditionalManifestFiles>C:\Users\hans-\Documents\Visual Studio 2017\Projects\CnC Suite\Release\compatibility.release.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+    <MASM>
+      <UseSafeExceptionHandlers>true</UseSafeExceptionHandlers>
+    </MASM>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+      <AdditionalManifestFiles>C:\Users\hans-\Documents\Visual Studio 2017\Projects\CnC Suite\x64\Release\compatibility.x64.release.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+    <MASM>
+      <UseSafeExceptionHandlers>true</UseSafeExceptionHandlers>
+    </MASM>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="ApplicationData.h" />
+    <ClInclude Include="AppPath.h" />
+    <ClInclude Include="Async.h" />
+    <ClInclude Include="AutocompleteManager.h" />
+    <ClInclude Include="autocompleteStrings.h" />
+    <ClInclude Include="AutosyntaxManager.h" />
+    <ClInclude Include="BasicFPO.h" />
+    <ClInclude Include="CnC Suite.h" />
+    <ClInclude Include="CnCSuite_CBox.h" />
+    <ClInclude Include="CnCSuite_FileNavigator.h" />
+    <ClInclude Include="CnCSuite_Property.h" />
+    <ClInclude Include="CnCSuite_Tabcontrol.h" />
+    <ClInclude Include="CnCSuite_Userinterface.h" />
+    <ClInclude Include="CnCS_CB.h" />
+    <ClInclude Include="CnCS_FN.h" />
+    <ClInclude Include="CnCS_PI.h" />
+    <ClInclude Include="CnCS_TC.h" />
+    <ClInclude Include="CnCS_UI.h" />
+    <ClInclude Include="cObject.h" />
+    <ClInclude Include="Colors.h" />
+    <ClInclude Include="ColorSchemeManager.h" />
+    <ClInclude Include="CommandLineTool.h" />
+    <ClInclude Include="CommonControls\cListView.h" />
+    <ClInclude Include="CommonControls\ComboBox.h" />
+    <ClInclude Include="CommonControls\cScrollbar.h" />
+    <ClInclude Include="CommonControls\ctrlHelper.h" />
+    <ClInclude Include="CommonControls\CustomButton.h" />
+    <ClInclude Include="CommonControls\CustomCheckbox.h" />
+    <ClInclude Include="CommonControls\CustomPopUpMenu.h" />
+    <ClInclude Include="CommonControls\CustomTrackbar.h" />
+    <ClInclude Include="CommonControls\CSConsole.h" />
+    <ClInclude Include="CommonControls\ItemCollection.h" />
+    <ClInclude Include="CommonControls\ProgressDialog.h" />
+    <ClInclude Include="CommonControls\SingleLineEdit.h" />
+    <ClInclude Include="CommonControls\StringClass.h" />
+    <ClInclude Include="CommonControls\textField.h" />
+    <ClInclude Include="dataAccessorID.h" />
+    <ClInclude Include="DataExchange\DataExchange.h" />
+    <ClInclude Include="DPI_Helper.h" />
+    <ClInclude Include="EditControl.h" />
+    <ClInclude Include="EditorContentManager.h" />
+    <ClInclude Include="Error dispatcher.h" />
+    <ClInclude Include="ExtendedResources.h" />
+    <ClInclude Include="external.h" />
+    <ClInclude Include="FileNPathOp.h" />
+    <ClInclude Include="FileSystem.h" />
+    <ClInclude Include="FontFileReader.h" />
+    <ClInclude Include="Global.h" />
+    <ClInclude Include="GlobalStyles.h" />
+    <ClInclude Include="Global_String_IDs.h" />
+    <ClInclude Include="Graphics\workingIndicator.h" />
+    <ClInclude Include="HelperF.h" />
+    <ClInclude Include="iBox.h" />
+    <ClInclude Include="IPath.h" />
+    <ClInclude Include="LanguageDispatcher.h" />
+    <ClInclude Include="OpenSave\Open_Save_CTRL.h" />
+    <ClInclude Include="ResetDialog.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="SafeRelease.h" />
+    <ClInclude Include="SampleManager\SampleManager.h" />
+    <ClInclude Include="Searchcontrol\SearchControl.h" />
+    <ClInclude Include="splashScreen.h" />
+    <ClInclude Include="Statusbar_dispatcher.h" />
+    <ClInclude Include="StringProcessHelper.h" />
+    <ClInclude Include="StringTable de-DE.h" />
+    <ClInclude Include="StringTable en-US.h" />
+    <ClInclude Include="ThreadWatcher.h" />
+    <ClInclude Include="TVComp\TreeViewClass.h" />
+    <ClInclude Include="uClipboard.h" />
+    <ClInclude Include="UpdateAgent.h" />
+    <ClInclude Include="XML Parsing\XML_Parsing.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CnC Suite.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="ApplicationData.cpp" />
+    <ClCompile Include="AutocompleteManager.cpp" />
+    <ClCompile Include="autocompleteStrings.cpp" />
+    <ClCompile Include="AutosyntaxManager.cpp" />
+    <ClCompile Include="CnC Suite.cpp" />
+    <ClCompile Include="CnCS_CB.cpp" />
+    <ClCompile Include="CnCS_FN.cpp" />
+    <ClCompile Include="CnCS_PI.cpp" />
+    <ClCompile Include="CnCS_TC.cpp" />
+    <ClCompile Include="CnCS_UI.cpp" />
+    <ClCompile Include="ColorSchemeManager.cpp" />
+    <ClCompile Include="CommandLineTool.cpp" />
+    <ClCompile Include="CommonControls\cListView.cpp" />
+    <ClCompile Include="CommonControls\ComboBox.cpp" />
+    <ClCompile Include="CommonControls\cScrollbar.cpp" />
+    <ClCompile Include="CommonControls\CustomButton.cpp" />
+    <ClCompile Include="CommonControls\CustomCheckbox.cpp" />
+    <ClCompile Include="CommonControls\CustomPopUpMenu.cpp" />
+    <ClCompile Include="CommonControls\CustomTrackbar.cpp" />
+    <ClCompile Include="CommonControls\CSConsole.cpp" />
+    <ClCompile Include="CommonControls\ProgressDialog.cpp" />
+    <ClCompile Include="CommonControls\SingleLineEdit.cpp" />
+    <ClCompile Include="CommonControls\StringClass.cpp" />
+    <ClCompile Include="CommonControls\textField.cpp" />
+    <ClCompile Include="DataExchange\DataExchange.cpp" />
+    <ClCompile Include="EditControl.cpp" />
+    <ClCompile Include="EditorContentManager.cpp" />
+    <ClCompile Include="English.cpp" />
+    <ClCompile Include="Error dispatcher.cpp" />
+    <ClCompile Include="FileNPathOp.cpp" />
+    <ClCompile Include="German.cpp" />
+    <ClCompile Include="Graphics\workingIndicator.cpp" />
+    <ClCompile Include="HelperF.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\CT 60\Documents\EigeneBibliotheken\Header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="IPath.cpp" />
+    <ClCompile Include="OpenSave\Open_Save_CTRL.cpp" />
+    <ClCompile Include="ResetDialog.cpp" />
+    <ClCompile Include="SampleManager\SampleManager.cpp" />
+    <ClCompile Include="Searchcontrol\SearchControl.cpp" />
+    <ClCompile Include="splashScreen.cpp" />
+    <ClCompile Include="TVComp\TreeViewClass.cpp" />
+    <ClCompile Include="uClipboard.cpp" />
+    <ClCompile Include="UpdateAgent.cpp" />
+    <ClCompile Include="XML Parsing\XML_Parsing.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\CnC_Suite_mIcon.ico" />
+    <Image Include="res\CnC_Suite_mIcon_small.ico" />
+    <Image Include="res\gtk_close_1.ico" />
+    <Image Include="res\gtk_close_mark_1.ico" />
+    <Image Include="res\gtk_close_pressed_1.ico" />
+    <Image Include="res\Mainbutton78.ico" />
+    <Image Include="res\Mainbutton78_marked.ico" />
+    <Image Include="res\Mainbutton78_pressed.ico" />
+    <Image Include="res\maximize_mark.bmp" />
+    <Image Include="res\maximize_min_mark.bmp" />
+    <Image Include="res\maximize_min_norm.bmp" />
+    <Image Include="res\maximize_min_pressed.bmp" />
+    <Image Include="res\maximize_norm.bmp" />
+    <Image Include="res\maximize_pressed.bmp" />
+    <Image Include="res\minimize_mark.bmp" />
+    <Image Include="res\minimize_norm.bmp" />
+    <Image Include="res\minimize_pressed.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="res\Fonts\Code New Roman.otf" />
+    <Font Include="res\Fonts\Courier Prime Code.ttf" />
+    <Font Include="res\Fonts\Inconsolata-Bold.ttf" />
+    <Font Include="res\Fonts\ProFontWindowsEdit.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\CnC Suite Setup\Program Folder Resources\CnC Suite.VisualElementsManifest.xml" />
+    <Xml Include="cncsuite_manifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Debug\compatibility.debug.manifest" />
+    <Manifest Include="..\Release\compatibility.release.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="stringCtrl.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </MASM>
+    <MASM Include="stringCtrl64.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </MASM>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>

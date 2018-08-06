@@ -1,0 +1,495 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\Interface-Header">
+      <UniqueIdentifier>{4a27587a-8eba-4925-8a98-36c55d646bdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Importierte Quelldateien">
+      <UniqueIdentifier>{f28eb204-0a54-4923-b219-ba9d08c9b954}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Importierte Komponentenheader">
+      <UniqueIdentifier>{b806721b-c1c3-410b-b9d8-8a9e46845818}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonControls">
+      <UniqueIdentifier>{9d7d434d-8b11-44a3-b1fc-5c1074ad8002}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strings">
+      <UniqueIdentifier>{e3098d07-2e3d-4779-a259-755997fd08c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataExchange">
+      <UniqueIdentifier>{402fab6e-2329-4828-b8ee-97719fd950e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SampleManager">
+      <UniqueIdentifier>{ca4a7840-d2f4-4273-8072-f7199e298cc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XML Parsing">
+      <UniqueIdentifier>{d3928847-5443-4b72-917e-433c04b103ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{2554be0f-3162-4f70-8adc-4aa8461ba4ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File and Path Operations">
+      <UniqueIdentifier>{01a02d80-2a67-4bff-9424-adade29e98ce}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="external.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CnC Suite.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Global.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CnCS_UI.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="HelperF.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CnCS_TC.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CnCS_FN.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="TVComp\TreeViewClass.h">
+      <Filter>Importierte Komponentenheader</Filter>
+    </ClInclude>
+    <ClInclude Include="CnCSuite_FileNavigator.h">
+      <Filter>Headerdateien\Interface-Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CnCSuite_Tabcontrol.h">
+      <Filter>Headerdateien\Interface-Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CnCSuite_Userinterface.h">
+      <Filter>Headerdateien\Interface-Header</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenSave\Open_Save_CTRL.h">
+      <Filter>Importierte Komponentenheader</Filter>
+    </ClInclude>
+    <ClInclude Include="Searchcontrol\SearchControl.h">
+      <Filter>Importierte Komponentenheader</Filter>
+    </ClInclude>
+    <ClInclude Include="CnCSuite_Property.h">
+      <Filter>Headerdateien\Interface-Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CnCS_PI.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CnCSuite_CBox.h">
+      <Filter>Headerdateien\Interface-Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CnCS_CB.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="EditControl.h">
+      <Filter>Importierte Komponentenheader</Filter>
+    </ClInclude>
+    <ClInclude Include="Error dispatcher.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateAgent.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\ItemCollection.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\StringClass.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="StringTable de-DE.h">
+      <Filter>Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="StringTable en-US.h">
+      <Filter>Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="LanguageDispatcher.h">
+      <Filter>Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Global_String_IDs.h">
+      <Filter>Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="DataExchange\DataExchange.h">
+      <Filter>DataExchange</Filter>
+    </ClInclude>
+    <ClInclude Include="SampleManager\SampleManager.h">
+      <Filter>SampleManager</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\CustomButton.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\ComboBox.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="XML Parsing\XML_Parsing.h">
+      <Filter>XML Parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\workingIndicator.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="cObject.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\CustomPopUpMenu.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="uClipboard.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalStyles.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\CustomCheckbox.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\SingleLineEdit.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationData.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="AppPath.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="iBox.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorSchemeManager.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="ExtendedResources.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Async.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="AutocompleteManager.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\cListView.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\ctrlHelper.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="autocompleteStrings.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="splashScreen.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="dataAccessorID.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadWatcher.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="FontFileReader.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Statusbar_dispatcher.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="AutosyntaxManager.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\ProgressDialog.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\CustomTrackbar.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\textField.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="DPI_Helper.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="FileNPathOp.h">
+      <Filter>File and Path Operations</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicFPO.h">
+      <Filter>File and Path Operations</Filter>
+    </ClInclude>
+    <ClInclude Include="IPath.h">
+      <Filter>File and Path Operations</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorContentManager.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="StringProcessHelper.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\CSConsole.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\cScrollbar.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
+    <ClInclude Include="SafeRelease.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandLineTool.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Colors.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="ResetDialog.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CnC Suite.rc">
+      <Filter>Ressourcendateien</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CnC Suite.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="CnCS_UI.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="HelperF.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="CnCS_TC.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="CnCS_FN.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="TVComp\TreeViewClass.cpp">
+      <Filter>Importierte Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenSave\Open_Save_CTRL.cpp">
+      <Filter>Importierte Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Searchcontrol\SearchControl.cpp">
+      <Filter>Importierte Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="CnCS_PI.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="CnCS_CB.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="EditControl.cpp">
+      <Filter>Importierte Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateAgent.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonControls\StringClass.cpp">
+      <Filter>CommonControls</Filter>
+    </ClCompile>
+    <ClCompile Include="German.cpp">
+      <Filter>Strings</Filter>
+    </ClCompile>
+    <ClCompile Include="English.cpp">
+      <Filter>Strings</Filter>
+    </ClCompile>
+    <ClCompile Include="DataExchange\DataExchange.cpp">
+      <Filter>DataExchange</Filter>
+    </ClCompile>
+    <ClCompile Include="SampleManager\SampleManager.cpp">
+      <Filter>SampleManager</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonControls\CustomButton.cpp">
+      <Filter>CommonControls</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonControls\ComboBox.cpp">
+      <Filter>CommonControls</Filter>
+    </ClCompile>
+    <ClCompile Include="Error dispatcher.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="XML Parsing\XML_Parsing.cpp">
+      <Filter>XML Parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\workingIndicator.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonControls\CustomPopUpMenu.cpp">
+      <Filter>CommonControls</Filter>
+    </ClCompile>
+    <ClCompile Include="uClipboard.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonControls\CustomCheckbox.cpp">
+      <Filter>CommonControls</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonControls\SingleLineEdit.cpp">
+      <Filter>CommonControls</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationData.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorSchemeManager.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="AutocompleteManager.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonControls\cListView.cpp">
+      <Filter>CommonControls</Filter>
+    </ClCompile>
+    <ClCompile Include="autocompleteStrings.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="splashScreen.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="AutosyntaxManager.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonControls\ProgressDialog.cpp">
+      <Filter>CommonControls</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonControls\CustomTrackbar.cpp">
+      <Filter>CommonControls</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonControls\textField.cpp">
+      <Filter>CommonControls</Filter>
+    </ClCompile>
+    <ClCompile Include="FileNPathOp.cpp">
+      <Filter>File and Path Operations</Filter>
+    </ClCompile>
+    <ClCompile Include="IPath.cpp">
+      <Filter>File and Path Operations</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorContentManager.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonControls\CSConsole.cpp">
+      <Filter>CommonControls</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonControls\cScrollbar.cpp">
+      <Filter>CommonControls</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandLineTool.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="ResetDialog.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\CnC_Suite_mIcon.ico">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\CnC_Suite_mIcon_small.ico">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\Mainbutton78.ico">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\Mainbutton78_marked.ico">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\gtk_close_1.ico">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\gtk_close_mark_1.ico">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\gtk_close_pressed_1.ico">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\Mainbutton78_pressed.ico">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\maximize_norm.bmp">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\maximize_mark.bmp">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\maximize_pressed.bmp">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\maximize_min_mark.bmp">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\maximize_min_norm.bmp">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\maximize_min_pressed.bmp">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\minimize_pressed.bmp">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\minimize_norm.bmp">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="res\minimize_mark.bmp">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="res\Fonts\ProFontWindowsEdit.ttf">
+      <Filter>Ressourcendateien</Filter>
+    </Font>
+    <Font Include="res\Fonts\Code New Roman.otf">
+      <Filter>Ressourcendateien</Filter>
+    </Font>
+    <Font Include="res\Fonts\Courier Prime Code.ttf">
+      <Filter>Ressourcendateien</Filter>
+    </Font>
+    <Font Include="res\Fonts\Inconsolata-Bold.ttf">
+      <Filter>Ressourcendateien</Filter>
+    </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="cncsuite_manifest.xml">
+      <Filter>Ressourcendateien</Filter>
+    </Xml>
+    <Xml Include="..\CnC Suite Setup\Program Folder Resources\CnC Suite.VisualElementsManifest.xml">
+      <Filter>Ressourcendateien</Filter>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Release\compatibility.release.manifest">
+      <Filter>Ressourcendateien</Filter>
+    </Manifest>
+    <Manifest Include="..\Debug\compatibility.debug.manifest">
+      <Filter>Ressourcendateien</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="stringCtrl.asm">
+      <Filter>Quelldateien</Filter>
+    </MASM>
+    <MASM Include="stringCtrl64.asm">
+      <Filter>Quelldateien</Filter>
+    </MASM>
+  </ItemGroup>
+</Project>

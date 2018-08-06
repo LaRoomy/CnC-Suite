@@ -1,0 +1,238 @@
+#pragma once
+#pragma comment( lib, "Kernel32.lib" )
+#pragma comment( lib, "User32.lib" )
+#pragma comment( lib, "Shlwapi.lib")
+#include"..//external.h"
+
+///// temp ///////////////
+#include"..//HelperF.h"
+/////////////////////////
+
+///////////////////////////////////
+#define		GERMAN			1
+#define		ENGLISH			2
+///////////////////////////////////
+#define		CX_ICON				24
+#define		CY_ICON				24
+#define		NUM_ICONS			3
+
+#define		A__FILE				7
+#define		A__FOLDER			8
+#define		A__CNC3FILE			9
+#define		A__EMPTYITEM		10
+#define		EMPTY_DIR			11
+#define		ROOT_DIR			12
+
+#define		PARENT__ITEM		13
+#define		CHILD__ITEM			14
+#define		CNC3__ITEM			15
+#define		EMPTY__ITEM			16
+#define		ROOT__ITEM			17
+
+#define		INIT_MODE			18
+#define		RELOAD_MODE			19
+
+#define		COUNT				30
+#define		READ				31
+#define		FOP_MOVE			32
+#define		FOP_COPY			33
+#define		FOP_RENAME			34
+#define		FOP_DELETE			35
+#define		FOP_NEWFILE			36
+#define		FOP_NEWFOLDER		37
+#define		FOP_INSERT			38
+
+#define		DYNAMICMODE_GETPARENTITEMFROMLEVEL		50
+#define		DYNAMICMODE_SAVEITEMHANDLE				51
+
+#define		TV_CTRL_OPEN_PATH		100
+#define		TV_CTRL_SET_FOLDER		101
+#define		TV_CTRL_CREATETOOLWND	102
+
+#define		MAX_HEADING_LEN			100
+#define		MAX_FILEPATH_LEN		(32767 * sizeof( TCHAR ))
+
+typedef void STD_NOTIMPLMETHOD;
+
+typedef struct _MDA{ TCHAR name[ MAX_HEADING_LEN ]; }MDA, *LPMDA;
+typedef struct _HTI { HTREEITEM hPrev; }HPREVITEM, *LPHPREVITEM;
+
+typedef struct _FOPCLIPBOARDINFO{
+	int type;
+	DWORD lastaction;
+	TCHAR* multipath;
+	TCHAR* copypath;
+	TCHAR* postOperationBuffer;
+	BOOL postOperationBuffer_valid;
+	BOOL copypath_valid;
+	BOOL multipath_valid;
+}FOPCLIPBOARDINFO,*LPFOPCLIPBOARDINFO;
+
+typedef struct{
+	TCHAR Heading[ MAX_HEADING_LEN ];
+	int Level;
+	int type;
+}HEADING, *LPHEADING;
+
+typedef struct {
+	LPHPREVITEM dynamic_array;
+	int nCount;
+}HDYNAMICLEVEL, *LPHDYNAMICLEVEL;
+
+class TreeViewCTRL
+	: public IFileOperationProgressSink
+{
+public:					TreeViewCTRL( HWND, HINSTANCE, int, LPTSTR );
+						~TreeViewCTRL( void );
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						///// IUNKNOWN + IFILEOPERATIONPROGRESSSINK METHODS ////////////////////////////////////////////////////
+						IFACEMETHODIMP QueryInterface(REFIID riid, void** ppv)
+						{
+							static QITAB rgqit[] = {
+								QITABENT(TreeViewCTRL,IFileOperationProgressSink),
+								{0},
+							};
+							return QISearch(this, rgqit, riid, ppv);
+						}
+						IFACEMETHODIMP_(ULONG) AddRef()
+						{
+							return InterlockedIncrement(&_cRef);
+						}
+						IFACEMETHODIMP_(ULONG) Release()
+						{
+							long cRef = InterlockedDecrement(&_cRef);
+							if (!cRef)
+								delete this;
+							return cRef;
+						}
+						IFACEMETHODIMP PostCopyItem(DWORD dwFlags, IShellItem* psiItem, IShellItem* psiDestinationFolder, LPCWSTR pszNewName, HRESULT hrCopy, IShellItem* psiNewlyCreated)
+						{
+							return this->ProcessPostCopyInfo(dwFlags, pszNewName);
+						}
+						IFACEMETHODIMP PostDeleteItem(DWORD dwFlags, IShellItem* psiItem, HRESULT hrDelete, IShellItem* psiNewlyCreated)
+						{
+							return this->ProcessPostDeleteInfo(dwFlags);
+						}
+						IFACEMETHODIMP PostMoveItem(DWORD dwFlags, IShellItem* psiItem, IShellItem* psiDestinationFolder, LPCWSTR pszNewName, HRESULT hrMove, IShellItem* psiNewlyCreated)
+						{
+							return this->ProcessPostMoveInfo(dwFlags, pszNewName);
+						}
+						IFACEMETHODIMP PostNewItem(DWORD dwFlags,IShellItem*,LPCWSTR newName,LPCWSTR,DWORD fileAttributes,HRESULT,IShellItem*)
+						{
+							return this->ProcessPostNewFile(dwFlags, newName, fileAttributes);
+						}
+						IFACEMETHODIMP PostRenameItem(DWORD dwFlags, IShellItem*, LPCWSTR newName, HRESULT, IShellItem*)
+						{
+							return this->ProcessPostRename(dwFlags, newName);
+						}
+						IFACEMETHODIMP PreCopyItem(DWORD, IShellItem*, IShellItem*, LPCWSTR) { return S_OK; }
+						IFACEMETHODIMP PreDeleteItem(DWORD, IShellItem*) { return S_OK; }
+						IFACEMETHODIMP PreMoveItem(DWORD, IShellItem*, IShellItem*, LPCWSTR) { return S_OK; }
+						IFACEMETHODIMP PreNewItem(DWORD, IShellItem*, LPCWSTR) { return S_OK; }
+						IFACEMETHODIMP PreRenameItem(DWORD, IShellItem*, LPCWSTR) { return S_OK; }
+
+						IFACEMETHODIMP FinishOperations(HRESULT hrResult) { return S_OK; }
+						IFACEMETHODIMP PauseTimer() { return S_OK; }
+						IFACEMETHODIMP ResetTimer() { return S_OK; }
+						IFACEMETHODIMP ResumeTimer() { return S_OK; }
+						IFACEMETHODIMP StartOperations() { return S_OK; }
+						IFACEMETHODIMP UpdateProgress(UINT, UINT) { return S_OK; }
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						HRESULT InitTreeView( COLORREF, HFONT, COLORREF, LPRECT );// Create the treeview control
+						BOOL InitTreeViewItems( LPTSTR, int );// load a new root folder
+						BOOL OnTreeViewNotify( LPARAM );// add to the parent's message handler...
+
+						void PerformFileOperation(int mode);
+
+
+
+
+						BOOL InsertNewFolder( LPTSTR, LPTSTR );// Create a new folder in the selected directory
+						BOOL InsertNewFile( LPTSTR, LPTSTR );// Create a new file in the selected directory
+						BOOL Delete_FFObject( void );// delete the selected file or directory
+						BOOL ExpandPathToItem( LPTSTR );
+						BOOL Reload(void);
+						BOOL SaveExpandImage( LPTSTR );
+						BOOL LoadExpandImage( LPTSTR );
+
+						HWND GetTreeViewHandle() { return this->hwndTV; }
+						BOOL IsInsertValid() { return this->FOPInfo.copypath_valid; }
+private:
+	long _cRef;// Instance counter -> set to 1 by creating
+	HINSTANCE hInstance;
+	HWND hwndTV;
+	HWND TVFrame;
+	int language_;// remove
+	int ico_index[ 5 ];
+	TCHAR* Root_Name;
+	TCHAR* Root_Folder;
+	TCHAR* Working_Dir;
+	FOPCLIPBOARDINFO FOPInfo;
+	HDYNAMICLEVEL DynamicLevel;
+	BOOL cSuccess;
+
+	BOOL InitTreeViewImageLists( HWND );
+	HTREEITEM AddItemToTree( HWND, LPTSTR, int, int );
+	HTREEITEM _dynamic_level_provider_(DWORD, int, HTREEITEM);
+	int CountItems( LPTSTR );
+	HRESULT CountItemsNextLevel(HANDLE, LPWIN32_FIND_DATA, TCHAR*, int&);
+
+	static int CALLBACK CompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
+
+	BOOL SaveRoot();
+	BOOL LoadRoot();
+	HRESULT GenerateRoot();
+	HRESULT InitNextLevelItems(HANDLE, LPWIN32_FIND_DATA, LPHEADING, TCHAR*,int, int, int&);
+
+	void DisplayErrorBox( LPTSTR );
+	void LeachRootName( LPTSTR, LPTSTR );
+
+	BOOL CompareHeading( LPTSTR, LPTSTR );
+	int CheckItemType( HTREEITEM );
+	int GetSelectedItemPath( TCHAR** );
+
+    BOOL Sequencing( LPHEADING, LPHEADING, int );
+    inline int SequenceNextLevel( int, int, LPHEADING, LPHEADING, int, int );
+	int CheckFileType( LPTSTR );
+	BOOL CheckForNumber( TCHAR );
+	inline BOOL ExpandNextLevel( HTREEITEM, int, LPMDA, int );
+
+	int GetExpandImage( LPHEADING, DWORD );
+	BOOL SetExpandImage( LPHEADING, DWORD );
+	int LoadExpandImageFromFile( LPTSTR, LPHEADING, DWORD );
+	BOOL SaveExpandImageToFile( LPTSTR, LPHEADING, int );
+
+	inline BOOL GetNextLevel_Image( LPHEADING, HTREEITEM, DWORD, int& );
+	inline BOOL SetNextLevel_Image( LPHEADING, HTREEITEM, DWORD&, DWORD );
+	BOOL DeleteImageFile( LPTSTR );
+	BOOL Read_Image_From_Buffer( LPHEADING, LPTSTR, int&, DWORD, int );
+
+	BOOL RemoveWildcard(TCHAR*);
+	BOOL RemoveFilename(TCHAR*);
+	BOOL RemoveFileExt(int, WCHAR*);	
+
+	HTREEITEM FindInsertAfter(HTREEITEM, int, LPTSTR);
+	BOOL InsertFolder(HTREEITEM);
+
+	int OnItemExpanding(LPNMTREEVIEW);
+	int OnItemExpanded(LPNMTREEVIEW);
+	int OnSelchanged(LPNMTREEVIEW);
+	int OnDblClick();
+	int OnRgtClick();
+
+	BOOL PrepareForCopyOperation();
+	
+
+
+
+	HRESULT	_executeCopyOP();
+	HRESULT _executeDeleteOP();
+
+
+	HRESULT ProcessPostCopyInfo(DWORD,LPCWSTR);
+	HRESULT ProcessPostDeleteInfo(DWORD);
+	HRESULT ProcessPostMoveInfo(DWORD, LPCWSTR);
+	HRESULT ProcessPostNewFile(DWORD, LPCWSTR, DWORD);
+	HRESULT ProcessPostRename(DWORD, LPCWSTR);
+};

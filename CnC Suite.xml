@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<iasettings>
+  <projectproperties>
+    <manufacturer>Hans Philipp Zimmermann</manufacturer>
+    <productname>CnC Suite</productname>
+    <productversion>1.0.0</productversion>
+    <productcode>{b8db3853-4a35-420d-85e2-3be3774da2d1}</productcode>
+    <upgradecode>{3d6dbd43-29a7-4b7a-915e-449a6163eac9}</upgradecode>
+    <language>0</language>
+    <languagename>English</languagename>
+  </projectproperties>
+  <summary>
+    <title>CnC Suite</title>
+    <subject>CnC Suite</subject>
+    <author>Hans Philipp Zimmermann</author>
+    <summarycomments>CnC Suite</summarycomments>
+    <revisioncode>{b5779d05-39cd-4a32-8f0b-31ae2c787884}</revisioncode>
+    <uacelevation>highestAvailable</uacelevation>
+  </summary>
+  <addremove>
+    <publishername>Hans Philipp Zimmermann</publishername>
+    <contactname>Hans Philipp Zimmermann</contactname>
+    <helplink>http://www.cnc-suite.de</helplink>
+    <productupdatelink>http://www.cnc-suite.de/update.html</productupdatelink>
+    <addremovecomments>All Rights Reserved</addremovecomments>
+    <iconfile />
+  </addremove>
+  <codegen>
+    <generateincludefiles>1</generateincludefiles>
+    <generatefeatures>0</generatefeatures>
+    <refreshscript>0</refreshscript>
+  </codegen>
+  <compilervariables>
+    <variables />
+  </compilervariables>
+  <build>
+    <buildtype>0</buildtype>
+  </build>
+  <files>
+    <filedetails filename="C:\Users\hans-\Documents\Visual Studio 2017\Projects\CnC Suite\Debug\CnC Suite.exe" targetlocation="$TARGETDIR$" generatenativeimage="0" registerassembly="0" runinstallerclass="0" createshortcut="1" runprogram="1" installfilecommand="1" />
+  </files>
+  <dependencies />
+  <dialogtheme>
+    <themename>Official</themename>
+  </dialogtheme>
+  <authenticode>
+    <sign>0</sign>
+    <certificatefile />
+    <keyfile />
+    <productinfourl />
+    <authpassword />
+    <timestampurl />
+  </authenticode>
+  <compression>
+    <compressiontype>6</compressiontype>
+    <encrypt>0</encrypt>
+    <compressionpassword />
+  </compression>
+  <output>
+    <outputtype>0</outputtype>
+    <location />
+    <filename />
+    <calculatefilehash>0</calculatefilehash>
+    <refreshrevisioncode>1</refreshrevisioncode>
+  </output>
+</iasettings>
