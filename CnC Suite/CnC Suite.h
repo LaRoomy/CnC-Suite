@@ -167,3 +167,21 @@ void ScheduleRestart(DWORD restartOption);
 
 	NOTE: when searching for codepage-issues, use the mark '//CODEPAGE' for searching
 */
+
+/*
+
+old .gitignore (BUILDRESULTS)
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+*/

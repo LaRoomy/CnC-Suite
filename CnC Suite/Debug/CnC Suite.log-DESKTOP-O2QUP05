@@ -1,0 +1,28 @@
+﻿  TreeViewClass.cpp
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(94): warning C4838: Konvertierung von "DWORD" zu "int" erfordert eine einschränkende Konvertierung
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(108): warning C4100: "psiNewlyCreated": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(108): warning C4100: "hrCopy": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(108): warning C4100: "psiDestinationFolder": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(108): warning C4100: "psiItem": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(112): warning C4100: "psiNewlyCreated": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(112): warning C4100: "hrDelete": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(112): warning C4100: "psiItem": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(116): warning C4100: "psiNewlyCreated": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(116): warning C4100: "hrMove": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(116): warning C4100: "psiDestinationFolder": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(116): warning C4100: "psiItem": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.h(134): warning C4100: "hrResult": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.cpp(682): warning C4100: "lParamSort": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.cpp(3288): warning C4100: "Folderitem": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.cpp(3839): warning C4100: "dwFlags": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.cpp(3856): warning C4100: "dwFlags": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.cpp(3861): warning C4100: "newName": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.cpp(3861): warning C4100: "dwFlags": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.cpp(3866): warning C4100: "fileAtttributes": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.cpp(3866): warning C4100: "newName": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.cpp(3866): warning C4100: "dwFlags": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.cpp(3871): warning C4100: "newName": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.cpp(3871): warning C4100: "dwFlags": Unreferenzierter formaler Parameter
+c:\users\ct 60\documents\visual studio 2015\projects\cnc suite\cnc suite\tvcomp\treeviewclass.cpp(3198): warning C4702: Unerreichbarer Code
+  CnC Suite.vcxproj -> C:\Users\CT 60\Documents\Visual Studio 2015\Projects\CnC Suite\Debug\CnC Suite.exe
+  CnC Suite.vcxproj -> C:\Users\CT 60\Documents\Visual Studio 2015\Projects\CnC Suite\Debug\CnC Suite.pdb (Partial PDB)
