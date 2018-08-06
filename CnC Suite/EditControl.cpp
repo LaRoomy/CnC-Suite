@@ -2142,7 +2142,7 @@ int EditControl::executeSyntaxConversion(_In_ LPCTSTR buffer_in, _Inout_opt_ LPT
 		auto hr = StringCbLength(buffer_in, STRSAFE_MAX_CCH, &len);
 		if (SUCCEEDED(hr))
 		{
-			const uintX bufSize = len / sizeof(TCHAR);
+			const int bufSize = (int)(len / sizeof(TCHAR));
 
 			int pos = 0;
 			int line = 1;

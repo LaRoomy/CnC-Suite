@@ -716,7 +716,7 @@ BOOL BasicFileNPathOperations::pVerifyFilename(LPCTSTR fileName)
 	HRESULT hr = StringCbLength(fileName, sizeof(TCHAR)* _MAX_FNAME, &len);
 	if (SUCCEEDED(hr))
 	{
-		uintX _len = len / sizeof(TCHAR);
+		int _len = (int)(len / sizeof(TCHAR));
 		if (len > 0)
 		{
 			int i = 0;
