@@ -149,7 +149,7 @@ void ScheduleRestart(DWORD restartOption);
 - Satznummer-Steuerung überarbeiten
 - Autosyntax implementieren
 - Editcontrol-property-setup in tabclass speichern
-- Samplemanager manche samples wurden nicht gelöscht, andere werden gelistet, sind aber gar nicht vorhanden???
+- Samplemanager -> manche samples wurden nicht gelöscht, andere werden gelistet, sind aber gar nicht vorhanden???
 - Autosave integrieren
 - Sessiondaten speichern
 - Samplemanager anders aufrufen

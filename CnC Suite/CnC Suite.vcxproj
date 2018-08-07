@@ -94,7 +94,7 @@
     </ClCompile>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>$(SolutionDir)Debug\compatibility.debug.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(SolutionDir)CnC Suite\Compatibility Manifest Data\Debug\x86\compatibility.debug.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
     <Link>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
@@ -111,7 +111,7 @@
     </ClCompile>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>$(SolutionDir)x64\Debug\compatibility.x64.debug.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(SolutionDir)CnC Suite\Compatibility Manifest Data\Debug\x64\compatibility.x64.debug.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,7 +129,7 @@
     </Link>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>$(SolutionDir)Release\compatibility.release.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(SolutionDir)CnC Suite\Compatibility Manifest Data\Release\x86\compatibility.release.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
     <MASM>
       <UseSafeExceptionHandlers>true</UseSafeExceptionHandlers>
@@ -149,7 +149,7 @@
     </Link>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>$(SolutionDir)x64\Release\compatibility.x64.release.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(SolutionDir)CnC Suite\Compatibility Manifest Data\Release\x64\compatibility.x64.release.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
     <MASM>
       <UseSafeExceptionHandlers>false</UseSafeExceptionHandlers>
