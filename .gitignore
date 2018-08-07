@@ -4,10 +4,10 @@
 # Project-specific config:
 #-----------------------------------
 # log files are not necessary
-CnC Suite/x64/Release/CnC Suite.tlog/
-CnC Suite/x64/Debug/CnC Suite.tlog/
-CnC Suite/Debug/CnC Suite.tlog/
-CnC Suite/Release/CnC Suite.tlog/
+CnC Suite/x64/Release/CnC Suite.tlog
+CnC Suite/x64/Debug/CnC Suite.tlog
+CnC Suite/Debug/CnC Suite.tlog
+CnC Suite/Release/CnC Suite.tlog
 
 
 # User-specific files
