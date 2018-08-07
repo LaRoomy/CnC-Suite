@@ -310,8 +310,10 @@
     <Xml Include="cncsuite_manifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="..\Debug\compatibility.debug.manifest" />
-    <Manifest Include="..\Release\compatibility.release.manifest" />
+    <Manifest Include="Compatibility Manifest Data\Debug\x64\compatibility.x64.debug.manifest" />
+    <Manifest Include="Compatibility Manifest Data\Debug\x86\compatibility.debug.manifest" />
+    <Manifest Include="Compatibility Manifest Data\Release\x64\compatibility.x64.release.manifest" />
+    <Manifest Include="Compatibility Manifest Data\Release\x86\compatibility.release.manifest" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="stringCtrl.asm">

@@ -43,6 +43,9 @@
     <Filter Include="File and Path Operations">
       <UniqueIdentifier>{01a02d80-2a67-4bff-9424-adade29e98ce}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Compatibility Manifest">
+      <UniqueIdentifier>{dc50b469-8284-43d5-9541-8ddb43709e45}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external.h">
@@ -477,11 +480,17 @@
     </Xml>
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="..\Release\compatibility.release.manifest">
-      <Filter>Ressourcendateien</Filter>
+    <Manifest Include="Compatibility Manifest Data\Debug\x64\compatibility.x64.debug.manifest">
+      <Filter>Compatibility Manifest</Filter>
     </Manifest>
-    <Manifest Include="..\Debug\compatibility.debug.manifest">
-      <Filter>Ressourcendateien</Filter>
+    <Manifest Include="Compatibility Manifest Data\Debug\x86\compatibility.debug.manifest">
+      <Filter>Compatibility Manifest</Filter>
+    </Manifest>
+    <Manifest Include="Compatibility Manifest Data\Release\x64\compatibility.x64.release.manifest">
+      <Filter>Compatibility Manifest</Filter>
+    </Manifest>
+    <Manifest Include="Compatibility Manifest Data\Release\x86\compatibility.release.manifest">
+      <Filter>Compatibility Manifest</Filter>
     </Manifest>
   </ItemGroup>
   <ItemGroup>
