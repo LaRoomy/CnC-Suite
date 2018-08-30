@@ -159,9 +159,9 @@ CnCS_UI::~CnCS_UI()
 		DestroyIcon(this->pObj->web_norm);
 		DestroyIcon(this->pObj->web_mark);
 		DestroyIcon(this->pObj->web_pressed);
-		DestroyIcon(this->pObj->quit_norm);
-		DestroyIcon(this->pObj->quit_mark);
-		DestroyIcon(this->pObj->quit_pressed);
+		DestroyIcon(this->pObj->history_norm);
+		DestroyIcon(this->pObj->history_mark);
+		DestroyIcon(this->pObj->history_pressed);
 		DestroyIcon(this->pObj->size_cross);
 		// DESTROY PENS
 		DeleteObject(this->pObj->outlinePen);
@@ -278,7 +278,7 @@ BOOL CnCS_UI::Init_Childs()
 		return FALSE;
 	if (!this->MakeButton(nullptr, DPIScale(190), 0, DPIScale(24), DPIScale(24), IDM_WEB))
 		return FALSE;
-	if (!this->MakeButton(nullptr, DPIScale(220), 0, DPIScale(24), DPIScale(24), IDM_QUIT))
+	if (!this->MakeButton(nullptr, DPIScale(220), 0, DPIScale(24), DPIScale(24), IDM_HISTORY))
 		return FALSE;
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -1270,7 +1270,7 @@ void CnCS_UI::OnRestoreWindow(HWND hWnd, LPARAM lParam)
 				MoveWindow(
 					GetDlgItem(hWnd, IDM_WEB), DPIScale(190), 0, DPIScale(24), DPIScale(24), TRUE);
 				MoveWindow(
-					GetDlgItem(hWnd, IDM_QUIT), DPIScale(220), 0, DPIScale(24), DPIScale(24), TRUE);
+					GetDlgItem(hWnd, IDM_HISTORY), DPIScale(220), 0, DPIScale(24), DPIScale(24), TRUE);
 
 				if (this->iParam->DropdownbuttonIsVisible)
 				{
@@ -2089,8 +2089,8 @@ BOOL CnCS_UI::MakeTooltip(HWND button, int ID)
 	case IDM_WEB:
 		hr = StringCbCopy(tooltiptext, sizeof(tooltiptext), getStringFromResource(UI_GNRL_VISITWEBSITE));
 		break;
-	case IDM_QUIT:
-		hr = StringCbCopy(tooltiptext, sizeof(tooltiptext), getStringFromResource(UI_GNRL_CLOSEAPP));
+	case IDM_HISTORY:
+		hr = StringCbCopy(tooltiptext, sizeof(tooltiptext), getStringFromResource(UI_GNRL_HISTORY));
 		break;
 
 		
@@ -2531,18 +2531,18 @@ BOOL CnCS_UI::GetButtonDrawInfo(int ID, int Status, LPBUTTONDRAWINFO pbdi)
 		else if (Status == BDRAW_PRESSED)
 			pbdi->icon = this->pObj->web_pressed;
 		break;
-	case IDM_QUIT:
+	case IDM_HISTORY:
 		pbdi->cx = DPIScale(24);
 		pbdi->cy = DPIScale(24);
 		pbdi->bitmap = NULL;
 		pbdi->bkgnd = this->pObj->titlebarBrush;
 
 		if (Status == BDRAW_NORMAL)
-			pbdi->icon = this->pObj->quit_norm;
+			pbdi->icon = this->pObj->history_norm;
 		else if (Status == BDRAW_MARKED)
-			pbdi->icon = this->pObj->quit_mark;
+			pbdi->icon = this->pObj->history_mark;
 		else if (Status == BDRAW_PRESSED)
-			pbdi->icon = this->pObj->quit_pressed;
+			pbdi->icon = this->pObj->history_pressed;
 		break;
 
 	default:
@@ -2952,9 +2952,9 @@ void CnCS_UI::_createDpiDependedResources(bool cleanOld)
 		DestroyIcon(this->pObj->web_norm);
 		DestroyIcon(this->pObj->web_mark);
 		DestroyIcon(this->pObj->web_pressed);
-		DestroyIcon(this->pObj->quit_norm);
-		DestroyIcon(this->pObj->quit_mark);
-		DestroyIcon(this->pObj->quit_pressed);
+		DestroyIcon(this->pObj->history_norm);
+		DestroyIcon(this->pObj->history_mark);
+		DestroyIcon(this->pObj->history_pressed);
 		DestroyIcon(this->pObj->dropdown_norm);
 		DestroyIcon(this->pObj->dropdown_mark);
 		DestroyIcon(this->pObj->dropdown_pressed);
@@ -3031,9 +3031,9 @@ void CnCS_UI::_createDpiDependedResources(bool cleanOld)
 	this->pObj->appSettingsIcon_marked = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_APPSETTINGS_MARKED), IMAGE_ICON, DPIScale(24), DPIScale(24), LR_DEFAULTCOLOR);
 	this->pObj->appSettingsIcon_pressed = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_APPSETTINGS_PRESSED), IMAGE_ICON, DPIScale(24), DPIScale(24), LR_DEFAULTCOLOR);
 
-	this->pObj->quit_norm = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_QUIT), IMAGE_ICON, DPIScale(24), DPIScale(24), LR_DEFAULTCOLOR);
-	this->pObj->quit_mark = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_QUIT_MARKED), IMAGE_ICON, DPIScale(24), DPIScale(24), LR_DEFAULTCOLOR);
-	this->pObj->quit_pressed = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_QUIT_PRESSED), IMAGE_ICON, DPIScale(24), DPIScale(24), LR_DEFAULTCOLOR);
+	this->pObj->history_norm = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_HISTORY), IMAGE_ICON, DPIScale(24), DPIScale(24), LR_DEFAULTCOLOR);
+	this->pObj->history_mark = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_HISTORY_MARKED), IMAGE_ICON, DPIScale(24), DPIScale(24), LR_DEFAULTCOLOR);
+	this->pObj->history_pressed = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_HISTORY_PRESSED), IMAGE_ICON, DPIScale(24), DPIScale(24), LR_DEFAULTCOLOR);
 
 	this->pObj->web_norm = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_WEB), IMAGE_ICON, DPIScale(24), DPIScale(24), LR_DEFAULTCOLOR);
 	this->pObj->web_mark = (HICON)LoadImage(this->hInstance, MAKEINTRESOURCE(IDI_WEB_MARKED), IMAGE_ICON, DPIScale(24), DPIScale(24), LR_DEFAULTCOLOR);

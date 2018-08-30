@@ -295,7 +295,7 @@
 #define				_UI_GNRL_USERCANCELCONFIRM			L"Is canceled..."
 #define				_UI_GNRL_NEWSUBFOLDER				L"New Sub-Folder"
 #define				_UI_GNRL_LINEENDFORMAT				L"End of Line:"
-
+#define				_UI_GNRL_HISTORY					L"History"
 
 // ERROR MESSAGES >>
 

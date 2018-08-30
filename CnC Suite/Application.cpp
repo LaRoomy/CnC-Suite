@@ -671,6 +671,9 @@ LRESULT Application::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	case IDM_WEB:
 		this->LaunchWebsite();
 		break;
+	case IDM_HISTORY:
+		this->ShowHistoryWnd();
+		break;
 	case NAVIGATOR_SETCURRENTFOLDER:
 		this->NavigationFolder.Replace(
 			reinterpret_cast<const TCHAR*>(lParam)
@@ -1817,6 +1820,11 @@ void Application::LaunchCommandlineTool()
 
 		cmdlntool->CreatePopUp(&ccs);
 	}
+}
+
+void Application::ShowHistoryWnd()
+{
+
 }
 
 BOOL Application::LoadUserData()

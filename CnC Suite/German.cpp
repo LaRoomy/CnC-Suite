@@ -570,6 +570,8 @@ TCHAR* LanguageDispatcher::getGermanString(int ID)
 		return _UI_GNRL_NEWSUBFOLDER;
 	case UI_GNRL_LINEENDFORMAT:
 		return _UI_GNRL_LINEENDFORMAT;
+	case UI_GNRL_HISTORY:
+		return _UI_GNRL_HISTORY;
 
 
 		// error messages

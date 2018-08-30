@@ -2363,7 +2363,7 @@ int TreeViewCTRL::SequenceNextLevel( int startPos, int counter, LPHEADING newIte
                 else
                     i++;
 
-                if( ( oldItems[ i ].Level < ProcessLevel ) || ( i == NUMitems ) )
+                if( ( oldItems[ i ].Level < ProcessLevel ) || ( i == (NUMitems - 1) ))// changed
                 {
                     i = startPos;
                     ffMode = FALSE;
@@ -2411,7 +2411,7 @@ int TreeViewCTRL::SequenceNextLevel( int startPos, int counter, LPHEADING newIte
                 else
                     i++;
 
-                if( ( oldItems[ i ].Level < ProcessLevel ) || ( i == NUMitems ) )
+                if( ( oldItems[ i ].Level < ProcessLevel ) || ( i == (NUMitems - 1) ) )//changed
                 {
                     break;
                 }

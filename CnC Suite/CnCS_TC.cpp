@@ -13,6 +13,7 @@
 
 //temp:
 #include"DataExchange\DataExchange.h"
+#include"DateTime.h"
 
 CnCS_TC::CnCS_TC(HINSTANCE hInst, HWND MainWindow) : hInstance(hInst), Main(MainWindow), TABCount(0), _thisThreadId(0)
 {
@@ -858,6 +859,11 @@ LRESULT CnCS_TC::OnPaint_inFrame(HWND Frame)
 
 	GetClientRect(Frame, &rc);
 
+	//GetClientRect(
+	//	this->GetCurrentVisibleEditbox(nullptr),
+	//	&rc_edit
+	//);
+
 	hdc = BeginPaint(Frame, &ps);
 	if (hdc)
 	{
@@ -885,6 +891,17 @@ LRESULT CnCS_TC::OnPaint_inFrame(HWND Frame)
 
 				SetRect(&rc_fill, 0, p27, p28, rc.bottom);
 				FillRect(hdc_mem, &rc_fill, this->tcObj.toolbarbkgnd);
+
+				// extension of the editscrollbar to fullfill a complete border from top to bottom
+				// (disabled because it must be conditional, the edit-wnd could also be without scrollbar)
+				//SetRect(
+				//	&rc_fill,
+				//	DPIScale(40) + rc_edit.right,
+				//	p26,
+				//	DPIScale(57) + rc_edit.right,
+				//	DPIScale(40)
+				//);
+				//FillRect(hdc_mem, &rc_fill, this->tcObj.framebkgnd);
 
 				SelectObject(hdc_mem, this->tcObj.cPen);
 				MoveToEx(hdc_mem, 0, p26, NULL);	
@@ -1900,10 +1917,24 @@ void CnCS_TC::OnVerticalToolBar_NumSequence()
 
 		SetFocus(ptp->AssocEditWnd);
 	}
+
 }
 
 void CnCS_TC::OnVerticalToolBar_ErrorCheck()
 {
+	DateTime dateTime;
+	dateTime.SetLangID(LANG_GERMAN);
+	dateTime.FromLocalTime();
+
+	MessageBox(this->TCFrame, dateTime.SimpleTimeAsString(), L"simple time", MB_OK);
+
+	MessageBox(this->TCFrame, dateTime.SimpleDateAsString(), L"simple date", MB_OK);
+
+	MessageBox(this->TCFrame, dateTime.PreciseTimeAsString(), L"precise time", MB_OK);
+
+	MessageBox(this->TCFrame, dateTime.FormalDateAsString(), L"formal date", MB_OK);
+
+
 	//TCHAR text[] = L"Line 1\r\nLine 2\nLine 3\rLine End";
 	//TCHAR texttocount[] = L"0123456789XXXX";
 	//TCHAR newBuffer[11] = { 0 };

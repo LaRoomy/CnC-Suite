@@ -128,6 +128,7 @@ private:
 	void LaunchWebsite();
 	void ShowHelpExtension();
 	void LaunchCommandlineTool();
+	void ShowHistoryWnd();
 
 	BOOL LoadUserData();
 	BOOL LoadNCSPath();

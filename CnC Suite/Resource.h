@@ -193,6 +193,7 @@
 #define			IDM_HELP					420
 #define			IDM_WEB						421
 #define			IDM_QUIT					422
+#define			IDM_HISTORY					423
 
 #define			IDM_TOOLBAR_DROPDOWN		449
 #define			ID_LASTBUTTON				450
@@ -328,6 +329,11 @@
 #define			IDI_SYS_SCROLLARROW_RIGHT_DSBL			688
 
 #define			IDI_GNRL_ARROW_UP						689
+
+#define			IDI_HISTORY								691
+#define			IDI_HISTORY_MARKED						692
+#define			IDI_HISTORY_PRESSED						693
+
 
 
 //#define			IDI_MAINBUTTON_100						671

@@ -264,6 +264,12 @@
     <ClInclude Include="ResetDialog.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="history.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="DateTime.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CnC Suite.rc">
@@ -401,6 +407,12 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="ResetDialog.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="history.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="DateTime.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

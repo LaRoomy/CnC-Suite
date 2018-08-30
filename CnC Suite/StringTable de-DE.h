@@ -304,6 +304,7 @@
 #define				_UI_GNRL_USERCANCELCONFIRM			L"Wird abgebrochen..."
 #define				_UI_GNRL_NEWSUBFOLDER				L"Neuer Unterordner"
 #define				_UI_GNRL_LINEENDFORMAT				L"Zeilenende:"
+#define				_UI_GNRL_HISTORY					L"Verlauf"
 
 
 

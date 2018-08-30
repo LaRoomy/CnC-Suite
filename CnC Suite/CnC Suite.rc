@@ -31,6 +31,10 @@ IDI_WEB						ICON		"res\\Systembuttons\\web_norm.ico"
 IDI_WEB_MARKED				ICON		"res\\Systembuttons\\web_mark.ico"
 IDI_WEB_PRESSED				ICON		"res\\Systembuttons\\web_pres.ico"
 
+IDI_HISTORY						ICON		"res\\Systembuttons\\history_norm.ico"
+IDI_HISTORY_MARKED				ICON		"res\\Systembuttons\\history_mark.ico"
+IDI_HISTORY_PRESSED				ICON		"res\\Systembuttons\\history_pres.ico"
+
 IDI_QUIT					ICON		"res\\Systembuttons\\quit_norm.ico"
 IDI_QUIT_MARKED				ICON		"res\\Systembuttons\\quit_mark.ico"
 IDI_QUIT_PRESSED			ICON		"res\\Systembuttons\\quit_pres.ico"

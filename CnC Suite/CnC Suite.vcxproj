@@ -195,6 +195,7 @@
     <ClInclude Include="CommonControls\textField.h" />
     <ClInclude Include="dataAccessorID.h" />
     <ClInclude Include="DataExchange\DataExchange.h" />
+    <ClInclude Include="DateTime.h" />
     <ClInclude Include="DPI_Helper.h" />
     <ClInclude Include="EditControl.h" />
     <ClInclude Include="EditorContentManager.h" />
@@ -209,6 +210,7 @@
     <ClInclude Include="Global_String_IDs.h" />
     <ClInclude Include="Graphics\workingIndicator.h" />
     <ClInclude Include="HelperF.h" />
+    <ClInclude Include="history.h" />
     <ClInclude Include="iBox.h" />
     <ClInclude Include="IPath.h" />
     <ClInclude Include="LanguageDispatcher.h" />
@@ -259,6 +261,7 @@
     <ClCompile Include="CommonControls\StringClass.cpp" />
     <ClCompile Include="CommonControls\textField.cpp" />
     <ClCompile Include="DataExchange\DataExchange.cpp" />
+    <ClCompile Include="DateTime.cpp" />
     <ClCompile Include="EditControl.cpp" />
     <ClCompile Include="EditorContentManager.cpp" />
     <ClCompile Include="English.cpp" />
@@ -269,6 +272,7 @@
     <ClCompile Include="HelperF.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\CT 60\Documents\EigeneBibliotheken\Header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="history.cpp" />
     <ClCompile Include="IPath.cpp" />
     <ClCompile Include="OpenSave\Open_Save_CTRL.cpp" />
     <ClCompile Include="ResetDialog.cpp" />

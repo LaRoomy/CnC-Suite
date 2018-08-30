@@ -110,9 +110,9 @@ typedef struct StaticObjects {
 	HICON web_norm;
 	HICON web_mark;
 	HICON web_pressed;
-	HICON quit_norm;
-	HICON quit_mark;
-	HICON quit_pressed;
+	HICON history_norm;
+	HICON history_mark;
+	HICON history_pressed;
 
 }STATICOBJECTS,*LPSTATICOBJECTS;
 

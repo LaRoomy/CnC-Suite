@@ -5,7 +5,7 @@ template<class C>
 class iCollectable
 {
 	virtual C& operator= (const C&) = 0;
-	virtual C* getInstance() = 0;				// this is not necessary for the collection (never used)
+	//virtual C* getInstance() = 0;				// this is not necessary for the collection (never used)
 	// virtual bool operator== (const C&) = 0;	// this is necessary for the RemoveOnComparison-Method !
 };
 
