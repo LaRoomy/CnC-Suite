@@ -5,11 +5,14 @@
 
 typedef LONG_PTR cObject;
 
-template<class C> class ObjectRelease
+// rename objectrelease ???
+// add method FromString and ToString
+
+template<class C> class ClsObject
 {
 public:
-	ObjectRelease(){}
-	~ObjectRelease(){}
+	ClsObject(){}
+	~ClsObject(){}
 
 	void Release(){
 		delete (C*)this;
@@ -20,6 +23,9 @@ public:
 		createReleaseThread();
 	}
 
+	virtual const wchar_t* ToString() = 0;
+	virtual void FromString(const wchar_t* stringRepresentation) = 0;
+
 private:
 	int delayTime = 0;
 
@@ -28,7 +34,7 @@ private:
 		DWORD threadId;
 		HANDLE hThread;
 
-		hThread = CreateThread(nullptr, 0, ObjectRelease::delayProc, reinterpret_cast<LPVOID>(this), 0, &threadId);
+		hThread = CreateThread(nullptr, 0, ClsObject::delayProc, reinterpret_cast<LPVOID>(this), 0, &threadId);
 		if (hThread != nullptr)
 		{
 			WaitForSingleObject(hThread, 10);
@@ -39,7 +45,7 @@ private:
 
 	static DWORD __stdcall delayProc(LPVOID lParam)
 	{
-		auto _this = reinterpret_cast<ObjectRelease*>(lParam);
+		auto _this = reinterpret_cast<ClsObject*>(lParam);
 		if (_this != nullptr)
 		{
 			int time = _this->delayTime;

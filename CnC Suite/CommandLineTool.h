@@ -8,7 +8,7 @@
 
 
 class CnCS_CommandLine
-	: public ObjectRelease<CnCS_CommandLine>,
+	: public ClsObject<CnCS_CommandLine>,
 	public IConsoleInputEvent
 {
 public:
@@ -30,6 +30,13 @@ public:
 			reinterpret_cast<CSConsole*>(sender),
 			command
 		);
+	}
+
+	const wchar_t* ToString() {
+		return L"commandline tool";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
 	}
 
 private:

@@ -142,7 +142,7 @@ public:
 };
 
 class SerialComm
-	: public ObjectRelease<SerialComm>,
+	: public ClsObject<SerialComm>,
 	//public IConsoleInputEvent,
 	public customButtonEventSink
 {
@@ -194,6 +194,13 @@ public:
 	// button event:
 
 	void onCustomButtonClick(cObject sender, CTRLID ID_button);
+
+	const wchar_t* ToString() {
+		return L"SerialComm Class";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
 			
 private:
 	HINSTANCE hInst;

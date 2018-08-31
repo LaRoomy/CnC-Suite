@@ -39,7 +39,7 @@ public:
 };
 
 class listViewItem
-	: public ObjectRelease<listViewItem>,
+	: public ClsObject<listViewItem>,
 	public iCollectable<listViewItem>
 	
 {
@@ -147,6 +147,13 @@ public:
 
 	int getRowCount() const { return this->numItemsInRow; }
 
+	const wchar_t* ToString() {
+		return L"listviewitem";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
+
 private:
 	int numItemsInRow;
 
@@ -170,7 +177,7 @@ private:
 };
 
 class cListView
-	: public ObjectRelease<cListView>
+	: public ClsObject<cListView>
 {
 public:
 	cListView(HINSTANCE hInst);
@@ -206,6 +213,13 @@ public:
 
 	void activateEventBlocker();
 	void deactivateEventBlocker();
+
+	const wchar_t* ToString() {
+		return L"customlistview";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
 
 private:
 	HINSTANCE hInstance;

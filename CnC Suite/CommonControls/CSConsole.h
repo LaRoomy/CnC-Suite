@@ -29,7 +29,7 @@ public:
 };
 
 class CSConsole
-	: public ObjectRelease<CSConsole>,
+	: public ClsObject<CSConsole>,
 	public IScrollEventProtocol,
 	public IScrollable
 {
@@ -114,6 +114,13 @@ public:
 	// This method prevents all input and update operations - it must be called if the user want's to close the host-window with an 'exit' command
 	void Freeze(bool enable) {
 		this->freezer = enable;
+	}
+
+	const wchar_t* ToString() {
+		return L"custom console X";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
 	}
 
 	static const WCHAR* CONSOLE_CLASS_ID;

@@ -76,7 +76,7 @@ public:
 	virtual void onCustomCheckboxChecked(cObject sender, bool newState) = 0;
 };
 
-class CustomCheckbox : public ObjectRelease<CustomCheckbox>
+class CustomCheckbox : public ClsObject<CustomCheckbox>
 {
 public:
 	CustomCheckbox(HINSTANCE hInst, HWND parent, LPPOINT position, LPSIZE size, int ctrlID);
@@ -99,6 +99,13 @@ public:
 	CTRLID getCtrlID() { return this->cbxProperty.ctrlID; }
 	bool isChecked() { return this->cbxControl.isChecked; }
 	void setChecked(bool state) { this->cbxControl.isChecked = state; }
+
+	const wchar_t* ToString() {
+		return L"checkbox";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
 
 private:
 	HINSTANCE hInstance;

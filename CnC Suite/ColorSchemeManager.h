@@ -25,7 +25,7 @@
 
 
 class colorSchemeManager
-	: public ObjectRelease<colorSchemeManager>,
+	: public ClsObject<colorSchemeManager>,
 	public customButtonEventSink,
 	public comboBoxEventSink,
 	public XMLParsingEventSink
@@ -101,6 +101,13 @@ public:
 	static bool loadSchemeList(itemCollection<iString>* list_out);
 	static bool xmlToColorStruct(itemCollection<iXML_Tag>* xmlColorStructure, LPEDITSTYLECOLORS esc);
 	static void indexToColor(int index, COLORREF color, LPEDITSTYLECOLORS esc);
+
+	const wchar_t* ToString() {
+		return L"colorschememanager";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
 
 private:
 	HINSTANCE hInstance;

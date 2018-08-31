@@ -19,7 +19,7 @@
 #define			TYPE_APPENDIXINPUT			2
 
 class autocompleteManager
-	: public ObjectRelease<autocompleteManager>,
+	: public ClsObject<autocompleteManager>,
 	public customButtonEventSink,
 	public singleLineEditEventSink,
 	public listViewEventSink
@@ -62,6 +62,13 @@ public:
 	}
 
 	static const CTRLID AutoCompWindowID = 1086;
+
+	const wchar_t* ToString() {
+		return L"autocompletemanager";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
 
 private:
 	HWND acmWnd;

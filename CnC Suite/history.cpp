@@ -1,5 +1,6 @@
 #include "history.h"
 #include "BasicFPO.h"
+#include "HelperF.h"
 
 HistoryItem::HistoryItem()
 	: historyAction(HistoryItem::NOT_DEFINED)
@@ -22,6 +23,72 @@ void HistoryItem::Clear()
 {
 	this->path.Clear();
 	this->historyAction = HistoryItem::NOT_DEFINED;
+}
+
+void HistoryItem::FromString(const wchar_t* stringRepresentation)
+{
+	if (stringRepresentation != nullptr)
+	{
+		auto maxChar = (DWORD)_lengthOfString(stringRepresentation);
+		DWORD i = 0, j = 0;
+		TCHAR hAction[65] = { 0 };
+		TCHAR dateTime[32] = { 0 };
+
+		// at first count the length of the path
+		while (stringRepresentation[i] != L'|')
+		{
+			if (stringRepresentation[i] == L'\0')
+				return;
+			if (i == maxChar)
+				return;
+
+			i++;
+		}
+
+		// get the path as a segment
+		CHARSCOPE cs;
+		cs.startChar = 0;
+		cs.endChar = i - 1;
+
+		iString sR(stringRepresentation);
+		this->path = sR.GetSegment(&cs);
+
+		i++;
+
+		while (stringRepresentation[i] != L'|')
+		{
+			if (stringRepresentation[i] == L'\0')
+				return;
+			if (i == maxChar)
+				return;
+
+			hAction[j] = stringRepresentation[i];
+
+			i++;
+			j++;
+		}
+
+		this->historyAction = (HistoryAction)_wtoi(hAction);
+
+		i++;
+		j = 0;
+
+		while (stringRepresentation[i] != L'|')
+		{
+			if (stringRepresentation[i] == L'\0')
+				break;
+			if (i == maxChar)
+				break;
+
+			dateTime[j] = stringRepresentation[i];
+
+			i++;
+			j++;
+		}
+		
+		this->lastOpenedTime.FromString(dateTime);
+		this->setTimes();
+	}
 }
 
 void HistoryItem::setTimes()
@@ -51,8 +118,9 @@ void HistoryItem::generateStringRepresentation()
 {
 	this->representation.Replace(this->path);
 	this->representation += L"|";
-	this->representation += this->historyAction;
+	this->representation += (DWORD)this->historyAction;
 	this->representation += L"|";
+	this->representation += this->lastOpenedTime.ToString();
 }
 
 History::History()

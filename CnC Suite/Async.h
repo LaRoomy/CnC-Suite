@@ -7,7 +7,7 @@ typedef void(*async_parameter)(LPVOID);
 typedef LPVOID FUNCTION_PTR;
 
 class Async
-	: public ObjectRelease<Async>
+	: public ClsObject<Async>
 {
 public:
 	Async()
@@ -46,6 +46,13 @@ public:
 
 	void setFunctionData(LPVOID data) {
 		this->functionData = data;
+	}
+
+	const wchar_t* ToString() {
+		return L"async-class";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
 	}
 
 private:

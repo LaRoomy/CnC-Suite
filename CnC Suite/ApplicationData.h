@@ -29,7 +29,7 @@ typedef struct _SAVERTHREADDATA {
 }SAVERTHREADDATA, *LPSAVERTHREADDATA;
 
 class ApplicationData
-	: public ObjectRelease<ApplicationData>,
+	: public ClsObject<ApplicationData>,
 	public XMLParsingEventSink,
 	public iCollectable<ApplicationData>
 {
@@ -123,6 +123,13 @@ public:
 	}
 
 	ApplicationData* getInstance() { return this; }
+
+	const wchar_t* ToString() {
+		return (const wchar_t*)this->filekey.GetData();
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
 
 private:
 	bool success;

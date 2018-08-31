@@ -65,7 +65,7 @@ public:
 };
 
 class CSScrollbar
-	: public ObjectRelease<CSScrollbar>
+	: public ClsObject<CSScrollbar>
 {
 public:
 	CSScrollbar();
@@ -155,6 +155,13 @@ public:
 	static const ScrollBarType SCROLLBARTYPE_HORIZONTAL = 2;
 
 	static const WCHAR* CSSCROLLBAR_CLASS_IDENTIFIER;
+
+	const wchar_t* ToString() {
+		return L"scrollbar";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
 
 private:
 	HINSTANCE hInstance;

@@ -18,7 +18,7 @@ typedef struct _GRAPHICOUTPUTINFO {
 }GRAPHICOUTPUTINFO, *LPGRAPHICOUTPUTINFO;
 
 class splashScreen
-	: public ObjectRelease<splashScreen>
+	: public ClsObject<splashScreen>
 {
 public:
 	splashScreen(HINSTANCE hInst);
@@ -26,6 +26,14 @@ public:
 
 	HRESULT Start();
 	HRESULT Stop();
+
+	const wchar_t* ToString() {
+		return L"splash screen";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
+
 
 private:
 	HINSTANCE hInstance;

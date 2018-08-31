@@ -30,7 +30,7 @@ typedef struct _CHECKSTATES {
 }CHECKSTATES, *LPCHECKSTATES;
 
 class ResetDialog
-	: public ObjectRelease<ResetDialog>,
+	: public ClsObject<ResetDialog>,
 	public customButtonEventSink,
 	public customCheckboxEventSink
 {
@@ -49,6 +49,13 @@ public:
 	void onCustomButtonClick(cObject sender, CTRLID ctrlID);
 	// checkbox event:
 	void onCustomCheckboxChecked(cObject sender, bool newState);
+
+	const wchar_t* ToString() {
+		return L"reset dialog class";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
 
 private:
 	HINSTANCE hInstance;

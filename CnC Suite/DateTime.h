@@ -8,7 +8,7 @@
 #include"cObject.h"
 
 class DateTime
-	: public ObjectRelease<DateTime>
+	: public ClsObject<DateTime>
 {
 public:
 	DateTime();
@@ -22,6 +22,12 @@ public:
 
 	void SetTime(_In_ LPSYSTEMTIME time_in);
 	void GetTime(_Out_ LPSYSTEMTIME time_out) const;
+
+	const wchar_t* ToString() {
+		return this->lpStringRepresentation;
+	}
+
+	void FromString(const wchar_t* stringRepresentation);
 
 	void FromSystemTime();
 	void FromLocalTime();
@@ -45,6 +51,7 @@ private:
 	TCHAR* lpPreciseTime;
 	TCHAR* lpDate;
 	TCHAR* lpFormalDate;
+	TCHAR* lpStringRepresentation;
 
 	void updateStrings();
 
@@ -52,6 +59,7 @@ private:
 	void makePreciseTime();
 	void makeSimpleDate();
 	void makeFormalDate();
+	void makeStringRepresentation();
 };
 
 #endif // !_DATETIME_HELPER_

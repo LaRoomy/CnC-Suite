@@ -7,7 +7,8 @@ DateTime::DateTime()
 	lpDate(nullptr),
 	lpTime(nullptr),
 	lpPreciseTime(nullptr),
-	lpFormalDate(nullptr)
+	lpFormalDate(nullptr),
+	lpStringRepresentation(nullptr)
 {
 	SecureZeroMemory(&this->_time, sizeof(SYSTEMTIME));
 }
@@ -17,7 +18,8 @@ DateTime::DateTime(LPSYSTEMTIME time)
 	lpDate(nullptr),
 	lpTime(nullptr),
 	lpPreciseTime(nullptr),
-	lpFormalDate(nullptr)
+	lpFormalDate(nullptr),
+	lpStringRepresentation(nullptr)
 {
 	this->_time = *time;
 	this->updateStrings();
@@ -28,7 +30,8 @@ DateTime::DateTime(const DateTime & dt)
 	lpDate(nullptr),
 	lpTime(nullptr),
 	lpPreciseTime(nullptr),
-	lpFormalDate(nullptr)
+	lpFormalDate(nullptr),
+	lpStringRepresentation(nullptr)
 {
 	dt.GetTime(&this->_time);
 	this->updateStrings();
@@ -40,6 +43,7 @@ DateTime::~DateTime()
 	SafeDeleteArray(&this->lpTime);
 	SafeDeleteArray(&this->lpPreciseTime);
 	SafeDeleteArray(&this->lpFormalDate);
+	SafeDeleteArray(&this->lpStringRepresentation);
 }
 
 void DateTime::Clear()
@@ -49,6 +53,7 @@ void DateTime::Clear()
 	SafeDeleteArray(&this->lpTime);
 	SafeDeleteArray(&this->lpPreciseTime);
 	SafeDeleteArray(&this->lpFormalDate);
+	SafeDeleteArray(&this->lpStringRepresentation);
 }
 
 DateTime & DateTime::operator=(const DateTime & dt)
@@ -68,6 +73,61 @@ void DateTime::SetTime(LPSYSTEMTIME time)
 void DateTime::GetTime(LPSYSTEMTIME time_out) const
 {
 	*time_out = this->_time;
+}
+
+void DateTime::FromString(const wchar_t * stringRepresentation)
+{
+	if (stringRepresentation != nullptr)
+	{
+		DWORD i = 0, j = 0;
+		TCHAR val[16] = { 0 };
+		int vIndex = 0;
+
+		while (1)
+		{
+			if ((stringRepresentation[i] == L'/')||(stringRepresentation[i] == L'\0'))
+			{
+				switch (vIndex)
+				{
+				case 0:
+					this->_time.wDayOfWeek = (WORD)_wtoi(val);
+					break;
+				case 1:
+					this->_time.wDay = (WORD)_wtoi(val);
+					break;
+				case 2:
+					this->_time.wMonth = (WORD)_wtoi(val);
+					break;
+				case 3:
+					this->_time.wYear = (WORD)_wtoi(val);
+					break;
+				case 4:
+					this->_time.wHour = (WORD)_wtoi(val);
+					break;
+				case 5:
+					this->_time.wMinute = (WORD)_wtoi(val);
+					break;
+				case 6:
+					this->_time.wSecond = (WORD)_wtoi(val);
+					break;
+				default:
+					return;
+				}
+
+				if (stringRepresentation[i] == L'\0')
+					return;
+
+				i++;
+				vIndex++;
+				j = 0;
+				SecureZeroMemory(val, sizeof(val));
+			}
+			val[j] = stringRepresentation[i];
+
+			i++;
+			j++;
+		}
+	}
 }
 
 void DateTime::FromSystemTime()
@@ -225,6 +285,7 @@ void DateTime::updateStrings()
 	this->makePreciseTime();
 	this->makeSimpleDate();
 	this->makeSimpleTime();
+	this->makeStringRepresentation();
 }
 
 void DateTime::makeSimpleTime()
@@ -379,6 +440,31 @@ void DateTime::makeFormalDate()
 			L"%s. %s %d",
 			day, month,
 			this->_time.wYear
+		);
+	}
+}
+
+void DateTime::makeStringRepresentation()
+{
+	SafeDeleteArray(&this->lpStringRepresentation);
+
+	this->lpStringRepresentation = new TCHAR[32];
+	if (this->lpStringRepresentation != nullptr)
+	{
+		// this ist the format:
+		// dayofweek / day / month / year / hours / minutes / seconds
+
+		StringCbPrintf(
+			this->lpStringRepresentation,
+			sizeof(TCHAR) * 32,
+			L"%d/%d/%d/%d/%d/%d/%d",
+			this->_time.wDayOfWeek,
+			this->_time.wDay,
+			this->_time.wMonth,
+			this->_time.wYear,
+			this->_time.wHour,
+			this->_time.wMinute,
+			this->_time.wSecond
 		);
 	}
 }

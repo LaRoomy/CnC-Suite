@@ -4,7 +4,7 @@
 #include"CommonControls\StringClass.h"
 
 class clipBoardOperations
-	: public ObjectRelease<clipBoardOperations>
+	: public ClsObject<clipBoardOperations>
 {
 public:
 	clipBoardOperations();
@@ -12,6 +12,13 @@ public:
 	~clipBoardOperations();
 
 	bool copyTextToClipboard(iString text);
+
+	const wchar_t* ToString() {
+		return L"clipboardoperationclass";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
 
 private:
 	BOOL success;

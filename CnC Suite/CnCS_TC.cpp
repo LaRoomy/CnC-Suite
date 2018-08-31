@@ -14,6 +14,7 @@
 //temp:
 #include"DataExchange\DataExchange.h"
 #include"DateTime.h"
+#include"history.h"
 
 CnCS_TC::CnCS_TC(HINSTANCE hInst, HWND MainWindow) : hInstance(hInst), Main(MainWindow), TABCount(0), _thisThreadId(0)
 {
@@ -1922,17 +1923,26 @@ void CnCS_TC::OnVerticalToolBar_NumSequence()
 
 void CnCS_TC::OnVerticalToolBar_ErrorCheck()
 {
-	DateTime dateTime;
-	dateTime.SetLangID(LANG_GERMAN);
-	dateTime.FromLocalTime();
+	//DateTime dateTime, newTest;
+	//dateTime.SetLangID(LANG_GERMAN);
+	//dateTime.FromLocalTime();
 
-	MessageBox(this->TCFrame, dateTime.SimpleTimeAsString(), L"simple time", MB_OK);
+	//auto str = dateTime.ToString();
 
-	MessageBox(this->TCFrame, dateTime.SimpleDateAsString(), L"simple date", MB_OK);
+	//newTest.FromString(str);
 
-	MessageBox(this->TCFrame, dateTime.PreciseTimeAsString(), L"precise time", MB_OK);
+	auto ptp = this->GetActiveTabProperty();
 
-	MessageBox(this->TCFrame, dateTime.FormalDateAsString(), L"formal date", MB_OK);
+	HistoryItem hItem;
+	hItem.SetActionType(HistoryItem::FILE_OPENED | HistoryItem::FILE_CHANGED);
+	hItem.SetItemPath(ptp->Path);
+	hItem.SetLastOpenedTime();
+
+	auto str = hItem.ToString();
+
+	HistoryItem newItem;
+	newItem.FromString(str);
+
 
 
 	//TCHAR text[] = L"Line 1\r\nLine 2\nLine 3\rLine End";

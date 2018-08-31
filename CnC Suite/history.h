@@ -12,7 +12,7 @@
 typedef uintX HistoryAction;
 
 class HistoryItem
-	: public ObjectRelease<HistoryItem>,
+	: public ClsObject<HistoryItem>,
 	public iCollectable<HistoryItem>
 {
 public:
@@ -40,12 +40,12 @@ public:
 
 	void Clear();
 
-	LPCTSTR ToString() {
+	const wchar_t* ToString() {
 		this->generateStringRepresentation();
 		return this->representation.GetData();
 	}
 
-	void FromString(LPCTSTR stringRepresentation);
+	void FromString(const wchar_t* stringRepresentation);
 
 	void SetActionType(HistoryAction hiac) {
 		this->historyAction = hiac;
@@ -90,7 +90,7 @@ private:
 
 
 class History
-	: public ObjectRelease<History>
+	: public ClsObject<History>
 {
 public:
 	History();
@@ -98,6 +98,13 @@ public:
 
 	void AddHistoryItem(const HistoryItem& item) {
 		this->historyList.AddItem(item);
+	}
+
+	const wchar_t* ToString() {
+		return L"historyclass";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
 	}
 
 private:

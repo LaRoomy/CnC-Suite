@@ -27,7 +27,7 @@ typedef struct _WIGRAPHICOUTPUTINFO {
 // Recall that the maximum number off circling balls depends on the window-with and the gap (spacing) programmed in the section
 
 class workingIndicator
-	: public ObjectRelease<workingIndicator>
+	: public ClsObject<workingIndicator>
 {
 public:
 	workingIndicator(HINSTANCE hInst, int indicationIcon);
@@ -57,6 +57,13 @@ public:
 	void killEx(DWORD delay_ms);
 
 	void setFinishNotificationTarget(HWND msgReceiver);
+
+	const wchar_t* ToString() {
+		return L"working indicator";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
 
 private:
 	HWND parent;

@@ -12,7 +12,7 @@
 class CustomPopUpMenu;
 
 class MenuEntry
-	: public ObjectRelease<MenuEntry>,
+	: public ClsObject<MenuEntry>,
 	  public iCollectable<MenuEntry>
 {
 public:
@@ -80,6 +80,13 @@ public:
 		this->ENTRY_ID = 0;
 	}
 
+	const wchar_t* ToString() {
+		return L"menu entry";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
+	}
+
 private:
 	iString text;
 	COLORREF backgroundcolor;
@@ -101,7 +108,7 @@ public:
 };
 
 class CustomPopUpMenu
-	: public ObjectRelease<CustomPopUpMenu>,
+	: public ClsObject<CustomPopUpMenu>,
 	  public customButtonEventSink
 {
 public:
@@ -121,6 +128,13 @@ public:
 	void CustomPopUpMenu::onCustomButtonClick(cObject sender, CTRLID ID) {
 		UNREFERENCED_PARAMETER(sender);
 		this->onButtonClick(ID);
+	}
+
+	const wchar_t* ToString() {
+		return L"custom popup menu";
+	}
+	void FromString(const wchar_t* stringRepresentation) {
+		UNREFERENCED_PARAMETER(stringRepresentation);
 	}
 
 private:
