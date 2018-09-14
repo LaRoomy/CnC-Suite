@@ -48,8 +48,8 @@
 #include"CnC Suite.h"
 #include"StringProcessHelper.h"
 #include"cObject.h"
-#include"Global.h"
-#include"GlobalStyles.h"
+//#include"Global.h"
+//#include"GlobalStyles.h"
 
 #endif// _CNCSUITE_EXTERNAL_DEPENDENCIES_
 

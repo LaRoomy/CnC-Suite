@@ -10,10 +10,6 @@
 #include"CommandLineTool.h"
 #include"EditorContentManager.h"
 
-// temp:
-//#include"EditorContentManager.h"
-
-
 Application::Application(HINSTANCE hInst)
 	:hInstance( hInst ),
 	MainWindow(nullptr),
@@ -21,7 +17,8 @@ Application::Application(HINSTANCE hInst)
 	restartOptions(NO_RESTART),
 	FileNavigator(nullptr),
 	Tabcontrol(nullptr),
-	CBox(nullptr)
+	CBox(nullptr),
+	fileHistory(nullptr)
 {
 	// load the style-data before creating the user-interface
 	this->LoadStyleInfo();
@@ -70,6 +67,7 @@ Application::~Application()
 	SafeRelease(&this->UserInterface);
 	SafeRelease(&this->appProperty);
 	SafeRelease(&this->CBox);
+	SafeRelease(&this->fileHistory);
 
 	//FreeLibrary()
 }
@@ -470,7 +468,16 @@ HRESULT Application::Init_Components()
 									async->callFunction(&updateFocusRect);
 								}
 
-								// ...								
+								this->fileHistory = new UIHistory();
+
+								hr = (this->fileHistory != nullptr) ? S_OK : E_NOINTERFACE;
+								if (SUCCEEDED(hr))
+								{
+									this->fileHistory->SetEventHandler(
+										dynamic_cast<IHistroyEventProtocoll*>(this)
+									);
+									// ...
+								}
 							}
 						}
 					}					
@@ -922,18 +929,6 @@ LRESULT Application::OnStyleInfo(LPARAM lParam)
 	LPAPPSTYLEINFO sInfo = reinterpret_cast<LPAPPSTYLEINFO>(lParam);
 	if (sInfo != NULL)
 	{
-		//sInfo->StyleID = this->StyleInfo.StyleID;
-		//sInfo->Stylecolor = this->StyleInfo.Stylecolor;
-		//sInfo->Background = this->StyleInfo.Background;
-		//sInfo->SizeWndColor = this->StyleInfo.SizeWndColor;
-		//sInfo->TextColor = this->StyleInfo.TextColor;
-		//sInfo->OutlineColor = this->StyleInfo.OutlineColor;
-		//sInfo->TabColor = this->StyleInfo.TabColor;
-		//sInfo->ToolbarbuttonBkgnd = this->StyleInfo.ToolbarbuttonBkgnd;
-		//sInfo->MenuPopUpColor = this->StyleInfo.MenuPopUpColor;
-		//sInfo->specialTextcolor = this->StyleInfo.specialTextcolor;
-		//sInfo->
-
 		copyAppStyleInfo(&this->StyleInfo, sInfo);
 	}
 	else
@@ -1824,7 +1819,35 @@ void Application::LaunchCommandlineTool()
 
 void Application::ShowHistoryWnd()
 {
+	RECT rc;
+	SPECIALCOLORSTRUCT scs;
 
+	this->SpecialColorForID(this->StyleInfo.StyleID, &scs);
+
+	auto fNav = this->UserInterface->GetFrameHandles(GFWH_TVFRAME);
+	GetClientRect(fNav, &rc);
+
+	CTRLCREATIONSTRUCT ccs;
+	ccs.ctrlID = 0;
+	ccs.hInst = this->hInstance;
+	ccs.parent = this->MainWindow;
+	ccs.pos = { 0,
+		DPIScale(25) };
+	ccs.size = {
+		rc.right,
+		rc.bottom };
+
+	this->fileHistory->SetColors(
+		this->StyleInfo.Background,
+		scs.normal,
+		scs.highlighted,
+		scs.text,
+		scs.accent_text,
+		scs.outline
+	);
+
+	this->FileNavigator->Hide();
+	this->fileHistory->ShowHistoryWindow(&ccs);
 }
 
 BOOL Application::LoadUserData()
@@ -2301,5 +2324,42 @@ void Application::SetDefaultRestoreFrame()
 		wpi.showCmd = this->AppData.WndSizeData.nCmdShow;
 
 		SetWindowPlacement(this->MainWindow, &wpi);
+	}
+}
+
+void Application::SpecialColorForID(int ID, LPSPECIALCOLORSTRUCT pscs)
+{
+	if (ID == STYLEID_BLACK)
+	{
+		pscs->normal = RGB(40, 40, 40);
+		pscs->selected = RGB(100, 100, 100);
+		pscs->pressed = RGB(70, 70, 70);
+		pscs->highlighted = RGB(100, 100, 100);
+		pscs->accent_norm = RGB(220, 100, 20);
+		pscs->text = RGB(240, 240, 240);
+		pscs->accent_text = RGB(220, 100, 20);
+		pscs->outline = RGB(180, 180, 180);
+	}
+	else if (ID == STYLEID_DARKGRAY)
+	{
+		pscs->normal = RGB(100, 100, 100);
+		pscs->selected = RGB(150, 150, 150);
+		pscs->pressed = RGB(110, 110, 110);
+		pscs->highlighted = RGB(150, 150, 150);
+		pscs->accent_norm = RGB(240, 120, 20);
+		pscs->text = RGB(255, 255, 255);
+		pscs->accent_text = RGB(240, 120, 20);
+		pscs->outline = RGB(220, 220, 200);
+	}
+	else// must be STYLEID_LIGHTGRAY !
+	{
+		pscs->normal = RGB(220, 220, 220);
+		pscs->selected = RGB(190, 190, 190);
+		pscs->pressed = RGB(160, 160, 160);
+		pscs->highlighted = RGB(190, 190, 190);
+		pscs->accent_norm = RGB(140, 140, 140);
+		pscs->text = RGB(0, 0, 0);
+		pscs->accent_text = RGB(100, 100, 100);
+		pscs->outline = RGB(100, 100, 100);
 	}
 }

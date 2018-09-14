@@ -60,7 +60,7 @@ public:
 	//      The method automatically sets the EOL-Format parameter to the format of the given buffer
 	void SetContent(LPCWSTR content);
 
-	// Sets the content without copying, the internal WCHAR* pointer will be set to the value of the pToBuffer parameter
+	// Sets the content without copying: The internal WCHAR* pointer will be set to the value of the pToBuffer parameter
 	// this method is for efficiency purposes, but also dangerous! Discard the pointer outside of this component immediately after calling this method
 	// otherwise an deletition or change of the buffer will corrupt the EditorContentManager object
 	// This method also starts the conversion, so see the NOTE-section by 'SetContent(...)'

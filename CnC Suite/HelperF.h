@@ -236,6 +236,10 @@ int CreateRandomInteger(int min, int max);
 // checks if the path is a drive - TRUE if yes, FALSE if not
 BOOL isDrive(LPCTSTR path);
 
+// checks if the length of the string printed in a device-context is possible and morphes
+// the string to the desired length
+
+
 
 
 #if defined UNICODE

@@ -122,6 +122,13 @@ public:
 	}
 	void CnCS_FN::Release() { delete this; }
 
+	void CnCS_FN::Hide() {
+		ShowWindow(this->fnParam.Frame, SW_HIDE);
+	}
+	void CnCS_FN::Show() {
+		ShowWindow(this->fnParam.Frame, SW_SHOW);
+	}
+
 	void CnCS_FN::Reload() {
 		this->pTV->Reload(true);
 	}

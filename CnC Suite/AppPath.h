@@ -24,7 +24,9 @@
 
 #define			PATHID_FILE_FIRST_USE			33
 #define			PATHID_FILE_ALREADYINSTALLED	34
-#define			PATHID_FILE_FIRSTUSEEXAMPLE	35
+#define			PATHID_FILE_FIRSTUSEEXAMPLE		35
+
+#define			PATHID_FILE_HISTORY			36
 
 
 // important: this ID's must have successive numbers for iteration
@@ -53,6 +55,7 @@
 #define			PATHTOFILE_APPSTYLE_ID						L"\\CnC Suite\\AppData\\appstyle.sys"
 #define			PATHTOFILE_NAVIGATION_FOLDER				L"\\CnC Suite\\AppData\\navroot.sys"
 #define			PATHTOFILE_WINDOWPLACEMENT_DATA				L"\\CnC Suite\\AppData\\wnduser.sys"
+#define			PATHTOFILE_FILEHISTORY_DATA					L"\\CnC Suite\\AppData\\history.lib"
 #define			PATHTOFILE_AUTOCOMPLETE_STRINGS				L"\\CnC Suite\\AppData\\Strings\\autocomplete.xml"
 #define			PATHTOFILE_AUTOSYNTAX_SETTINGS				L"\\CnC Suite\\AppData\\Settings\\autosyntax.xml"
 #define			PATHTOFILE_CNCSUITE_SETTINGS				L"\\CnC Suite\\AppData\\Settings\\cncsuitesettings.xml"
@@ -159,6 +162,8 @@ public:
 			return this->documentsPath + PATHTOFILE_DESCPROPERTY_THREE;
 		case PATHID_FILE_FIRSTUSEEXAMPLE:
 			return this->documentsPath + PATHTOFILE_FIRSTUSE_EXAMPLEFILE;
+		case PATHID_FILE_HISTORY:
+			return this->documentsPath + PATHTOFILE_FILEHISTORY_DATA;
 
 
 		case PATHID_FOLDER_CNCSUITE_USERFOLDER:

@@ -33,6 +33,9 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #define HINST_THISCOMPONENT (HINSTANCE)&__ImageBase)
 #endif
 
+#include"Global.h"
+#include"GlobalStyles.h"
+
 /// buildinfo section ///////////////////////////////////////////////////////////////////////////////////////////////
 // this section contains displayable information regarding the buildinfo of the application (displayed on info page)
 #define		CNCSUITE_BUILDVERSION		L"CnC Suite Build 1.3.2"
@@ -141,6 +144,7 @@ HFONT CreateScaledUnderlinedFont(int fontHeight, int fontWeight, LPCTSTR fontNam
 bool isCnC3Path(LPCTSTR path);
 LONG WINAPI lpTopLevelExceptionFilter(_EXCEPTION_POINTERS *exceptionInfo);
 void ScheduleRestart(DWORD restartOption);
+BOOL GetApplicationStyleInformation(LPAPPSTYLEINFO pSInfo);
 
 
 /* TODO GLOBAL !!!

@@ -20,6 +20,8 @@ public:
 	virtual void Reload() = 0;
 	virtual void ReloadAsync() = 0;// scroll recovering does not work async, and is therefore disabled!
 	virtual void SetEventHandler(IFileSystemModificationProtocoll *FileSystemEvents_) = 0;
+	virtual void Hide() = 0;
+	virtual void Show() = 0;
 };
 
 CnCSuite_FileNavigator* CreateFileNavigator(HINSTANCE hInst, HWND MainWindow);

@@ -26,14 +26,14 @@ DateTime::DateTime(LPSYSTEMTIME time)
 }
 
 DateTime::DateTime(const DateTime & dt)
-	: langID(LANG_ENGLISH),
-	lpDate(nullptr),
+	: lpDate(nullptr),
 	lpTime(nullptr),
 	lpPreciseTime(nullptr),
 	lpFormalDate(nullptr),
 	lpStringRepresentation(nullptr)
 {
 	dt.GetTime(&this->_time);
+	this->langID = dt.langID;
 	this->updateStrings();
 }
 
@@ -54,12 +54,14 @@ void DateTime::Clear()
 	SafeDeleteArray(&this->lpPreciseTime);
 	SafeDeleteArray(&this->lpFormalDate);
 	SafeDeleteArray(&this->lpStringRepresentation);
+	this->langID = LANG_ENGLISH;
 }
 
 DateTime & DateTime::operator=(const DateTime & dt)
 {
 	this->Clear();
 	dt.GetTime(&this->_time);
+	this->langID = dt.langID;
 	this->updateStrings();
 	return *this;
 }

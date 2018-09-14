@@ -135,7 +135,37 @@ typedef struct _APPSTYLEINFO {
 	COLORREF titlebarColor;
 	COLORREF mainToolbarColor;
 
+	_APPSTYLEINFO& operator=(const _APPSTYLEINFO& asi)
+	{
+		this->StyleID = asi.StyleID;
+		this->Stylecolor = asi.Stylecolor;
+		this->Background = asi.Background;
+		this->SizeWndColor = asi.SizeWndColor;
+		this->TextColor = asi.TextColor;
+		this->OutlineColor = asi.OutlineColor;
+		this->TabColor = asi.TabColor;
+		this->ToolbarbuttonBkgnd = asi.ToolbarbuttonBkgnd;
+		this->MenuPopUpColor = asi.MenuPopUpColor;
+		this->specialTextcolor = asi.specialTextcolor;
+		this->titlebarColor = asi.titlebarColor;
+		this->mainToolbarColor = asi.mainToolbarColor;
+		return *this;
+	}
+
 }APPSTYLEINFO, *LPAPPSTYLEINFO;
+
+typedef struct _SPECIALCOLORSTRUCT {
+
+	COLORREF normal;
+	COLORREF selected;
+	COLORREF pressed;
+	COLORREF highlighted;
+	COLORREF accent_norm;
+	COLORREF text;
+	COLORREF accent_text;
+	COLORREF outline;
+
+}SPECIALCOLORSTRUCT, *LPSPECIALCOLORSTRUCT;
 
 typedef struct _STBUPDATE {
 

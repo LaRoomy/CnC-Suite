@@ -906,7 +906,7 @@ void EditorContentManager::saveBufferAsTemporaryFile()
 						FILE_SHARE_WRITE,
 						nullptr,
 						CREATE_ALWAYS,
-						FILE_ATTRIBUTE_TEMPORARY,
+						FILE_ATTRIBUTE_TEMPORARY | FILE_ATTRIBUTE_HIDDEN,
 						nullptr
 					);
 

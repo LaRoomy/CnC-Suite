@@ -5,9 +5,6 @@
 
 typedef LONG_PTR cObject;
 
-// rename objectrelease ???
-// add method FromString and ToString
-
 template<class C> class ClsObject
 {
 public:

@@ -10,51 +10,69 @@
 #include"HelperF.h"
 #include"BasicFPO.h"
 #include"DPI_Helper.h"
+#include"history.h"
 
 class Application
-	:public IFileSystemModificationProtocoll
+	:public IFileSystemModificationProtocoll, public IHistroyEventProtocoll
 {
 
-public:			Application(HINSTANCE);
-				~Application();
+public:			
+	Application(HINSTANCE);
+	~Application();
 
-				HRESULT Init_Data();
-				HRESULT Init_Application();
-				int Run();
-				BOOL CHK_Mutex(LPTSTR);
+	void Release() {
+		delete this;
+	}
 
-				LanguageID getLanguage();
+	HRESULT Init_Data();
+	HRESULT Init_Application();
+	int Run();
+	BOOL CHK_Mutex(LPTSTR);
 
-				LONG_PTR getPropertyComponent();
-				LONG_PTR getFileExplorerComponent();
-				LONG_PTR getTabControlComponent();
-				LONG_PTR getCBoxComponent();
+	LanguageID getLanguage();
 
-				void ChangeAppStyle(int styleID);
-				void ShowSplashScreen();
+	LONG_PTR getPropertyComponent();
+	LONG_PTR getFileExplorerComponent();
+	LONG_PTR getTabControlComponent();
+	LONG_PTR getCBoxComponent();
 
-				void RestartApplication(DWORD restartOption);
+	HWND GetMainWindowHandle() {
+		return this->MainWindow;
+	}
 
-				DWORD GetRestartOption() {
-					return this->restartOptions;
-				}
+	void ChangeAppStyle(int styleID);
+	void ShowSplashScreen();
 
-				void Application::onFilesysItemCreated(cObject sender, LPFILESYSTEMOBJECT fso){
-					UNREFERENCED_PARAMETER(sender);
-					UNREFERENCED_PARAMETER(fso);
-				}
-				void Application::onFilesysItemDeleted(cObject sender, LPFILESYSTEMOBJECT fso) {
-					UNREFERENCED_PARAMETER(sender);
-					this->Tabcontrol->FileSystemChanged(fso);
-				}
-				void Application::onFilesysItemMoved(cObject sender, LPFILESYSTEMOBJECT fso) {
-					UNREFERENCED_PARAMETER(sender);
-					this->Tabcontrol->FileSystemChanged(fso);
-				}
-				void Application::onFilesysItemRenamed(cObject sender, LPFILESYSTEMOBJECT fso) {
-					UNREFERENCED_PARAMETER(sender);
-					this->Tabcontrol->FileSystemChanged(fso);
-				}
+	void RestartApplication(DWORD restartOption);
+
+	DWORD GetRestartOption() {
+		return this->restartOptions;
+	}
+
+	// IFileSystemModificationProtocoll Base
+	void Application::onFilesysItemCreated(cObject sender, LPFILESYSTEMOBJECT fso){
+		UNREFERENCED_PARAMETER(sender);
+		UNREFERENCED_PARAMETER(fso);
+	}
+	void Application::onFilesysItemDeleted(cObject sender, LPFILESYSTEMOBJECT fso) {
+		UNREFERENCED_PARAMETER(sender);
+		this->Tabcontrol->FileSystemChanged(fso);
+	}
+	void Application::onFilesysItemMoved(cObject sender, LPFILESYSTEMOBJECT fso) {
+		UNREFERENCED_PARAMETER(sender);
+		this->Tabcontrol->FileSystemChanged(fso);
+	}
+	void Application::onFilesysItemRenamed(cObject sender, LPFILESYSTEMOBJECT fso) {
+		UNREFERENCED_PARAMETER(sender);
+		this->Tabcontrol->FileSystemChanged(fso);
+	}
+
+	// IHistroyEventProtocoll Base
+	void OnEntryClicked(cObject sender, HistoryItem* item) {}
+	void OnWindowClosed(cObject sender) {
+		this->FileNavigator->Show();
+	}
+
 private:
 	HINSTANCE hInstance;
 	HWND MainWindow;
@@ -74,6 +92,8 @@ private:
 	CnCSuite_FileNavigator* FileNavigator;
 	CnCSuite_Property* appProperty;
 	CnCSuite_CBox* CBox;
+	
+	UIHistory* fileHistory;
 
 	splashScreen* splScreen;
 
@@ -147,4 +167,5 @@ private:
 
 	void SetDefaultAppSettings();
 	void SetDefaultRestoreFrame();
+	void SpecialColorForID(int ID, LPSPECIALCOLORSTRUCT pscs);
 };

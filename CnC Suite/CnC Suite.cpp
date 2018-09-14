@@ -9,7 +9,7 @@ ApplicationData* ApplicationDataContainer = nullptr;
 itemCollection<ApplicationData> extendedApplicationDataContainer;
 DPI_Assist* dpiAssist = nullptr;
 
-// Application entry
+// Application entry:
 extern int APIENTRY _tWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInst,
@@ -54,7 +54,7 @@ extern int APIENTRY _tWinMain(
 			}
 			restart = pApplication->GetRestartOption();
 
-			delete pApplication;
+			SafeRelease(&pApplication);//delete pApplication;
 		}
 		else
 			result = I_ERROR_PAPP_INVALID;
@@ -371,5 +371,15 @@ void ScheduleRestart(DWORD restartOption)
 	UNREFERENCED_PARAMETER(restartOption);
 
 	ShellExecute(nullptr, L"open", EXECUTABLE_NAME, nullptr, EXECUTABLE_DIRPATH, SW_SHOW);
+}
+
+BOOL GetApplicationStyleInformation(LPAPPSTYLEINFO pSInfo)
+{
+	auto mWnd = pApplication->GetMainWindowHandle();
+	if (mWnd != nullptr)
+	{
+		return SendMessage(mWnd, WM_GETSTYLEINFO, 0, reinterpret_cast<LPARAM>(pSInfo));
+	}
+	return FALSE;
 }
 
