@@ -65,10 +65,19 @@ public:
 	void Application::onFilesysItemRenamed(cObject sender, LPFILESYSTEMOBJECT fso) {
 		UNREFERENCED_PARAMETER(sender);
 		this->Tabcontrol->FileSystemChanged(fso);
+		this->FileHistory->OnFilesystemModification(fso);
 	}
 
 	// IHistroyEventProtocoll Base
-	void OnEntryClicked(cObject sender, HistoryItem* item) {}
+	void OnEntryClicked(cObject sender, HistoryItem* item) {
+	
+		MessageBox(
+			this->MainWindow,			
+			item->GetItemPath().GetData(),
+			item->GetDisplayName().GetData(),
+			MB_OK
+		);
+	}
 	void OnWindowClosed(cObject sender) {
 		this->FileNavigator->Show();
 	}
@@ -93,7 +102,7 @@ private:
 	CnCSuite_Property* appProperty;
 	CnCSuite_CBox* CBox;
 	
-	UIHistory* fileHistory;
+	UIHistory* FileHistory;
 
 	splashScreen* splScreen;
 

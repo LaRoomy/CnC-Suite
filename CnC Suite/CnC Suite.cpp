@@ -378,7 +378,7 @@ BOOL GetApplicationStyleInformation(LPAPPSTYLEINFO pSInfo)
 	auto mWnd = pApplication->GetMainWindowHandle();
 	if (mWnd != nullptr)
 	{
-		return SendMessage(mWnd, WM_GETSTYLEINFO, 0, reinterpret_cast<LPARAM>(pSInfo));
+		return (BOOL)SendMessage(mWnd, WM_GETSTYLEINFO, 0, reinterpret_cast<LPARAM>(pSInfo));
 	}
 	return FALSE;
 }

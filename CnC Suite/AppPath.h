@@ -88,8 +88,14 @@
 #define			PATHTOFOLDER_CNCSUITE_SAMPLES					L"\\CnC Suite\\Samples"
 #define			PATHTOFOLDER_CNCSUITE_USERSTYLES				L"\\CnC Suite\\UserStyles"
 #define			PATHTOFOLDER_CNCSUITE_USERSTYLES_EDITOR			L"\\CnC Suite\\UserStyles\\Editor"
+
+#ifndef _WIN64
 #define			PATHTOFOLDER_CNCSUITE_APPLICATIONFOLDER			L"C:\\Program Files (x86)\\CnC Suite"
 #define			PATHTOFOLDER_CNCSUITE_APPLICATIONFOLDER_FONTS	L"C:\\Program Files (x86)\\CnC Suite\\fonts"
+#else
+#define			PATHTOFOLDER_CNCSUITE_APPLICATIONFOLDER			L"C:\\Program Files\\CnC Suite"
+#define			PATHTOFOLDER_CNCSUITE_APPLICATIONFOLDER_FONTS	L"C:\\Program Files\\CnC Suite\\fonts"
+#endif
 //##############################################################################################################################
 //##############################################################################################################################
 // FOLDERS in Local-App-Data Folder:  ##########################################################################################

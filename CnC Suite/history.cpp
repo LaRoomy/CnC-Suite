@@ -185,7 +185,7 @@ HistoryItem & History::GetHistoryItemAt(int index)
 {
 	this->curItem.Clear();
 	this->curItem.SetLangID(
-		getCurrentAppLanguage()
+		(LANGID)getCurrentAppLanguage()
 	);
 	this->curItem.FromString(
 		this->historyList.GetLine(index)
@@ -298,7 +298,9 @@ UIHistory::UIHistory()
 	itemBrush(nullptr),
 	textAccentColor(RGB(220,220,220)),
 	selectedItemBrush(nullptr),
-	outlineColor(RGB(255,255,255))
+	outlineColor(RGB(255,255,255)),
+	verticalScrollbar(nullptr),
+	redrawScrollbar(false)
 {
 	//                    ||
 	//                   _||_
@@ -346,6 +348,15 @@ UIHistory::UIHistory()
 	this->historyData.FromFile(
 		path.GetData()
 	);
+
+
+	// race conditions ?? access violations ??
+
+	while (!this->historyData.IsReady()) {
+		Sleep(20);
+	}
+
+	this->currentIndexPos = this->historyData.GetItemCount() - 1;
 
 	//this->historyData.ToFile(
 	//	path.GetData()
@@ -402,7 +413,7 @@ HRESULT UIHistory::ShowHistoryWindow(LPCTRLCREATIONSTRUCT pccs)
 				CreateWindow(
 					UIHistory::HISTORY_WINDOW_CLASS,
 					nullptr,
-					WS_CHILD | WS_BORDER | WS_CLIPSIBLINGS,
+					WS_CHILD | WS_BORDER | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 					pccs->pos.x,
 					pccs->pos.y,
 					pccs->size.cx,
@@ -445,11 +456,32 @@ void UIHistory::CloseHistoryWindow()
 	this->parent = nullptr;
 	this->selectedArea = { 0,0,0,0 };
 	this->canReset = false;
-	this->currentIndexPos = 0;
+	this->currentIndexPos = this->historyData.GetItemCount() - 1;
 	this->currentSelectedIndex = -1;
 	this->mousePosY = -1;
+	this->verticalScrollbar = nullptr;
 
 	// cancel leave event ??
+}
+
+void UIHistory::Save()
+{
+	AppPath appPath;
+
+	auto fPath =
+		appPath.Get(PATHID_FILE_HISTORY);
+
+	if (fPath.succeeded())
+	{
+		this->historyData.ToFile(
+			fPath.GetData()
+		);
+	}
+}
+
+void UIHistory::CleanUp(int daysToDelete)
+{
+	// TODO!
 }
 
 void UIHistory::SetColors(COLORREF BackgroundColor, COLORREF ItemColor, COLORREF SelectedItemColor, COLORREF TextColor, COLORREF AccentTextColor, COLORREF OutlineColor)
@@ -471,6 +503,28 @@ void UIHistory::SetColors(COLORREF BackgroundColor, COLORREF ItemColor, COLORREF
 	this->selectedItemBrush = CreateSolidBrush(SelectedItemColor);
 }
 
+void UIHistory::OnFilesystemModification(LPFILESYSTEMOBJECT fso)
+{
+	if (fso != nullptr)
+	{
+		switch (fso->FileSystemOperation)
+		{
+		case FSO_ITEM_RENAMED:
+			this->onItemRenamed(fso);
+			break;
+		case FSO_ITEM_MOVED:
+			break;
+		case FSO_ITEM_CREATED:
+			break;
+		case FSO_ITEM_DELETED:
+			break;
+		default:
+			break;
+		}
+		this->Save();
+	}
+}
+
 void UIHistory::onCustomButtonClick(cObject sender, CTRLID ID)
 {
 	switch (ID)
@@ -480,6 +534,33 @@ void UIHistory::onCustomButtonClick(cObject sender, CTRLID ID)
 		break;
 	default:
 		break;
+	}
+}
+
+void UIHistory::OnThumbTrack(cObject sender, int absoluteTrackPos)
+{
+	auto sBar =
+		reinterpret_cast<CSScrollbar*>(sender);
+
+	sBar->UpdateThumb(absoluteTrackPos);
+
+	auto pos = sBar->GetScrollPosition();
+	if (pos >= 0)
+	{
+		auto cItems = this->historyData.GetItemCount();
+
+		auto index =
+			((int)(pos / this->GetLineSize(0)) - 1);
+
+		if (index < cItems && index >= 0)
+		{
+			index = (cItems - 1) - index;
+			if (index >= 0)
+			{
+				this->currentIndexPos = index;
+				this->Update();
+			}
+		}
 	}
 }
 
@@ -516,27 +597,68 @@ HRESULT UIHistory::createControls()
 	GetClientRect(this->historyWindow, &rc);
 
 	POINT pt;
-	pt.x = rc.right - DPIScale(29);
-	pt.y = DPIScale(3);
+	pt.x = rc.right - DPIScale(25);
+	pt.y = 0;
 	SIZE sz;
-	sz.cx = DPIScale(26);
-	sz.cy = DPIScale(26);
+	sz.cx = DPIScale(25);
+	sz.cy = DPIScale(25);
 
 	auto closeButton =
 		new CustomButton(this->historyWindow, BUTTONMODE_ICON, &pt, &sz, BID_QUIT, this->hInstance);
+
 	auto hr =
 		(closeButton != nullptr)
 		? S_OK : E_POINTER;
+
 	if (SUCCEEDED(hr))
 	{
 		closeButton->setAppearance_onlyIcon(IDI_CLOSEBUTTON_MARKED, DPIScale(24));
 		closeButton->setColors(this->backgroundColor, COLOR_BUTTON_MOUSE_OVER, COLOR_BUTTON_PRESSED);
 		closeButton->setEventListener(dynamic_cast<customButtonEventSink*>(this));
+		closeButton->setBorder(TRUE, this->styleInfo.OutlineColor);
 		
 		hr = closeButton->Create();
 		if (SUCCEEDED(hr))
 		{
+			this->verticalScrollbar = new CSScrollbar(this->hInstance);
 
+			hr =
+				(this->verticalScrollbar != nullptr)
+				? S_OK : E_NOINTERFACE;
+
+			if (SUCCEEDED(hr))
+			{
+				RECT rcList;
+				this->getListArea(&rcList);
+				pt.x = rcList.right;
+				pt.y = rcList.top;
+				sz.cx = DPIScale(16);
+				sz.cy = rcList.bottom - rcList.top;
+
+				this->verticalScrollbar->SetScrollbarType(
+					CSScrollbar::SCROLLBARTYPE_VERTICAL
+				);
+				this->verticalScrollbar->SetEventHandler(
+					dynamic_cast<IScrollEventProtocol*>(this)
+				);
+				this->verticalScrollbar->SetScrollRange(
+					this->getContentHeight()
+					- rcList.bottom
+				);
+				this->verticalScrollbar->SetDefaultThickness(
+					DPIScale(16)
+				);
+				this->verticalScrollbar->SetImages(IDI_SYS_SCROLLARROW_DOWN, IDI_SYS_SCROLLARROW_UP, 16);
+				this->verticalScrollbar->SetStyleImages(IDI_SYS_SCROLLARROW_DOWN_HGL, IDI_SYS_SCROLLARROW_DOWN_PRS, IDI_SYS_SCROLLARROW_UP_HGL, IDI_SYS_SCROLLARROW_UP_PRS);
+				this->verticalScrollbar->SetDisabledImages(IDI_SYS_SCROLLARROW_DOWN_DSBL, IDI_SYS_SCROLLARROW_UP_DSBL);
+				//this->verticalScrollbar->SetColors(this->styleInfo.TabColor, )
+
+				hr = this->verticalScrollbar->Create(this->historyWindow, &pt, &sz);
+				if (SUCCEEDED(hr))
+				{
+					// ...
+				}
+			}
 		}
 	}
 	return hr;
@@ -576,12 +698,14 @@ LRESULT UIHistory::historyProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			{
 			case WM_PAINT:
 				return pUIhistory->onPaint(hWnd);
+			case WM_SIZE:
+				return pUIhistory->onSize();
 			case WM_ERASEBKGND:
 				return static_cast<LRESULT>(TRUE);
 			case WM_MOUSEMOVE:
 				return pUIhistory->onMouseMove(lParam);
 			case WM_MOUSEWHEEL:
-				return pUIhistory->onMouseWheel(lParam);
+				return pUIhistory->onMouseWheel(wParam);
 			case WM_LBUTTONUP:
 				return pUIhistory->onLButtonUp(lParam);
 			case WM_LBUTTONDOWN:
@@ -614,6 +738,7 @@ LRESULT UIHistory::onPaint(HWND hWnd)
 		if (offScreenDC)
 		{
 			GetClientRect(this->historyWindow, &rc);
+			//rc.right -= DPIScale(16);
 
 			HBITMAP offScreenBmp = CreateCompatibleBitmap(hdc, rc.right, rc.bottom);
 			if (offScreenBmp)
@@ -625,7 +750,8 @@ LRESULT UIHistory::onPaint(HWND hWnd)
 				SetRect(
 					&itemRect,
 					0, curHeight,
-					rc.right, itemHeight
+					rcListArea.right,
+					itemHeight + curHeight
 				);
 
 				auto originBmp =
@@ -635,7 +761,7 @@ LRESULT UIHistory::onPaint(HWND hWnd)
 				FillRect(offScreenDC, &rc, this->backgroundBrush);
 
 				// draw items
-				while (curHeight < (rc.bottom - itemHeight)) // only rc.bottom
+				while (curHeight < rcListArea.bottom)// - itemHeight)) // only rc.bottom
 				{
 					itemRect.top = curHeight;
 					itemRect.bottom = curHeight + itemHeight;
@@ -643,7 +769,7 @@ LRESULT UIHistory::onPaint(HWND hWnd)
 					if (!this->drawHistoryItem(offScreenDC, curIndex, &itemRect))
 						break;
 
-					curIndex++;
+					curIndex--;
 					curHeight += itemHeight;
 				}
 
@@ -701,10 +827,47 @@ LRESULT UIHistory::onMouseMove(LPARAM lParam)
 	return static_cast<LRESULT>(0);
 }
 
-LRESULT UIHistory::onMouseWheel(LPARAM lParam)
+LRESULT UIHistory::onMouseWheel(WPARAM wParam)
 {
-	// scroll if possible!
+	int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+	if (zDelta > 0)
+	{
+		// wheel minus
+		if (this->itemUP())
+		{
+			auto pos = this->verticalScrollbar->GetScrollPosition();
 
+			this->verticalScrollbar->SetScrollPosition(
+				pos
+				- this->GetLineSize(0), true
+			);
+		}
+		else
+			this->redrawScrollbar = true;
+	}
+	else if (zDelta < 0)
+	{
+		// wheel plus
+		if (this->itemDOWN())
+		{
+			auto pos = this->verticalScrollbar->GetScrollPosition();
+
+			this->verticalScrollbar->SetScrollPosition(
+				pos
+				+ this->GetLineSize(0), true
+			);
+		}
+		else
+			this->redrawScrollbar = true;
+	}
+
+	if (this->redrawScrollbar)
+	{
+		this->verticalScrollbar->SetScrollPosition(
+			this->verticalScrollbar->GetScrollPosition(),
+			true
+		);
+	}
 	return static_cast<LRESULT>(0);
 }
 
@@ -718,9 +881,12 @@ LRESULT UIHistory::onLButtonUp(LPARAM lParam)
 {
 	if (this->hHistoryEvent != nullptr)
 	{
-		auto yPos = GET_Y_LPARAM(lParam);
-		auto index = this->itemIndexFromPosition(yPos);
-		auto item = this->historyData.GetHistoryItemAt(index);
+		auto yPos =
+			GET_Y_LPARAM(lParam);
+		auto index =
+			this->itemIndexFromPosition(yPos);
+		auto item =
+			this->historyData.GetHistoryItemAt(index);
 
 		this->hHistoryEvent->OnEntryClicked(
 			reinterpret_cast<cObject>(this),
@@ -752,6 +918,38 @@ LRESULT UIHistory::onDestroy()
 	return static_cast<LRESULT>(0);
 }
 
+LRESULT UIHistory::onSize()
+{
+	RECT rcList, rc;
+	this->getListArea(&rcList);
+	GetClientRect(this->historyWindow, &rc);
+
+	if (this->verticalScrollbar != nullptr)
+	{
+		this->verticalScrollbar->Move(
+			rcList.right,
+			rcList.top,
+			DPIScale(16),
+			rcList.bottom - rcList.top
+		);
+	}
+
+	auto cls_btn = GetDlgItem(this->historyWindow, BID_QUIT);
+	if (cls_btn != nullptr)
+	{
+		MoveWindow(
+			cls_btn,
+			rc.right - DPIScale(25),
+			0,
+			DPIScale(25),
+			DPIScale(25),
+			TRUE
+		);
+	}
+
+	return static_cast<LRESULT>(0);
+}
+
 void UIHistory::onQuit()
 {
 	this->CloseHistoryWindow();
@@ -762,11 +960,38 @@ void UIHistory::onQuit()
 	}
 }
 
+void UIHistory::onItemRenamed(LPFILESYSTEMOBJECT fso)
+{
+	auto cItems = this->historyData.GetItemCount();
+	if (cItems > 0)
+	{
+		for (int i = 0; i < cItems; i++)
+		{
+			auto item = this->historyData.GetHistoryItemAt(i);
+			auto path = item.GetItemPath();
+
+			if (path.Equals(
+				fso->OldPath.GetPathData()
+				))
+			{
+				item.SetItemPath(
+					fso->Path.GetPathData()
+				);
+				this->historyData.ReplaceHistoryItemAt(item, i);
+			}
+		}
+	}
+}
+
 bool UIHistory::drawHistoryItem(HDC hdc, int itemIndex, LPRECT itemRect)
 {
-	auto maxItems = this->historyData.GetItemCount();
-	if (itemIndex == maxItems)
+	//auto maxItems = this->historyData.GetItemCount();
+	//if (itemIndex == maxItems)
+	//	return false;
+
+	if (itemIndex < 0)
 		return false;
+
 
 	auto item = this->historyData.GetHistoryItemAt(itemIndex);
 
@@ -872,12 +1097,25 @@ void UIHistory::getListArea(LPRECT prc)
 {
 	// retrieve the window rect excluding the area used by the other controls	
 	GetClientRect(this->historyWindow, prc);
-	prc->top = DPIScale(33);
+
+	prc->top = DPIScale(25);			// tool area
+	prc->right -= DPIScale(16);			// scrollbar
 }
 
 int UIHistory::getItemHeight()
 {
 	return DPIScale(40);
+}
+
+int UIHistory::getContentHeight()
+{
+	RECT rcList;
+	this->getListArea(&rcList);
+
+	return
+		this->historyData.GetItemCount()
+		* this->getItemHeight()
+		+ ((rcList.bottom - rcList.top) / 4);
 }
 
 int UIHistory::itemIndexFromPosition(int Ypos)
@@ -892,8 +1130,13 @@ int UIHistory::itemIndexFromPosition(int Ypos)
 		((int)(relativePos /
 			this->getItemHeight())
 		);
+
+	//old:   !
 	// add the relative index to the index of the first visible item-index
-	return this->currentIndexPos + relativeIndex;
+	//return this->currentIndexPos + relativeIndex;
+
+	// sub the relative index from the currentPos
+	return this->currentIndexPos - relativeIndex;
 }
 
 void UIHistory::eraseSelectedArea()
@@ -915,4 +1158,87 @@ bool UIHistory::isOverValidItem(int pos_y)
 		return false;
 	else
 		return true;
+}
+
+bool UIHistory::itemUP()
+{
+	auto nItems = this->historyData.GetItemCount();
+	if (nItems > 0)
+	{
+		if (this->currentIndexPos < (nItems - 1))
+		{
+			this->currentIndexPos++;
+			RedrawWindow(this->historyWindow, nullptr, nullptr, RDW_INVALIDATE | RDW_NOERASE | RDW_UPDATENOW | RDW_NOCHILDREN);
+			reinterpret_cast<CustomButton*>(
+				CUSTOMBUTTONCLASS_FROMID(this->historyWindow, BID_QUIT)
+				)->Update();
+			return true;
+		}		
+	}
+	return false;
+}
+
+bool UIHistory::itemDOWN()
+{
+	if (this->currentIndexPos > 0)
+	{
+		RECT rcList;
+		this->getListArea(&rcList);
+
+		auto remHeight =
+			this->getItemHeight()
+			* this->currentIndexPos;
+
+		auto availableHeight = rcList.bottom - rcList.top;
+
+		if (remHeight > (availableHeight - availableHeight / 4))
+		{
+			this->currentIndexPos--;
+			RedrawWindow(this->historyWindow, nullptr, nullptr, RDW_INVALIDATE | RDW_NOERASE | RDW_UPDATENOW | RDW_NOCHILDREN);
+			reinterpret_cast<CustomButton*>(
+				CUSTOMBUTTONCLASS_FROMID(this->historyWindow, BID_QUIT)
+				)->Update();
+
+			return true;
+		}		
+	}
+	return false;
+}
+
+void UIHistory::updatePage()
+{
+	auto pos = this->verticalScrollbar->GetScrollPosition();
+	if (pos >= 0)
+	{
+		auto cItems = this->historyData.GetItemCount();
+
+		auto index =
+			((int)(pos / this->GetLineSize(0)) - 1);
+
+		_BELOW_ZERO_SETTOZERO(index);
+
+		if (index < cItems)
+		{
+			index = (cItems - 1) - index;
+			if (index >= 0)
+			{
+				this->currentIndexPos = index;
+				this->Update();
+			}
+		}
+	}
+}
+
+void UIHistory::UpdateScrollbar()
+{
+	if (this->verticalScrollbar != nullptr)
+	{
+		RECT rcList;
+		this->getListArea(&rcList);
+
+		this->verticalScrollbar->SetScrollRange(
+			this->getContentHeight()
+			- rcList.bottom
+		);
+	}
 }

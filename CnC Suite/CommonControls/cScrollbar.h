@@ -5,7 +5,7 @@
 #include<Windows.h>
 #include"..//cObject.h"
 
-#define	SCROLLPOS_MAX	-100
+constexpr auto SCROLLPOS_MAX = -100;
 #define	SCROLLPOS_MIN	-101
 
 typedef int ScrollBarType;

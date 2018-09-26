@@ -18,7 +18,7 @@ Application::Application(HINSTANCE hInst)
 	FileNavigator(nullptr),
 	Tabcontrol(nullptr),
 	CBox(nullptr),
-	fileHistory(nullptr)
+	FileHistory(nullptr)
 {
 	// load the style-data before creating the user-interface
 	this->LoadStyleInfo();
@@ -67,7 +67,7 @@ Application::~Application()
 	SafeRelease(&this->UserInterface);
 	SafeRelease(&this->appProperty);
 	SafeRelease(&this->CBox);
-	SafeRelease(&this->fileHistory);
+	SafeRelease(&this->FileHistory);
 
 	//FreeLibrary()
 }
@@ -468,14 +468,20 @@ HRESULT Application::Init_Components()
 									async->callFunction(&updateFocusRect);
 								}
 
-								this->fileHistory = new UIHistory();
+								this->FileHistory = new UIHistory();
 
-								hr = (this->fileHistory != nullptr) ? S_OK : E_NOINTERFACE;
+								hr = (this->FileHistory != nullptr) ? S_OK : E_NOINTERFACE;
 								if (SUCCEEDED(hr))
 								{
-									this->fileHistory->SetEventHandler(
+									this->FileHistory->SetEventHandler(
 										dynamic_cast<IHistroyEventProtocoll*>(this)
 									);
+									this->FileHistory->CleanUp(
+										reinterpret_cast<ApplicationData*>(
+											getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
+											)->getIntegerData(DATAKEY_EXSETTINGS_HISTORY_DAYSTODELETE, 100)
+										);
+
 									// ...
 								}
 							}
@@ -1251,6 +1257,23 @@ void Application::Open()
 					{
 						this->FileNavigator->ExpandPathToFile(path);
 					}
+
+					// add to history
+					auto saveHist =
+						reinterpret_cast<ApplicationData*>(
+							getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
+							)->getBooleanData(DATAKEY_EXSETTINGS_HISTORY_SAVEHISTORY, true);
+
+					if (saveHist)
+					{
+						HistoryItem hiItem;
+						hiItem.SetActionType(HistoryItem::FILE_OPENED);
+						hiItem.SetLastOpenedTime();
+						hiItem.SetItemPath(path);
+
+						this->FileHistory->AddToHistory(hiItem);
+						this->FileHistory->Save();
+					}
 				}
 				SafeDeleteArray(&path);
 			}
@@ -1315,11 +1338,33 @@ void Application::SaveAs()
 			}
 		}
 
+		auto extendedDataContainer =
+			reinterpret_cast<ApplicationData*>(
+				getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
+				);
+		if (extendedDataContainer != nullptr)
+		{
+			auto saveHist =
+				extendedDataContainer->getBooleanData(DATAKEY_EXSETTINGS_HISTORY_SAVEHISTORY, true);
+
+			if (saveHist)
+			{
+				HistoryItem hiItem;
+				hiItem.SetActionType(HistoryItem::FILE_OPENED);
+				hiItem.SetLastOpenedTime();
+				hiItem.SetItemPath(path);
+
+				this->FileHistory->AddToHistory(hiItem);
+				this->FileHistory->Save();
+			}
+		}
+
 		// deprecated (since the filesystem-watcher will do that)
 		//if (result == TRUE)// only insert in treeview if the file was newly created (if the file was overwritten the return-value of 'SaveAs' is 'FILE_OVERWRITTEN')
 		//{
 		//	this->FileNavigator->AddNewFileToView(path, this->AppSetup.expandPathToItem);
 		//}
+
 		SafeDeleteArray(&path);
 	}
 }
@@ -1692,7 +1737,7 @@ void Application::OnNavigatorOpenRequest(WPARAM wParam, LPARAM lParam)
 	auto path = reinterpret_cast<LPTSTR>(lParam);
 	if (path != nullptr)
 	{
-		auto bfpo = CreateBasicFPO();
+ 		auto bfpo = CreateBasicFPO();
 		if (bfpo != nullptr)
 		{
 			TCHAR *fileExt = nullptr;
@@ -1717,6 +1762,23 @@ void Application::OnNavigatorOpenRequest(WPARAM wParam, LPARAM lParam)
 						openInNewTab ? TRUE : FALSE,
 						(openFlags & DO_NOT_SET_FOCUS) ? FALSE : TRUE
 					);
+
+					// add to history
+					auto saveHist =
+						reinterpret_cast<ApplicationData*>(
+							getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
+							)->getBooleanData(DATAKEY_EXSETTINGS_HISTORY_SAVEHISTORY, true);
+
+					if (saveHist)
+					{
+						HistoryItem hiItem;
+						hiItem.SetActionType(HistoryItem::FILE_OPENED);
+						hiItem.SetLastOpenedTime();
+						hiItem.SetItemPath(path);
+
+						this->FileHistory->AddToHistory(hiItem);
+						this->FileHistory->Save();
+					}
 				}
 				else
 				{
@@ -1837,7 +1899,7 @@ void Application::ShowHistoryWnd()
 		rc.right,
 		rc.bottom };
 
-	this->fileHistory->SetColors(
+	this->FileHistory->SetColors(
 		this->StyleInfo.Background,
 		scs.normal,
 		scs.highlighted,
@@ -1847,7 +1909,7 @@ void Application::ShowHistoryWnd()
 	);
 
 	this->FileNavigator->Hide();
-	this->fileHistory->ShowHistoryWindow(&ccs);
+	this->FileHistory->ShowHistoryWindow(&ccs);
 }
 
 BOOL Application::LoadUserData()

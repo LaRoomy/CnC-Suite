@@ -269,13 +269,13 @@
 		or rcx, rcx				;test buffer for nullptr
 		jz fail
 
-		mov rsi, rcx			;buffer to source
+		mov r11, rcx			;buffer as source in r11
 		mov rcx, 0				;rcx is the counter
 	;------------------------------------------------------------------------------------------------;
 
 	; count >> --------------------------------------------------------------------------------------;
 
-	@@: movzx eax, word ptr [rsi + rcx * 2]				;charater to eax
+	@@: movzx eax, word ptr [r11 + rcx * 2]				;charater to eax
 		inc rcx											;count the characters
 		or ax, ax										;test for nullptr
 		jz finalize
@@ -351,23 +351,23 @@
 		;-------------------------------------------------------------------------------;
 
 		;prepare move operation >> -----------------------------------------------------;
-			mov rdi, rcx				;buffer as destination
-			mov rsi, rdx				;appendix as source
+			mov r10, rcx				;buffer as destination in r10
+			mov r11, rdx				;appendix as source in r11
 
 			mov rcx, r8
 			imul rcx, 2
-			add rdi, rcx				;add the index-offset to buffer
+			add r10, rcx				;add the index-offset to buffer
 
 			mov rcx, 0					;counter to zero
 		;-------------------------------------------------------------------------------;
 		
 		;move >> -----------------------------------------------------------------------;
-		@@:	movzx eax, word ptr [rsi + rcx * 2]		;current char to eax (from appendix)
+		@@:	movzx eax, word ptr [r11 + rcx * 2]		;current char to eax (from appendix)
 
 			or ax, ax								;test for terminating null character
 			jz finalize
 
-			mov word ptr [rdi + rcx * 2], ax		;char into buffer
+			mov word ptr [r10 + rcx * 2], ax		;char into buffer
 
 			inc rcx
 			jmp @B
@@ -405,16 +405,16 @@
 
 		;prepare for compare operation >> -------------------------------------;
 
-			mov rsi, rcx			;string1 in source
-			mov rdi, rdx			;string2 in destination
+			mov r8, rcx			;string1 in r8 (start-address of operand 1)
+			mov r9, rdx			;string2 in r9 (start-address of operand 2)
 			
 			mov rcx, 0				;initalize counter
 		;----------------------------------------------------------------------;
 
 		;compare >> -----------------------------------------------------------;
 
-		@@:	movzx eax, word ptr [rsi + rcx * 2]			;string1[x] into eax
-			movzx edx, word ptr [rdi + rcx * 2]			;string2[x] into edx
+		@@:	movzx eax, word ptr [r8 + rcx * 2]			;string1[x] into eax
+			movzx edx, word ptr [r9 + rcx * 2]			;string2[x] into edx
 
 			inc rcx
 
@@ -473,8 +473,8 @@
 
 		;prepare for insert operation >> -------------------------------------------;
 
-			mov rsi, rcx				;oldBuffer as source
-			mov rdi, rdx				;newBuffer as destination
+			mov r11, rcx				;oldBuffer as source in r11
+			mov r10, rdx				;newBuffer as destination in r10
 
 			mov rcx, 0					;reset source counter
 			mov rdx, 0					;reset target counter
@@ -482,8 +482,8 @@
 
 		;process >> ----------------------------------------------------------------;
 
-		@@:	movzx eax, word ptr [rsi + rcx * 2]		;current char to eax
-			mov word ptr [rdi + rdx * 2], ax		;current char to target buffer
+		@@:	movzx eax, word ptr [r11 + rcx * 2]		;current char to eax
+			mov word ptr [r10 + rdx * 2], ax		;current char to target buffer
 
 			inc rcx
 			inc rdx
@@ -497,7 +497,7 @@
 
 
 		insertchar:
-			mov word ptr [rdi + rdx * 2], r8w		;insertchar to index
+			mov word ptr [r10 + rdx * 2], r8w		;insertchar to index
 			inc rdx
 
 			jmp @B
@@ -538,8 +538,8 @@
 
 		;prepare operation >> ---------------------------------------------------;
 			
-			mov rsi, rcx				;oldBuffer as source
-			mov rdi, rdx				;newBuffer as target
+			mov r11, rcx				;oldBuffer as source in r11
+			mov r10, rdx				;newBuffer as target in r10
 
 			mov rcx, 0					;reset source counter
 			mov rdx, 0					;reset target counter
@@ -547,8 +547,8 @@
 
 		;process >> -------------------------------------------------------------;
 			
-		@@:	movzx eax, word ptr [rsi + rcx * 2]			;current char into eax
-			mov word ptr [rdi + rdx * 2], ax			;current char to target buffer
+		@@:	movzx eax, word ptr [r11 + rcx * 2]			;current char into eax
+			mov word ptr [r10 + rdx * 2], ax			;current char to target buffer
 
 			inc rcx
 			inc rdx
@@ -603,8 +603,8 @@
 
 		;prepare operation >> -----------------------------------------------------------;
 
-			mov rsi, rcx					;sourceBuffer as source
-			mov rdi, rdx					;targetBuffer as destination
+			mov r11, rcx					;sourceBuffer as source in r11
+			mov r10, rdx					;targetBuffer as destination in r10
 
 			mov rcx, r8						;set source counter
 			mov rdx, 0						;set target counter
@@ -612,8 +612,8 @@
 
 		;process >> ---------------------------------------------------------------------;
 
-		@@: movzx eax, word ptr [rsi + rcx * 2]			;current char into eax
-			mov word ptr [rdi + rdx * 2], ax			;char to target buffer
+		@@: movzx eax, word ptr [r11 + rcx * 2]			;current char into eax
+			mov word ptr [r10 + rdx * 2], ax			;char to target buffer
 
 			inc rcx
 			inc rdx
@@ -633,7 +633,7 @@
 
 		finalize:
 			mov rax, 0
-			mov word ptr [rdi + rdx * 2], ax	;set zero terminator
+			mov word ptr [r10 + rdx * 2], ax	;set zero terminator
 			mov rax, 1							;success return value
 
 		return:
@@ -646,7 +646,25 @@
 ;------------------------------------------------------------------------------------------------------------------------------
 ;this function inserts the bufferToInsert in the oldBuffer at the specified index and stores the new string in the targetBuffer
 
-	InsertBlockInBufferW64 proc
+	InsertBlockInBufferW64 proc frame
+
+		;prolog >> ---------------------------------------------------------------------;
+
+			push rbp							;save caller's stackbase
+				.pushreg rbp
+			push rsi							;save caller's si-source
+				.pushreg rsi
+			push rdi							;save caller's si-destination
+				.pushreg rdi
+
+			sub rsp, 16							;allocate local stack space
+				.allocstack 16
+
+			mov rbp, rsp						;set stackframe base pointer
+				.setframe rbp, 0
+
+			RBP_RA = 40							;offset from rbp to return address
+				.endprolog
 
 		;check arguments >> ------------------------------------------------------------;
 
@@ -736,7 +754,15 @@
 		finalize:
 			mov rax, 1							;success return code
 
+		;function epilog >> ----------------------------------------------------------------------------;
+
 		return:
+			add rsp, 16									;clear the local stack space
+
+			pop rdi										;recover caller's rdi
+			pop rsi										;recover caller's rsi
+			pop rbp										;recover caller's rbp
+
 			ret
 
 	InsertBlockInBufferW64 endp
@@ -746,7 +772,25 @@
 ;----------------------------------------------------------------------------------------------------------------
 ;this function removes a string segment from the given buffer and stores the result in the targetBuffer
 
-	RemoveBlockFromBufferW64 proc
+	RemoveBlockFromBufferW64 proc frame
+
+		;prolog >> ---------------------------------------------------------------;
+
+			push rbp
+				.pushreg rbp
+			push rsi
+				.pushreg rsi
+			push rdi
+				.pushreg rdi
+
+			sub rsp, 16						;allocate local stack space
+				.allocstack 16
+
+			mov rbp, rsp					;set stackframe base
+				.setframe rbp, 0
+
+			RBP_RA = 40						;offset from rbp to return address
+				.endprolog
 
 		;check arguments >> ------------------------------------------------------;
 
@@ -810,7 +854,15 @@
 		finalize:
 			mov rax, 1
 
+		;epilog >> ---------------------------------------------------------------;
+
 		return:
+			add rsp, 16							;clear the local stack space
+
+			pop rdi
+			pop rsi
+			pop rbp
+
 			ret
 
 	RemoveBlockFromBufferW64 endp

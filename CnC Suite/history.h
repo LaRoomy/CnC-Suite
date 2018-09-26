@@ -8,10 +8,12 @@
 #include<ItemCollection.h>
 #include<ctrlHelper.h>
 #include<CustomButton.h>
+#include<cScrollbar.h>
 
 #include "DateTime.h"
 #include"EditorContentManager.h"
 #include"CnC Suite.h"
+#include"FileSystem.h"
 
 constexpr auto BID_QUIT = 10;
 
@@ -154,6 +156,12 @@ public:
 			item.ToString()
 		);
 	}
+	void ReplaceHistoryItemAt(HistoryItem& item, int index) {
+		this->historyList.ReplaceLine(
+			item.ToString(),
+			index
+		);
+	}
 
 	HistoryItem& GetHistoryItemAt(int index);
 
@@ -185,7 +193,7 @@ private:
 };
 
 class UIHistory
-	: public ClsObject<UIHistory>, public customButtonEventSink
+	: public ClsObject<UIHistory>, public customButtonEventSink, public IScrollEventProtocol, public IScrollable
 {
 public:
 	UIHistory();
@@ -196,11 +204,23 @@ public:
 	HRESULT ShowHistoryWindow(LPCTRLCREATIONSTRUCT pccs);
 	void CloseHistoryWindow();
 
+	void AddToHistory(HistoryItem& item) {
+		this->historyData.AddHistoryItem(item);
+		this->UpdateScrollbar();
+	}
+	void Save();
+	void CleanUp(int daysToDelete);
+	void Update() {
+		RedrawWindow(this->historyWindow, nullptr, nullptr, RDW_NOCHILDREN | RDW_NOERASE | RDW_INVALIDATE | RDW_UPDATENOW);
+	}
+
 	void SetColors(COLORREF BackgroundColor,COLORREF ItemColor, COLORREF SelectedItemColor, COLORREF TextColor, COLORREF AccentTextColor, COLORREF OutlineColor);
 
 	void SetEventHandler(IHistroyEventProtocoll* hEvent) {
 		this->hHistoryEvent = hEvent;
 	}
+
+	void OnFilesystemModification(LPFILESYSTEMOBJECT fso);
 
 	//ClsObject Base:
 	const wchar_t* ToString() {
@@ -212,6 +232,80 @@ public:
 
 	//button event Base:
 	void onCustomButtonClick(cObject sender, CTRLID ID);
+
+	//scrollbar event Base
+	int GetLineSize(ScrollBarType type){
+		UNREFERENCED_PARAMETER(type);
+		return this->getItemHeight();
+	}
+	
+	void OnLinePlus(cObject sender, int currentPos) {
+		reinterpret_cast<CSScrollbar*>(sender)
+			->SetScrollPosition(
+				currentPos
+				+ this->GetLineSize(0),
+				true
+			);
+		// Scoll the Window-Content !
+		this->itemDOWN();
+	}
+	void OnLineMinus(cObject sender, int currentPos) {
+		reinterpret_cast<CSScrollbar*>(sender)
+			->SetScrollPosition(
+				currentPos
+				- this->GetLineSize(0),
+				true
+			);
+		// Scoll the Window-Content !
+		this->itemUP();
+	}
+	void OnPagePlus(cObject sender, int currentPos) {
+		reinterpret_cast<CSScrollbar*>(sender)
+			->SetScrollPosition(
+				currentPos
+				+ this->GetPageScrollHeight(
+					this->historyWindow,
+					this->getContentHeight()
+				),
+				true
+			);
+		// Scoll the Window-Content !
+		this->updatePage();
+	}
+	void OnPageMinus(cObject sender, int currentPos) {
+		reinterpret_cast<CSScrollbar*>(sender)
+			->SetScrollPosition(
+				currentPos
+				- this->GetPageScrollHeight(
+					this->historyWindow,
+					this->getContentHeight()
+				),
+				true
+			);
+		// Scoll the Window-Content !
+		this->updatePage();
+	}
+	void OnMouseWheelPlus(cObject sender, int currentPos) {
+		reinterpret_cast<CSScrollbar*>(sender)
+			->SetScrollPosition(
+				currentPos
+				+ this->GetLineSize(0),
+				true
+			);
+		// Scoll the Window-Content !
+		this->itemDOWN();
+	}
+	void OnMouseWheelMinus(cObject sender, int currentPos) {
+		reinterpret_cast<CSScrollbar*>(sender)
+			->SetScrollPosition(
+				currentPos
+				- this->GetLineSize(0),
+				true
+			);
+		// Scoll the Window-Content !
+		this->itemUP();
+	}
+	void OnThumbTrack(cObject sender, int absoluteTrackPos);
 
 private:
 	HINSTANCE hInstance;
@@ -226,6 +320,7 @@ private:
 	bool trackingEvent;
 	bool isWndOpen;
 	bool canReset;
+	bool redrawScrollbar;
 
 	RECT selectedArea;
 
@@ -248,6 +343,7 @@ private:
 	IHistroyEventProtocoll* hHistoryEvent;
 
 	History historyData;
+	CSScrollbar* verticalScrollbar;
 
 	HRESULT registerClass();
 	HRESULT createControls();
@@ -257,21 +353,30 @@ private:
 
 	LRESULT onPaint(HWND hWnd);
 	LRESULT onMouseMove(LPARAM lParam);
-	LRESULT onMouseWheel(LPARAM lParam);
+	LRESULT onMouseWheel(WPARAM wParam);
 	LRESULT onLButtonDown(LPARAM lParam);
 	LRESULT onLButtonUp(LPARAM lParam);
 	LRESULT onMouseLeave();
 	LRESULT onDestroy();
+	LRESULT onSize();
 
 	void onQuit();
+	void onItemRenamed(LPFILESYSTEMOBJECT fso);
 
 	bool drawHistoryItem(HDC hdc, int itemIndex, LPRECT itemRect);
 
 	void getListArea(LPRECT prc);
 	int getItemHeight();
+	int getContentHeight();
 	int itemIndexFromPosition(int Ypos);
 	void eraseSelectedArea();
 	bool isOverValidItem(int pos_y);
+
+	bool itemUP();
+	bool itemDOWN();
+	void updatePage();
+
+	void UpdateScrollbar();
 };
 
 
