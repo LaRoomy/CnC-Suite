@@ -358,11 +358,46 @@ bool isCnC3Path(LPCTSTR path)
 
 LONG WINAPI lpTopLevelExceptionFilter(_EXCEPTION_POINTERS * exceptionInfo)
 {
-	UNREFERENCED_PARAMETER(exceptionInfo);
+	if (exceptionInfo != nullptr)
+	{
+		if (exceptionInfo->ExceptionRecord != nullptr)
+		{
+			iString exInfo(L"CnC Suite ExceptionInfo:\r\n\r\nEventTime: [");
 
-	// TODO!
-	MessageBox(nullptr, L"Unhandled exception", L"except", MB_OK);
+			DateTime time;
+			time.FromLocalTime();
 
+			exInfo += time.PreciseTimeAsString();
+			exInfo += L"] : [";
+			exInfo += time.SimpleDateAsString();
+			exInfo += L"]";
+			exInfo += L"\r\n\r\n";
+			exInfo += L"ExceptionCode: ";
+			exInfo += iString::fromHex(exceptionInfo->ExceptionRecord->ExceptionCode);
+			exInfo += L"\r\nExceptionAddress: ";
+			exInfo += iString::fromHex((uintX)(exceptionInfo->ExceptionRecord->ExceptionAddress));
+			exInfo += L"\r\nExceptionFlags: ";
+			exInfo += iString::fromHex(exceptionInfo->ExceptionRecord->ExceptionFlags);
+			exInfo += L"\r\nWasNested: ";
+			if (exceptionInfo->ExceptionRecord->ExceptionRecord != nullptr)
+				exInfo += L"true";
+			else
+				exInfo += L"false";
+
+			AppPath appPath;
+			auto exceptPath = appPath.Get(PATHID_FILE_EXCEPTIONINFO);
+
+			auto bfpo = CreateBasicFPO();
+			if (bfpo != nullptr)
+			{
+				bfpo->SaveBufferToFileAsUtf8(
+					exInfo.GetData(),
+					exceptPath.GetData()
+				);
+				SafeRelease(&bfpo);
+			}
+		}
+	}
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
@@ -370,7 +405,19 @@ void ScheduleRestart(DWORD restartOption)
 {
 	UNREFERENCED_PARAMETER(restartOption);
 
-	ShellExecute(nullptr, L"open", EXECUTABLE_NAME, nullptr, EXECUTABLE_DIRPATH, SW_SHOW);
+	AppPath appPath;
+
+	auto exe_path =
+		appPath.Get(PATHID_FOLDER_CNCSUITE_EXECUTABLE_FOLDER);
+
+	ShellExecute(
+		nullptr,
+		L"open",
+		EXECUTABLE_NAME,
+		nullptr,
+		exe_path.GetData(),
+		SW_SHOW
+	);
 }
 
 BOOL GetApplicationStyleInformation(LPAPPSTYLEINFO pSInfo)

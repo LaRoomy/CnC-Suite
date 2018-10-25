@@ -807,6 +807,19 @@ iString iString::fromHex(DWORD x)
 		return iString(L"");
 }
 
+iString iString::fromHex(uintX x)
+{
+	TCHAR buffer[256] = { 0 };
+
+	HRESULT hr = StringCbPrintf(buffer, sizeof(buffer), L"%IX", x);	
+	if (SUCCEEDED(hr))
+	{
+		iString hex(buffer);
+		return hex;
+	}
+	return iString(0);
+}
+
 iString * iString::FromUInt(unsigned int i)
 {
 	TCHAR buffer[256] = { 0 };

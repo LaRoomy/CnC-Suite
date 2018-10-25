@@ -112,6 +112,7 @@ public:
 	static iString* FromBoolean(bool b);
 	static iString* FromHex(DWORD x);
 	static iString fromHex(DWORD x);
+	static iString fromHex(uintX x);
 	static iString* FromUInt(unsigned int i);
 	static iString fromUInt(unsigned int i);
 	static iString fromPointer(LPVOID p);

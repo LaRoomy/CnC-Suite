@@ -2775,60 +2775,86 @@ HRESULT CnCS_PI::_createInfoPage()
 											hr = builddateTextfield->Create(this->hInstance, this->iParam.infoPage, &pos, nullptr);
 											if (SUCCEEDED(hr))
 											{
-												pos.y = rc.bottom - DPIScale(50);
-												pos.x = DPIScale(25);
+												pos.y = DPIScale(142);
 
-												SIZE sz;
-												sz.cx = rc.right - DPIScale(50);
-												sz.cy = DPIScale(30);
-
-												iString bText(
-													getStringFromResource(UI_PROPWND_RESETBUTTON)
-												);
-
-												auto resetButton = new CustomButton(this->iParam.infoPage, BUTTONMODE_TEXT, &pos, &sz, CTRLID_RESETAPPBUTTON, this->hInstance);
+												auto insttypeTextfield = new Textfield();
 												hr =
-													(resetButton != nullptr)
+													(insttypeTextfield != nullptr)
 													? S_OK : E_FAIL;
+
 												if (SUCCEEDED(hr))
 												{
-													resetButton->setColors(this->sInfo.TabColor, COLOR_BUTTON_MOUSE_OVER, COLOR_BUTTON_PRESSED);
-													resetButton->setAppearance_onlyText(bText, FALSE);
-													resetButton->setBorder(TRUE, this->sInfo.OutlineColor);
-													resetButton->setFont(
+													iString insttype(L"Installation-Type: ");
+#ifndef CNCSUITE_USERINSTALLATION
+													insttype += L"admin";
+#else
+													insttype += L"user";
+#endif // !CNCSUITE_USERINSTALLATION
+													insttypeTextfield->setText(
+														insttype.GetData()
+													);
+													insttypeTextfield->setColors(this->sInfo.TextColor, this->sInfo.TabColor);
+													insttypeTextfield->setFont(
 														CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
 													);
-													resetButton->setTextColor(this->sInfo.TextColor);
+													insttypeTextfield->setCreationFlags(Textfield::CF_APPLYSIZETOCONTEXT);
 
-													if (this->sInfo.StyleID == STYLEID_LIGHTGRAY)
-													{
-														resetButton->setTextHighlight(
-															TRUE,
-															RGB(255, 255, 255)
-														);
-													}
-													resetButton->setEventListener(dynamic_cast<customButtonEventSink*>(this));
-
-													hr = resetButton->Create();
+													hr = insttypeTextfield->Create(this->hInstance, this->iParam.infoPage, &pos, nullptr);
 													if (SUCCEEDED(hr))
 													{
 
+														pos.y = rc.bottom - DPIScale(50);
+														pos.x = DPIScale(25);
 
+														SIZE sz;
+														sz.cx = rc.right - DPIScale(50);
+														sz.cy = DPIScale(30);
+
+														iString bText(
+															getStringFromResource(UI_PROPWND_RESETBUTTON)
+														);
+
+														auto resetButton = new CustomButton(this->iParam.infoPage, BUTTONMODE_TEXT, &pos, &sz, CTRLID_RESETAPPBUTTON, this->hInstance);
+														hr =
+															(resetButton != nullptr)
+															? S_OK : E_FAIL;
+
+														if (SUCCEEDED(hr))
+														{
+															resetButton->setColors(this->sInfo.TabColor, COLOR_BUTTON_MOUSE_OVER, COLOR_BUTTON_PRESSED);
+															resetButton->setAppearance_onlyText(bText, FALSE);
+															resetButton->setBorder(TRUE, this->sInfo.OutlineColor);
+															resetButton->setFont(
+																CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
+															);
+															resetButton->setTextColor(this->sInfo.TextColor);
+
+															if (this->sInfo.StyleID == STYLEID_LIGHTGRAY)
+															{
+																resetButton->setTextHighlight(
+																	TRUE,
+																	RGB(255, 255, 255)
+																);
+															}
+															resetButton->setEventListener(dynamic_cast<customButtonEventSink*>(this));
+
+															hr = resetButton->Create();
+															if (SUCCEEDED(hr))
+															{
+
+
+															}
+														}
 													}
 												}
 											}
 										}
-
 									}
 								}
-
-
 							}
 						}
-
 					}
 				}
-
 			}
 		}
 	}

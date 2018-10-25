@@ -523,6 +523,7 @@ private:
 	void NewUndoAction(int, WPARAM);
 	void onClear();
 	void onPaste();
+	void onCut();
 	void onDeleteKeyWasPressed();
 
 	void EditChangeCTRL();

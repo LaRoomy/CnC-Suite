@@ -562,6 +562,23 @@ void EditControl::onPaste()
 	}
 }
 
+void EditControl::onCut()
+{
+	CHARRANGE cr;
+	this->_getsel(&cr);
+
+	UNDOREDOACTIONS action;
+	action.action = UNDOACTION_CONTENT_DELETED;
+	action.range = cr;
+	action.content = nullptr;
+	action.replacedContent = nullptr;
+	action.replacedRange = { 0 };
+
+	GetRichEditSelectionContent(this->EditWnd, &action.content);
+
+	this->UndoStack.addNewUndoAction(&action);
+}
+
 void EditControl::onDeleteKeyWasPressed()
 {
 	CHARRANGE cr;
@@ -698,6 +715,7 @@ int EditControl::OnEditNotify(HWND Parent, WPARAM wParam, LPARAM lParam)
 					{
 					case 0x58: // ctrl + x (cut)
 						this->EditChangeCTRL();
+						this->onCut();
 						break;
 					case 0x52:	// ctrl + r
 						return 1;

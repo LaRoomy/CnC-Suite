@@ -305,7 +305,7 @@ UIHistory::UIHistory()
 	//                    ||
 	//                   _||_
 	//                   \  /
-	// DO NOT DELETE!!!!! \/
+	// DO NOT DELETE!!!!! \/		???? do delete!
 
 	//AppPath appPath;
 	//auto historyPath =
@@ -345,18 +345,26 @@ UIHistory::UIHistory()
 	AppPath appPath;
 	auto path = appPath.Get(PATHID_FILE_HISTORY);
 
-	this->historyData.FromFile(
-		path.GetData()
-	);
+	auto hFound =
+		this->historyData.FromFile(
+			path.GetData()
+		);
 
+	if (hFound)
+	{
+		// race conditions ?? access violations ??
 
-	// race conditions ?? access violations ??
+		int ix = 0;
 
-	while (!this->historyData.IsReady()) {
-		Sleep(20);
+		while (!this->historyData.IsReady()) {
+			Sleep(20);
+			ix++;
+
+			if (ix > 500)// 20 x 500 = 10000ms timeout!
+				break;
+		}
+		this->currentIndexPos = this->historyData.GetItemCount() - 1;
 	}
-
-	this->currentIndexPos = this->historyData.GetItemCount() - 1;
 
 	//this->historyData.ToFile(
 	//	path.GetData()
@@ -482,6 +490,14 @@ void UIHistory::Save()
 void UIHistory::CleanUp(int daysToDelete)
 {
 	// TODO!
+
+	//DateTime timeNow;
+	//timeNow.FromLocalTime();
+
+	DateTime timeTo;
+	timeTo.FromLocalTime();
+
+
 }
 
 void UIHistory::SetColors(COLORREF BackgroundColor, COLORREF ItemColor, COLORREF SelectedItemColor, COLORREF TextColor, COLORREF AccentTextColor, COLORREF OutlineColor)
@@ -843,7 +859,10 @@ LRESULT UIHistory::onMouseWheel(WPARAM wParam)
 			);
 		}
 		else
+		{
+			this->verticalScrollbar->SetScrollPosition(0);
 			this->redrawScrollbar = true;
+		}
 	}
 	else if (zDelta < 0)
 	{
@@ -883,15 +902,20 @@ LRESULT UIHistory::onLButtonUp(LPARAM lParam)
 	{
 		auto yPos =
 			GET_Y_LPARAM(lParam);
+
 		auto index =
 			this->itemIndexFromPosition(yPos);
-		auto item =
-			this->historyData.GetHistoryItemAt(index);
 
-		this->hHistoryEvent->OnEntryClicked(
-			reinterpret_cast<cObject>(this),
-			&item
-		);
+		if ((index >= 0) && (index < this->historyData.GetItemCount()))
+		{
+			auto item =
+				this->historyData.GetHistoryItemAt(index);
+
+				this->hHistoryEvent->OnEntryClicked(
+					reinterpret_cast<cObject>(this),
+					&item
+				);
+		}
 	}
 	return static_cast<LRESULT>(0);
 }

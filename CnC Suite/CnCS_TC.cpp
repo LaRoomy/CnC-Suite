@@ -1923,66 +1923,76 @@ void CnCS_TC::OnVerticalToolBar_NumSequence()
 
 void CnCS_TC::OnVerticalToolBar_ErrorCheck()
 {
-	//DateTime dateTime, newTest;
-	//dateTime.SetLangID(LANG_GERMAN);
-	//dateTime.FromLocalTime();
+	RaiseException(EXCEPTION_ARRAY_BOUNDS_EXCEEDED, EXCEPTION_NONCONTINUABLE, 0, nullptr);
 
-	//auto str = dateTime.ToString();
+	//SYSTEMTIME past;
+	//SYSTEMTIME present;
+	//SYSTEMTIME future;
 
-	//newTest.FromString(str);
+	//past.wDay = 28;
+	//past.wHour = 23;
+	//past.wMinute = 01;
+	//past.wSecond = 45;
+	//past.wMonth = 2;
+	//past.wYear = 2005;
+	//past.wMilliseconds = 422;
 
-	auto ptp = this->GetActiveTabProperty();
+	//// 28.2.2005 23:01:45 422
 
-	HistoryItem hItem;
-	hItem.SetActionType(HistoryItem::FILE_OPENED | HistoryItem::FILE_CHANGED);
-	hItem.SetItemPath(ptp->Path);
-	hItem.SetLastOpenedTime();
+	//present.wDay = 5;
+	//present.wHour = 9;
+	//present.wMinute = 28;
+	//present.wMonth = 3;
+	//present.wSecond = 21;
+	//present.wYear = 2018;
+	//present.wMilliseconds = 763;
 
-	auto str = hItem.ToString();
+	// 5.3.2018 9:28:21 763
 
-	HistoryItem newItem;
-	newItem.FromString(str);
+	//future.wDay = 26;
+	//future.wHour = 10;
+	//future.wMinute = 0;
+	//future.wMonth = 10;
+	//future.wSecond = 0;
+	//future.wYear = 2018;
 
+	// 26.10.2018 10:00:00 000
 
+	//DateTime _past_(&past);
+	//DateTime _pres2_(&present);
+	//DateTime _future_(&future);
 
-	//TCHAR text[] = L"Line 1\r\nLine 2\nLine 3\rLine End";
-	//TCHAR texttocount[] = L"0123456789XXXX";
-	//TCHAR newBuffer[11] = { 0 };
-
-
-	////EditorContentManager ecm;
-	////ecm.SetExecuteAsync(false);
-	////ecm.SetContent(text);
-
-	//int index = 0;
-
-	////int result = CompareStringsAsmW(L"test1", L"testament");//not equal
-
-	////result = CompareStringsAsmW(L"testomio", L"testomio");//equal
-
-	////result = CompareStringsAsmW(L"test1", nullptr);//error
-
-	////int result = RemoveCharacterFromBufferW(texttocount, newBuffer, 3);
-
-	////int result = GetBlockSegmentOutOfBufferW(text, newBuffer, 0, 5);
-
-	////int result = InsertBlockInBufferW(newBuffer, texttocount, L"XXX", 0);
-
-	////int result = RemoveBlockFromBufferW(newBuffer, texttocount, 10, 13);
-
-	//index = 0;
-
-	//while (index >= 0)
+	//if (_past_ < _pres1_)
 	//{
-	//	auto res = GetNextLineFromStartIndexW(&index, text);
-	//	if (res != nullptr)
-	//	{
-	//		//UNREFERENCED_PARAMETER(res);
-	//		//free((void*)res);
-	//		ReleaseStringVect(res);
-	//	}
+	//	MessageBox(this->Main, L"past < pres1", L"test", MB_OK);
 	//}
 
+	//if (_past_ < _future_)
+	//{
+	//	MessageBox(this->Main, L"past < future", L"test", MB_OK);
+	//}
+
+	//if (_pres1_ == _pres2_)
+	//{
+	//	MessageBox(this->Main, L"pres1 == pres2", L"test", MB_OK);
+	//}
+
+	//if (_future_ > _pres2_)
+	//{
+	//	MessageBox(this->Main, L"future > pres2", L"test", MB_OK);
+	//}
+
+	//TimeSpan span;
+	//span.FromTimeToTime(&present, &past);
+	//auto srep = span.ToString();
+
+	//MessageBox(this->Main, srep, L"test 1", MB_OK);
+
+	//span.Clear();
+	//span.FromTimeToTime(&past, &present);
+	//srep = span.ToString();
+
+	//MessageBox(this->Main, srep, L"test 2", MB_OK);
 }
 
 void CnCS_TC::OnVerticalToolBar_Undo()
@@ -3729,7 +3739,7 @@ BOOL CnCS_TC::CalculateInsertTabrange(LPPOINT pt)
 	GetClientRect(this->TCFrame, &rc);
 
 	int calWidth = (rc.right - DPIScale(42)) / (this->TABCount + 1);		//int calWidth = (rc.right - 4) / (this->TABCount + 1);
-	if (calWidth > COMMONTABWIDTH)
+	if (calWidth >= COMMONTABWIDTH)
 	{
 		pt->x = (this->TABCount*COMMONTABWIDTH) + DPIScale(40);			//pt->x = (this->TABCount*COMMONTABWIDTH) + 2;
 		pt->y = ((this->TABCount + 1)*COMMONTABWIDTH) + DPIScale(40);		//pt->y = ((this->TABCount + 1)*COMMONTABWIDTH) + 2;

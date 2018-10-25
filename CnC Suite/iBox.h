@@ -19,7 +19,8 @@ public:
 	{
 		this->b
 			= new B(
-				box.get());
+				box.get()
+			);
 	}
 	~iBox() {
 		if(this->b != nullptr)

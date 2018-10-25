@@ -38,8 +38,8 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
 /// buildinfo section ///////////////////////////////////////////////////////////////////////////////////////////////
 // this section contains displayable information regarding the buildinfo of the application (displayed on info page)
-#define		CNCSUITE_BUILDVERSION		L"CnC Suite Build 1.3.2"
-#define		CNCSUITE_BUILDDATE			L"Build-date: May 18th 2018"
+#define		CNCSUITE_BUILDVERSION		L"CnC Suite Build 1.3.8"
+#define		CNCSUITE_BUILDDATE			L"Build-date: October 25th 2018"
 /// buildinfo section END ///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// app identity section ///////////////////////////////////////////////////////////////////////////////////////////
@@ -47,13 +47,14 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #define		APPTYPE_STOREAPP		1
 #define		APPTYPE_FREEAPP			2
 
+//#define			CNCSUITE_USERINSTALLATION		// disable this to create the executable for the classic installation
+
 #define		IDSEX_APPLICATIONCLASS			L"CNCSUITECLASS"
 #define		APPLICATION_DISPLAY_NAME		L"CnC Suite"
-#define		APPLICATION_FULLVERSION_NAME	L"CnC Suite 1. 3. 2"
-#define		APPLICATION_VERSION				L"Version 1.3.22"
+#define		APPLICATION_FULLVERSION_NAME	L"CnC Suite 1. 3. 8"
+#define		APPLICATION_VERSION				L"Version 1.3.81"
 
 #define		EXECUTABLE_NAME					L"CnC Suite.exe"
-#define		EXECUTABLE_DIRPATH				L"C:\\Program Files (x86)\\CnC Suite"
 
 #define		MUTEX_NAME						L"CnC Suite 1.0"
 

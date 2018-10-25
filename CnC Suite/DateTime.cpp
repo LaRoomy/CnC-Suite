@@ -66,6 +66,12 @@ DateTime & DateTime::operator=(const DateTime & dt)
 	return *this;
 }
 
+DateTime & DateTime::operator-(int days)
+{
+	this->subtractDays(days);
+	return *this;
+}
+
 bool DateTime::operator>(const DateTime & dt)
 {
 	if (this->_time.wYear > dt._time.wYear)
@@ -573,137 +579,353 @@ void DateTime::makeStringRepresentation()
 	}
 }
 
-void TimeFrame::FromTimeToTime(LPSYSTEMTIME from, LPSYSTEMTIME to, LPSYSTEMTIME frame)
+void DateTime::subtractDays(int days)
 {
-	if (from != nullptr && to != nullptr && frame != nullptr)
+	int years = 0, month = 0, rel_days = days;
+
+	SYSTEMTIME time;
+	this->GetTime(&time);
+
+	if (rel_days > 365)
 	{
-		int mode;
+		years = (int)(days / 365);
+		rel_days -= (years * 365);
+		time.wYear -= years;
+	}
+	if (rel_days > 0)
+	{
+		//if(rel_days > )
+
+	}
+}
+
+void TimeSpan::TimeToTime(LPSYSTEMTIME from, LPSYSTEMTIME to, LPSYSTEMTIME span)
+{
+	if (from != nullptr && to != nullptr && span != nullptr)
+	{
+		int time_type;
+		WORD corVal_plus_even = 0, corVal_minus_even = 0;
+		WORD corVal_plus_odd = 0, corVal_minus_odd = 0;
+
 
 		DateTime _to_(to);
 		DateTime _from_(from);
 
 		if (_to_ > _from_)
-			mode = TimeFrame::FUTURE_TIME;
+			time_type = TimeSpan::FUTURE_TIME;
 		else if (_to_ < from)
-			mode = TimeFrame::PAST_TIME;
+			time_type = TimeSpan::PAST_TIME;
 		else
-			mode = TimeFrame::PRESENT_TIME;
+			time_type = TimeSpan::PRESENT_TIME;
 
-		if (mode == TimeFrame::PRESENT_TIME)
+		if (time_type == TimeSpan::PRESENT_TIME)
 		{
-			SecureZeroMemory(frame, sizeof(SYSTEMTIME));
+			SecureZeroMemory(span, sizeof(SYSTEMTIME));
 			return;
 		}
 
-		// day of week makes no sense in this context so reset to invalid state
-		frame->wDayOfWeek = 0;
+		// day of week makes no sense in this context -so reset to invalid state
+		span->wDayOfWeek = 0;
 
 		// get millisecond frame - base:1000		::result-range 0 - 999 ms
 		if (to->wMilliseconds == from->wMilliseconds)
-			frame->wMilliseconds = 0;
+			span->wMilliseconds = 0;
 		else if (to->wMilliseconds > from->wMilliseconds)
 		{
-			if (mode == TimeFrame::FUTURE_TIME)
-				frame->wMilliseconds = to->wMilliseconds - from->wMilliseconds;
+			if (time_type == TimeSpan::FUTURE_TIME)
+			{
+				span->wMilliseconds = to->wMilliseconds - from->wMilliseconds;
+
+				//if (to->wSecond != from->wSecond)
+				//	corVal_plus_even = 1;
+			}
 			else
-				frame->wMilliseconds = (1000 - to->wMilliseconds) + from->wMilliseconds;
+			{
+				span->wMilliseconds = (1000 - to->wMilliseconds) + from->wMilliseconds;
+
+				if (to->wSecond != from->wSecond)
+					corVal_minus_even = 1;
+			}
 		}
 		else // (to->wMilliseconds < from->wMilliseconds)
 		{
-			if (mode == TimeFrame::FUTURE_TIME)
-				frame->wMilliseconds = (1000 - from->wMilliseconds) + to->wMilliseconds;
+			if (time_type == TimeSpan::FUTURE_TIME)
+			{
+				span->wMilliseconds = (1000 - from->wMilliseconds) + to->wMilliseconds;
+
+				if (to->wSecond != from->wSecond)
+					corVal_minus_even = 1;
+			}
 			else
-				frame->wMilliseconds = from->wMilliseconds - to->wMilliseconds;
+			{
+				span->wMilliseconds = from->wMilliseconds - to->wMilliseconds;
+
+				//if (to->wSecond != from->wSecond)
+				//	corVal_plus_even = 1;
+			}
 		}
+
+		if (span->wMilliseconds >= 1000)
+			span->wMilliseconds = 0;
 
 		// get second frame - base:60				::result range 0 - 59 sec
 		if (to->wSecond == from->wSecond)
-			frame->wSecond = 0;
+			span->wSecond = 0;
 		else if (to->wSecond > from->wSecond)
-			frame->wSecond = to->wSecond - from->wSecond;
+		{
+			if (time_type == TimeSpan::FUTURE_TIME)
+			{
+				span->wSecond = to->wSecond - from->wSecond;
+
+				//if (to->wMinute != from->wMinute)
+				//	corVal_plus_odd = 1;
+			}
+			else
+			{
+				span->wSecond = (60 - to->wSecond) + from->wSecond;
+
+				if (to->wMinute != from->wMinute)
+					corVal_minus_odd = 1;
+			}
+		}
 		else // (to->wSecond < from->wSecond)
 		{
-			if (mode == TimeFrame::FUTURE_TIME)
-				frame->wSecond = (60 - from->wSecond) + to->wSecond;
+			if (time_type == TimeSpan::FUTURE_TIME)
+			{
+				span->wSecond = (60 - from->wSecond) + to->wSecond;
+
+				if (to->wMinute != from->wMinute)
+					corVal_minus_odd = 1;
+			}
 			else
-				frame->wSecond = from->wSecond - to->wSecond;
+			{
+				span->wSecond = from->wSecond - to->wSecond;
+
+				//if (to->wMinute != from->wMinute)
+				//	corVal_plus_odd = 1;
+			}
 		}
+
+		span->wSecond += corVal_plus_even;
+		span->wSecond -= corVal_minus_even;
+
+		if (span->wSecond >= 60)
+			span->wSecond = 0;
+
+		corVal_minus_even = 0;
+		corVal_plus_even = 0;
 
 
 		// get minute frame - base:60				::result-range 0 - 59 min
 		if (to->wMinute == from->wMinute)
-			frame->wMinute = 0;
+			span->wMinute = 0;
 		else if (to->wMinute > from->wMinute)
-			frame->wMinute = to->wMinute - from->wMinute;
+		{
+			if (time_type == TimeSpan::FUTURE_TIME)
+			{
+				span->wMinute = to->wMinute - from->wMinute;
+
+				//if (to->wHour != from->wHour)
+				//	corVal_plus_even = 1;
+			}
+			else
+			{
+				span->wMinute = (60 - to->wMinute) + from->wMinute;
+
+				if (to->wHour != from->wHour)
+					corVal_minus_even = 1;
+			}
+		}
 		else // (to->wMinute < from->wMinute)
 		{
-			if (mode == TimeFrame::FUTURE_TIME)
-				frame->wMinute = (60 - from->wMinute) + to->wMinute;
+			if (time_type == TimeSpan::FUTURE_TIME)
+			{
+				span->wMinute = (60 - from->wMinute) + to->wMinute;
+
+				if (to->wHour != from->wHour)
+					corVal_minus_even = 1;
+			}
 			else
-				frame->wMinute = from->wMinute - to->wMinute;
+			{
+				span->wMinute = from->wMinute - to->wMinute;
+
+				//if (to->wHour != from->wHour)
+				//	corVal_plus_even = 1;
+			}
 		}
+
+		span->wMinute += corVal_plus_odd;
+		span->wMinute -= corVal_minus_odd;
+
+		if (span->wMinute >= 60)
+			span->wMinute = 0;
+
+		corVal_plus_odd = 0;
+		corVal_minus_odd = 0;
 
 		// get hour frame - base:24					::result-range 0 - 23 hrs
 		if (to->wHour == from->wHour)
-			frame->wHour = 0;
+			span->wHour = 0;
 		else if (to->wHour > from->wHour)
-			frame->wHour = to->wHour - from->wHour;
+		{
+			if (time_type == TimeSpan::FUTURE_TIME)
+			{
+				span->wHour = to->wHour - from->wHour;
+
+				//if (to->wDay != from->wDay)
+				//	corVal_plus_odd = 1;
+			}
+			else
+			{
+				span->wHour = (24 - to->wHour) + from->wHour;
+
+				if (to->wDay != from->wDay)
+					corVal_minus_odd = 1;
+			}
+		}
 		else // (to->wHour < from->wHour)
 		{
-			if (mode == TimeFrame::FUTURE_TIME)
-				frame->wHour = (24 - from->wHour) + to->wHour;
+			if (time_type == TimeSpan::FUTURE_TIME)
+			{
+				span->wHour = (24 - from->wHour) + to->wHour;
+
+				if (to->wDay != from->wDay)
+					corVal_minus_odd = 1;
+			}
 			else
-				frame->wHour = from->wHour - to->wHour;
+			{
+				span->wHour = from->wHour - to->wHour;
+
+				//if (to->wDay != from->wDay)
+				//	corVal_plus_odd = 1;
+			}
 		}
+
+		span->wHour += corVal_plus_even;
+		span->wHour -= corVal_minus_even;
+
+		if (span->wHour >= 24)
+			span->wHour = 0;
+
+		corVal_plus_even = 0;
+		corVal_minus_even = 0;
 
 		// get day frame - base:variable			::result-range 0 - 30 days
 		if (to->wDay == from->wDay)
-			frame->wDay = 0;
+			span->wDay = 0;
 		else if (to->wDay > from->wDay)
-			frame->wDay = to->wDay - from->wDay;
-		else // (to->wDay < from->wDay)
 		{
-			if (mode == TimeFrame::FUTURE_TIME)
+			if (time_type == TimeSpan::FUTURE_TIME)
 			{
-				frame->wDay =
-					(TimeFrame::dayCountFromMonth(
-						from->wMonth,
-						TimeFrame::isSwitchingYear(from->wYear))
-						- from->wDay)
-					+ to->wDay;
+				span->wDay = to->wDay - from->wDay;
+
+				//if (to->wMonth != from->wMonth)
+				//	corVal_plus_even = 1;
 			}
 			else
 			{
-				frame->wDay = from->wDay - to->wDay;
+				span->wDay =
+					(TimeSpan::dayCountFromMonth(to->wMonth,
+						TimeSpan::isSwitchingYear(to->wYear))
+						- to->wDay)
+					+ from->wDay;
+
+				if (to->wMonth != from->wMonth)
+					corVal_minus_even = 1;
+			}
+		}
+		else // (to->wDay < from->wDay)
+		{
+			if (time_type == TimeSpan::FUTURE_TIME)
+			{
+				span->wDay =
+					(TimeSpan::dayCountFromMonth(
+						from->wMonth,
+						TimeSpan::isSwitchingYear(from->wYear))
+						- from->wDay)
+					+ to->wDay;
+
+				if (to->wMonth != from->wMonth)
+					corVal_minus_even = 1;
+			}
+			else
+			{
+				span->wDay = from->wDay - to->wDay;
+
+				//if (to->wMonth != from->wMonth)
+				//	corVal_plus_even = 1;
 			}
 		}
 
+		span->wDay += corVal_plus_odd;
+		span->wDay -= corVal_minus_odd;
+
+		// TODO: day correction!???!
+
+		corVal_plus_odd = 0;
+		corVal_minus_odd = 0;
 
 		// get month frame - base:12				::result-range 0 - 11 month
 		if (to->wMonth == from->wMonth)
-			frame->wMonth = 0;
+			span->wMonth = 0;
 		else if (to->wMonth > from->wMonth)
-			frame->wMonth = from->wMonth - to->wMonth;
+		{
+			if (time_type == TimeSpan::FUTURE_TIME)
+			{
+				span->wMonth = to->wMonth - from->wMonth;
+
+				//if (to->wYear != from->wYear)
+				//	corVal_plus_odd = 1;
+			}
+			else
+			{
+				span->wMonth = (12 - to->wMonth) + from->wMonth;
+
+				if (to->wYear != from->wYear)
+					corVal_minus_odd = 1;
+			}
+		}
 		else // (to->wMonth < from->wMonth)
 		{
-			if (mode == TimeFrame::FUTURE_TIME)
-				frame->wMonth = (12 - from->wMonth) + to->wMonth;
+			if (time_type == TimeSpan::FUTURE_TIME)
+			{
+				span->wMonth = (12 - from->wMonth) + to->wMonth;
+
+				if (to->wYear != from->wYear)
+					corVal_minus_odd = 1;
+			}
 			else
-				frame->wMonth = from->wMonth - to->wMonth;
+			{
+				span->wMonth = from->wMonth - to->wMonth;
+
+				//if (to->wYear != from->wYear)
+				//	corVal_plus_odd = 1;
+			}
 		}
+
+		span->wMonth += corVal_plus_even;
+		span->wMonth -= corVal_minus_even;
+
+		if (span->wMonth >= 12)
+			span->wMonth = 0;
+
+		corVal_plus_even = 0;
+		corVal_minus_even = 0;
 
 		// get year frame
 		if (to->wYear == from->wYear)
-			frame->wYear = 0;
+			span->wYear = 0;
 		else if (to->wYear > from->wYear)
-			frame->wYear = to->wYear - from->wYear;
+			span->wYear = to->wYear - from->wYear;
 		else // (to->wYear < from->wYear)
-			frame->wYear = from->wYear - to->wYear;
+			span->wYear = from->wYear - to->wYear;
 
+		span->wYear += corVal_plus_odd;
+		span->wYear -= corVal_minus_odd;
 	}
 }
 
-TimeFrame & TimeFrame::operator=(const TimeFrame & timeFrame)
+TimeSpan & TimeSpan::operator=(const TimeSpan & timeFrame)
 {
 	this->time_now = timeFrame.time_now;
 	this->time_to = timeFrame.time_to;
@@ -711,7 +933,23 @@ TimeFrame & TimeFrame::operator=(const TimeFrame & timeFrame)
 	return *this;
 }
 
-WORD TimeFrame::dayCountFromMonth(WORD month, bool switchingYear)
+const wchar_t * TimeSpan::ToString()
+{
+	this->representation =
+		this->representation
+		+ L"TimeSpan:\n"
+		+ L"\nmilliseconds: " + this->timespan.wMilliseconds
+		+ L"\nseconds: " + this->timespan.wSecond
+		+ L"\nminutes: " + this->timespan.wMinute
+		+ L"\nhours: " + this->timespan.wHour
+		+ L"\ndays: " + this->timespan.wDay
+		+ L"\nmonth: " + this->timespan.wMonth
+		+ L"\nyears: " + this->timespan.wYear;
+
+	return this->representation.GetData();
+}
+
+WORD TimeSpan::dayCountFromMonth(WORD month, bool switchingYear)
 {
 	switch (month)
 	{
@@ -747,7 +985,7 @@ WORD TimeFrame::dayCountFromMonth(WORD month, bool switchingYear)
 	}
 }
 
-bool TimeFrame::isSwitchingYear(WORD year)
+bool TimeSpan::isSwitchingYear(WORD year)
 {
 	return ((year % 4) != 0) ? false : true;
 }
