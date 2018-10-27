@@ -117,6 +117,8 @@
 #define			CTRLID_EXPORT_REMOVEAPTCOMMENT	264
 #define			CTRLID_EXPORT_REMOVEBRCTCOMMENT	265
 #define			CTRLID_EXPORT_REMOVESPACES		266
+#define			CTRLID_SAVEHISTORY				267
+#define			CTRLID_DELETEHISTORYNOW			268
 
 
 typedef struct _CNCSPROP_MENUBUTTONS {
@@ -225,8 +227,12 @@ public:
 	}
 
 	// updateAgent eventhandler
-	void CnCS_PI::onUpdateSearchComplete(bool isUpdateAvailable) { this->onUpdateSrcComplete(isUpdateAvailable); }
-	void CnCS_PI::onUpdateSearchFailed(int errorcode) { this->onUpdateSrcFailed(errorcode); }
+	void CnCS_PI::onUpdateSearchComplete(bool isUpdateAvailable) {
+		this->onUpdateSrcComplete(isUpdateAvailable);
+	}
+	void CnCS_PI::onUpdateSearchFailed(int errorcode) {
+		this->onUpdateSrcFailed(errorcode);
+	}
 
 	// editbox events
 	void CnCS_PI::onEditboxContentChanged(cObject sender, CTRLID ctrlID) {

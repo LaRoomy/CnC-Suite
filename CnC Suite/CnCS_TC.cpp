@@ -815,7 +815,10 @@ LRESULT CnCS_TC::OnSize_inFrame()
 	RECT rc;
 	GetClientRect(this->TCFrame, &rc);
 	
-	LPTABPROPERTY ptp = reinterpret_cast<LPTABPROPERTY>(GetWindowLongPtr(this->iParam.hwndActiveTab, GWLP_USERDATA));
+	LPTABPROPERTY ptp =
+		reinterpret_cast<LPTABPROPERTY>(
+			GetWindowLongPtr(this->iParam.hwndActiveTab, GWLP_USERDATA)
+		);
 	if (ptp != NULL)
 	{
 		int Ewidth = rc.right - DPIScale(40);

@@ -487,19 +487,6 @@ void UIHistory::Save()
 	}
 }
 
-void UIHistory::CleanUp(int daysToDelete)
-{
-	// TODO!
-
-	//DateTime timeNow;
-	//timeNow.FromLocalTime();
-
-	DateTime timeTo;
-	timeTo.FromLocalTime();
-
-
-}
-
 void UIHistory::SetColors(COLORREF BackgroundColor, COLORREF ItemColor, COLORREF SelectedItemColor, COLORREF TextColor, COLORREF AccentTextColor, COLORREF OutlineColor)
 {
 	this->textColor = TextColor;

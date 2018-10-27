@@ -67,7 +67,6 @@
 #define		DATAKEY_EXSETTINGS_EXPORT_REMOVEBRACKETCOMMENT		L"exs_removebracketcomment"//type: bool //default: false
 #define		DATAKEY_EXSETTINGS_EXPORT_REMOVESPACES				L"exs_removespaces"//type: bool //default: false
 #define		DATAKEY_EXSETTINGS_HISTORY_SAVEHISTORY				L"hst_savehistory"//type: bool //default: true
-#define		DATAKEY_EXSETTINGS_HISTORY_DAYSTODELETE				L"hst_daystodelete"//type: int //default: 100
 
 // FILEKEY >> Internal Settings
 #define		DATAKEY_INTSET_BLOCKDRIVELOADING					L"ins_blockdriveloading"//type: bool //default: true

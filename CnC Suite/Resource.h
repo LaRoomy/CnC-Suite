@@ -334,6 +334,8 @@
 #define			IDI_HISTORY_MARKED						692
 #define			IDI_HISTORY_PRESSED						693
 
+#define			IDI_GNRL_SYNC							694
+
 
 
 //#define			IDI_MAINBUTTON_100						671

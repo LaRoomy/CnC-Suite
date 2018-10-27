@@ -20,7 +20,6 @@ public:
 	void Clear();
 
 	DateTime& operator= (const DateTime& dt);
-	DateTime& operator- (int days);
 	bool operator> (const DateTime& dt);
 	bool operator>= (const DateTime& dt);
 	bool operator< (const DateTime& dt);
@@ -67,8 +66,6 @@ private:
 	void makeSimpleDate();
 	void makeFormalDate();
 	void makeStringRepresentation();
-
-	void subtractDays(int days);
 };
 
 class TimeSpan : public ClsObject<TimeSpan> {

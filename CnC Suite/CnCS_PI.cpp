@@ -307,7 +307,17 @@ HRESULT CnCS_PI::_createGeneralPage()
 	{
 		GetClientRect(this->iParam.generalPage, &rc);
 
-		auto dataContainer = reinterpret_cast<ApplicationData*>(getDefaultApplicationDataContainer());
+		auto dataContainer =
+			reinterpret_cast<ApplicationData*>(
+				getDefaultApplicationDataContainer()
+			);
+		auto extendedDataContainer =
+			reinterpret_cast<ApplicationData*>(
+				getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
+			);
+
+		if ((dataContainer == nullptr) || (extendedDataContainer == nullptr))
+			return E_POINTER;
 
 		// language selection >>
 		iString syslang(getStringFromResource(UI_PROPWND_SYSTEMLANGUAGE));
@@ -376,10 +386,10 @@ HRESULT CnCS_PI::_createGeneralPage()
 		// update search checkbox
 		POINT pt;
 		pt.x = DPIScale(20);
-		pt.y = DPIScale(220);
+		pt.y = DPIScale(210);
 
 		SIZE sz;
-		sz.cx = rc.right - DPIScale(50);
+		sz.cx = DPIScale(200);//rc.right - DPIScale(50);
 		sz.cy = DPIScale(30);
 
 		iString cb_text(
@@ -411,21 +421,26 @@ HRESULT CnCS_PI::_createGeneralPage()
 		else
 			hr = E_FAIL;
 
-		pt.y = DPIScale(260);
-		sz.cx = DPIScale(250);
-		sz.cy = DPIScale(40);
+		pt.x = rc.right - DPIScale(240);
+		sz.cx = DPIScale(180);
+		sz.cy = DPIScale(30);
 
 		auto updateButton = new CustomButton(this->iParam.generalPage, BUTTONMODE_ICONTEXT, &pt, &sz, CTRLID_UPDATEBUTTON, this->hInstance);
 		if (updateButton != nullptr)
 		{
 			iString button_text(getStringFromResource(UI_PROPWND_SEARCHFORUPDATESNOW));
 
-			updateButton->setAppearance_IconText(IDI_PROP_UPDATEARROWS, 32, button_text);
+			updateButton->setAppearance_IconText(IDI_GNRL_SYNC, DPIScale(24), button_text);
 			updateButton->setEventListener(
 				dynamic_cast<customButtonEventSink*>(this)
 			);
-			updateButton->setColors(this->sInfo.TabColor, COLOR_BUTTON_MOUSE_OVER, COLOR_BUTTON_PRESSED);
+			updateButton->setColors(
+				this->sInfo.TabColor,
+				makeSelectionColor(this->sInfo.TabColor),
+				makePressedColor(this->sInfo.TabColor)
+			);
 			updateButton->setTextColor(this->sInfo.TextColor);
+			updateButton->setBorder(TRUE, this->sInfo.OutlineColor);
 			updateButton->setDisabledIcon(IDI_PROP_UPDATEARROWS_DSBL);
 			updateButton->setDisabledColor(this->sInfo.TabColor);
 			updateButton->setConstraints(5, 10);
@@ -445,7 +460,8 @@ HRESULT CnCS_PI::_createGeneralPage()
 		else
 			hr = E_FAIL;
 
-		pt.y = DPIScale(360);
+		pt.x = DPIScale(20);
+		pt.y = DPIScale(300);
 		sz.cx = rc.right - DPIScale(50);
 		sz.cy = DPIScale(30);
 
@@ -472,7 +488,7 @@ HRESULT CnCS_PI::_createGeneralPage()
 			);
 			sExplorerCheckbox->Create();
 		}
-		pt.y = DPIScale(400);
+		pt.y = DPIScale(340);
 
 		cb_text.Replace(
 			getStringFromResource(UI_PROPWND_SAVETABWNDCOND)
@@ -498,7 +514,7 @@ HRESULT CnCS_PI::_createGeneralPage()
 		else
 			hr = E_FAIL;
 
-		pt.y = DPIScale(440);
+		pt.y = DPIScale(380);
 
 		cb_text.Replace(
 			getStringFromResource(UI_PROPWND_SAVEUNSAVEDCONTENT)
@@ -523,6 +539,65 @@ HRESULT CnCS_PI::_createGeneralPage()
 		}
 		else
 			hr = E_FAIL;
+
+		pt.y = DPIScale(470);
+		sz.cx = DPIScale(200);
+
+		cb_text.Replace(
+			getStringFromResource(UI_PROPWND_SAVEHISTORY)
+		);
+
+		auto saveHistoryCheckbox = new CustomCheckbox(this->hInstance, this->iParam.generalPage, &pt, &sz, CTRLID_SAVEHISTORY);
+		if (saveHistoryCheckbox != nullptr)
+		{
+			saveHistoryCheckbox->setChecked(
+				extendedDataContainer->getBooleanData(DATAKEY_EXSETTINGS_HISTORY_SAVEHISTORY, true)
+			);
+			saveHistoryCheckbox->setEventHandler(
+				dynamic_cast<customCheckboxEventSink*>(this)
+			);
+			saveHistoryCheckbox->setText(cb_text);
+			saveHistoryCheckbox->setColors(this->sInfo.TabColor, this->sInfo.TextColor);
+			saveHistoryCheckbox->setConstraints(10, 10);
+			saveHistoryCheckbox->setFont(
+				CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
+			);
+			saveHistoryCheckbox->Create();
+		}
+		else
+			hr = E_FAIL;
+
+		pt.x = rc.right - DPIScale(240);
+		sz.cx = DPIScale(180);
+		sz.cy = DPIScale(30);
+
+		auto deleteHistoryButton = new CustomButton(this->iParam.generalPage, BUTTONMODE_ICONTEXT, &pt, &sz, CTRLID_DELETEHISTORYNOW, this->hInstance);
+		if (deleteHistoryButton != nullptr)
+		{
+			iString button_text(
+				getStringFromResource(UI_PROPWND_DELETEHISTORYNOW)
+			);
+			deleteHistoryButton->setBorder(TRUE, this->sInfo.OutlineColor);
+			deleteHistoryButton->setAppearance_IconText(IDI_EXP_DELETEELEMENT, DPIScale(24), button_text);
+			deleteHistoryButton->setEventListener(
+				dynamic_cast<customButtonEventSink*>(this)
+			);
+			deleteHistoryButton->setColors(
+				this->sInfo.TabColor,
+				makeSelectionColor(this->sInfo.TabColor),
+				makePressedColor(this->sInfo.TabColor)
+			);
+			deleteHistoryButton->setTextColor(this->sInfo.TextColor);
+			deleteHistoryButton->setConstraints(5, 10);
+			deleteHistoryButton->setFont(
+				CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
+			);
+			deleteHistoryButton->Create();
+
+		}
+		else
+			hr = E_FAIL;
+
 	}
 	return hr;
 }
@@ -3780,6 +3855,10 @@ void CnCS_PI::onCheckboxChecked(CustomCheckbox* checkBox, bool newState)
 				((ApplicationData*)(getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)))
 					->saveValue(DATAKEY_EXSETTINGS_EXCHANGEWND_AUTOCLOSE, newState);
 				break;
+			case CTRLID_SAVEHISTORY:
+				((ApplicationData*)(getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)))
+					->saveValue(DATAKEY_EXSETTINGS_HISTORY_SAVEHISTORY, newState);
+				break;
 			default:
 				break;
 			}
@@ -3982,7 +4061,7 @@ void CnCS_PI::onUpdateButtonClicked(CustomButton *sender)
 		{
 			POINT pos;
 			pos.x = DPIScale(20);
-			pos.y = DPIScale(300);
+			pos.y = DPIScale(241);
 
 			this->wki->setExtendedAnimationProperty(
 				ANIMATIONMODE_LINEAR_EXTENDED,
@@ -4617,27 +4696,35 @@ void CnCS_PI::createStyleParams()
 
 void CnCS_PI::createDownloadButton()
 {
+	RECT rc;
+	GetClientRect(this->iParam.generalPage, &rc);
 	DestroyWindow(
 		GetDlgItem(this->iParam.generalPage, CTRLID_UPDATEBUTTON)
-	);
+	);// auto release the old button
 
-	iString updatetext(getStringFromResource(UI_PROPWND_UPDATEAVAILABLE));
-	iString btn_text(L"  \x2192 Download\0");
-	iString full = updatetext + btn_text;
+	iString btn_text(L"\x2192 Update\0");
+
 	POINT pt = {
-		DPIScale(20),
-		DPIScale(260)
+		rc.right - DPIScale(240),
+		DPIScale(210)
 	};
 	SIZE sz = {
-		DPIScale(250),
-		DPIScale(40)
+		DPIScale(180),
+		DPIScale(30)
 	};
 
 	auto downloadButton = new CustomButton(this->iParam.generalPage, BUTTONMODE_TEXT, &pt, &sz, CTRLID_DOWNLOADBUTTON, this->hInstance);
-	downloadButton->setEventListener(dynamic_cast<customButtonEventSink*>(this));
-	downloadButton->setAppearance_onlyText(full, FALSE);
-	downloadButton->setColors(this->sInfo.TabColor, COLOR_BUTTON_MOUSE_OVER, COLOR_BUTTON_PRESSED);
-	downloadButton->setTextColor(RGB(210, 255, 0));
+	downloadButton->setEventListener(
+		dynamic_cast<customButtonEventSink*>(this)
+	);
+	downloadButton->setBorder(TRUE, this->sInfo.OutlineColor);
+	downloadButton->setAppearance_onlyText(btn_text, FALSE);
+	downloadButton->setColors(
+		this->sInfo.TabColor,
+		makeSelectionColor(this->sInfo.TabColor),
+		makePressedColor(this->sInfo.TabColor)
+	);
+	downloadButton->setTextColor(RGB(0, 255, 0));
 
 	downloadButton->Create();
 }
@@ -4685,22 +4772,29 @@ void CnCS_PI::displayUpdateSearchResult(int type)
 		TextOutWnd(
 			this->iParam.generalPage,
 			getStringFromResource(UI_PROPWND_APPUPTODATE),
-			DPIScale(300),
-			DPIScale(270),
+			DPIScale(160),
+			DPIScale(180),
 			this->iParam.clientFont,
 			RGB(0, 255, 0)
 		);
 		break;
 	case UPDATERESULT_APPDEPRECATED:
 		PostMessage(this->iParam.generalPage, WM_COMMAND, MAKEWPARAM(ASYNCMSG_CREATEDWNLBUTTON, 0), 0);
-		/*TextOutWnd(this->iParam.generalPage, getStringFromResource(UI_PROPWND_UPDATEAVAILABLE), 300, 270, this->iParam.clientFont, RGB(210, 255, 0));*/
+		TextOutWnd(
+			this->iParam.generalPage,
+			getStringFromResource(UI_PROPWND_UPDATEAVAILABLE),
+			DPIScale(160),
+			DPIScale(180),
+			this->iParam.clientFont,
+			RGB(0, 255, 0)
+		);
 		break;
 	case UPDATERESULT_ERRORNOTCONNECTED:
 		TextOutWnd(
 			this->iParam.generalPage,
 			getStringFromResource(UI_PROPWND_ERRORNOINTERNETCON),
-			DPIScale(300),
-			DPIScale(270),
+			DPIScale(160),
+			DPIScale(180),
 			this->iParam.clientFont,
 			RGB(255, 0, 0)
 		);
@@ -4721,7 +4815,11 @@ void CnCS_PI::resetUpdateSearchIndication()
 	auto updateButton
 		= reinterpret_cast<CustomButton*>(
 			SendMessage(
-				GetDlgItem(this->iParam.generalPage, CTRLID_UPDATEBUTTON), WM_GETWNDINSTANCE, 0, 0));
+				GetDlgItem(this->iParam.generalPage, CTRLID_UPDATEBUTTON),
+				WM_GETWNDINSTANCE,
+				0, 0
+			)
+		);
 
 	if (updateButton != nullptr)
 	{
@@ -4792,10 +4890,20 @@ void CnCS_PI::drawGeneralPage(HDC hdc, LPRECT rc)
 		hdc,
 		getStringFromResource(UI_PROPWND_ACTIONONLAUNCH),
 		DPIScale(20),
-		DPIScale(320),
+		DPIScale(270),
 		this->iParam.clientFont,
 		this->sInfo.TextColor
 	);
+
+	TextOutDC(
+		hdc,
+		getStringFromResource(UI_GNRL_HISTORY),
+		DPIScale(20),
+		DPIScale(440),
+		this->iParam.clientFont,
+		this->sInfo.TextColor
+	);
+
 
 	pen = CreatePen(PS_SOLID, 1, this->sInfo.TextColor);
 	if (pen)
@@ -4816,8 +4924,11 @@ void CnCS_PI::drawGeneralPage(HDC hdc, LPRECT rc)
 		MoveToEx(hdc, DPIScale(20), DPIScale(200), nullptr);
 		LineTo(hdc, rc->right - DPIScale(30), DPIScale(200));
 
-		MoveToEx(hdc, DPIScale(20), DPIScale(340), nullptr);
-		LineTo(hdc, rc->right - DPIScale(30), DPIScale(340));
+		MoveToEx(hdc, DPIScale(20), DPIScale(290), nullptr);
+		LineTo(hdc, rc->right - DPIScale(30), DPIScale(290));
+
+		MoveToEx(hdc, DPIScale(20), DPIScale(460), nullptr);
+		LineTo(hdc, rc->right - DPIScale(30), DPIScale(460));
 
 		SelectObject(hdc, original);
 		DeleteObject(pen);

@@ -203,6 +203,7 @@ IDI_GNRL_LOADRUNNER_BLUE	ICON		"res\\splashScreen\\runner1_blue.ico"
 IDI_GNRL_ADD_CROSS_GREEN	ICON		"res\\Common\\add_48_green.ico"
 IDI_GNRL_DELETE_BIN			ICON		"res\\Common\\delete_48_red.ico"
 IDI_GNRL_ARROW_UP			ICON		"res\\gnrl_arrow_up.ico"
+IDI_GNRL_SYNC				ICON		"res\\PropertyWindow\\sync_arrows.ico"
 
 
 IDI_S_CONFIG				ICON		"DataExchange\\res\\exchange.ico"
@@ -252,6 +253,7 @@ IDI_PROPCHECKBOX_CHECKED_DISABLED	ICON		"res\\PropertyWindow\\checkbox_checked_1
 IDI_PROPCHECKBOX_UNCHECKED_DISABLED	ICON		"res\\PropertyWindow\\checkbox_unchecked_16_disabled.ico"
 IDI_PROPRADIOBUTTON_CHECKED			ICON		"res\\PropertyWindow\\radio_button_checked_16.ico"
 IDI_PROPRADIOBUTTON_UNCHECKED		ICON		"res\\PropertyWindow\\radio_button_unchecked_16.ico"
+
 
 IDI_TCVT_UNDO				ICON	"Tabcontrol\\res\\EditToolbar\\undo.ico"
 IDI_TCVT_REDO				ICON	"Tabcontrol\\res\\EditToolbar\\redo.ico"

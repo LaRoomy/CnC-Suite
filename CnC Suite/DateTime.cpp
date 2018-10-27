@@ -66,12 +66,6 @@ DateTime & DateTime::operator=(const DateTime & dt)
 	return *this;
 }
 
-DateTime & DateTime::operator-(int days)
-{
-	this->subtractDays(days);
-	return *this;
-}
-
 bool DateTime::operator>(const DateTime & dt)
 {
 	if (this->_time.wYear > dt._time.wYear)
@@ -576,26 +570,6 @@ void DateTime::makeStringRepresentation()
 			this->_time.wMinute,
 			this->_time.wSecond
 		);
-	}
-}
-
-void DateTime::subtractDays(int days)
-{
-	int years = 0, month = 0, rel_days = days;
-
-	SYSTEMTIME time;
-	this->GetTime(&time);
-
-	if (rel_days > 365)
-	{
-		years = (int)(days / 365);
-		rel_days -= (years * 365);
-		time.wYear -= years;
-	}
-	if (rel_days > 0)
-	{
-		//if(rel_days > )
-
 	}
 }
 

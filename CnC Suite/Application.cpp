@@ -476,11 +476,6 @@ HRESULT Application::Init_Components()
 									this->FileHistory->SetEventHandler(
 										dynamic_cast<IHistroyEventProtocoll*>(this)
 									);
-									this->FileHistory->CleanUp(
-										reinterpret_cast<ApplicationData*>(
-											getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
-											)->getIntegerData(DATAKEY_EXSETTINGS_HISTORY_DAYSTODELETE, 100)
-										);
 
 									// ...
 								}

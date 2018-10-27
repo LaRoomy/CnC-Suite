@@ -144,13 +144,13 @@
 #define				_UI_PROPWND_DSG_GREY				L"Dunkelgrau\0"
 #define				_UI_PROPWND_DSG_LIGHT				L"Hellgrau\0"
 #define				_UI_PROPWND_DSG_GREEN				L"Grün\0"
-#define				_UI_PROPWND_AUTOUPDATESEARCH		L"Automatisch nach Updates suchen\0"
+#define				_UI_PROPWND_AUTOUPDATESEARCH		L"Automatisch\0"
 #define				_UI_PROPWND_ACTIONONLAUNCH			L"Aktionen bei Programmstart:\0"
 #define				_UI_PROPWND_SAVEEXPLORERCOND		L"Zustand des Datei-Explorers wiederherstellen\0"
 #define				_UI_PROPWND_SAVETABWNDCOND			L"Tabs und Inhalt wiederherstellen\0"
 #define				_UI_PROPWND_SAVEUNSAVEDCONTENT		L"Ungespeicherten Inhalt wiederherstellen\0"
 #define				_UI_PROPWND_UPDATING				L"Aktualisierung\0"
-#define				_UI_PROPWND_SEARCHFORUPDATESNOW		L"Jetzt nach Updates suchen...\0"
+#define				_UI_PROPWND_SEARCHFORUPDATESNOW		L"Jetzt überprüfen"//L"Jetzt nach Updates suchen...\0"
 #define				_UI_PROPWND_APPUPTODATE				L"\x2713 Aktuell\0"
 #define				_UI_PROPWND_UPDATEAVAILABLE			L"Update verfügbar\0"
 #define				_UI_PROPWND_ERRORNOINTERNETCON		L"! Keine Internetverbindung\0"
@@ -294,9 +294,10 @@
 #define				_UI_RESETWND_AUTOCOMPLETESETUP		L"Autocomplete Daten"
 #define				_UI_RESETWND_APPDATA				L"Anwendungsdaten"
 #define				_UI_RESETWND_SESSIONDATA			L"Sitzungsdaten"
-
 #define				_UI_RESETWND_RESTARTMESSAGE			L"Die Anwendung muss neu gestartet werden."
 
+#define				_UI_PROPWND_SAVEHISTORY				L"Chronik anlegen"
+#define				_UI_PROPWND_DELETEHISTORYNOW		L"Chronik löschen"
 
 
 #define				_UI_GNRL_COPYRIGHT					L"\xa9 2018 LaroomySoft"
@@ -304,7 +305,7 @@
 #define				_UI_GNRL_USERCANCELCONFIRM			L"Wird abgebrochen..."
 #define				_UI_GNRL_NEWSUBFOLDER				L"Neuer Unterordner"
 #define				_UI_GNRL_LINEENDFORMAT				L"Zeilenende:"
-#define				_UI_GNRL_HISTORY					L"Verlauf"
+#define				_UI_GNRL_HISTORY					L"Chronik"
 
 
 

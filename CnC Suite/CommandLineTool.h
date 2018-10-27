@@ -60,6 +60,7 @@ private:
 	void onExitCommand();
 	void onDataCommand(iString& command);
 	void onSetValueCommand(iString& command);
+	void onGetValueCommand(iString& command);
 
 	// sublevel commands
 	void onDriveLoadingBlockerCommand(iString& command);

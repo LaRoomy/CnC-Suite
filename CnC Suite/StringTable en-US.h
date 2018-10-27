@@ -141,13 +141,13 @@
 #define				_UI_PROPWND_DSG_GREY				L"Grey\0"
 #define				_UI_PROPWND_DSG_LIGHT				L"Light\0"
 #define				_UI_PROPWND_DSG_GREEN				L"Green\0"
-#define				_UI_PROPWND_AUTOUPDATESEARCH		L"Search for updates automatically\0"
+#define				_UI_PROPWND_AUTOUPDATESEARCH		L"Automatically"//L"Search for updates automatically\0"
 #define				_UI_PROPWND_ACTIONONLAUNCH			L"Actions on App-Launch:\0"
 #define				_UI_PROPWND_SAVEEXPLORERCOND		L"Restore file-explorer condition\0"
 #define				_UI_PROPWND_SAVETABWNDCOND			L"Restore tabs and content\0"
 #define				_UI_PROPWND_SAVEUNSAVEDCONTENT		L"Restore unsaved content\0"
 #define				_UI_PROPWND_UPDATING				L"Update\0"
-#define				_UI_PROPWND_SEARCHFORUPDATESNOW		L"Check for Updates...\0"
+#define				_UI_PROPWND_SEARCHFORUPDATESNOW		L"Check now"//L"Check for Updates...\0"
 #define				_UI_PROPWND_APPUPTODATE				L"\x2713 Up to date\0"
 #define				_UI_PROPWND_UPDATEAVAILABLE			L"Update available\0"
 #define				_UI_PROPWND_ERRORNOINTERNETCON		L"! No Internet Connection\0"
@@ -287,15 +287,17 @@
 #define				_UI_RESETWND_AUTOCOMPLETESETUP		L"Autocomplete Data"
 #define				_UI_RESETWND_APPDATA				L"Application Data"
 #define				_UI_RESETWND_SESSIONDATA			L"Session Data"
-
 #define				_UI_RESETWND_RESTARTMESSAGE			L"The Application must be relaunched."
+
+#define				_UI_PROPWND_SAVEHISTORY				L"Generate chronicle"
+#define				_UI_PROPWND_DELETEHISTORYNOW		L"Reset chronicle"
 
 #define				_UI_GNRL_COPYRIGHT					L"\xa9 2018 LaroomySoft"
 #define				_UI_GNRL_RIGHTS						L"All Rights reserved."
 #define				_UI_GNRL_USERCANCELCONFIRM			L"Is canceled..."
 #define				_UI_GNRL_NEWSUBFOLDER				L"New Sub-Folder"
 #define				_UI_GNRL_LINEENDFORMAT				L"End of Line:"
-#define				_UI_GNRL_HISTORY					L"History"
+#define				_UI_GNRL_HISTORY					L"Chronicle"
 
 // ERROR MESSAGES >>
 

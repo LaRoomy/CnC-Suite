@@ -190,6 +190,8 @@ bool CnCS_CommandLine::analyzeCommand(CSConsole * csconsole, LPCWSTR command)
 			this->onDataCommand(_cmd_);
 		else if (_cmd_.Contains(L"setvalue"))
 			this->onSetValueCommand(_cmd_);
+		else if (_cmd_.Contains(L"getvalue"))
+			this->onGetValueCommand(_cmd_);
 		else if (_cmd_.Equals(L"exit"))
 		{
 			this->onExitCommand();
@@ -209,10 +211,11 @@ void CnCS_CommandLine::onHelpCommand(LPCWSTR command)
 
 	this->console->AddLine(L"Available Commands:", RGB(255,255,0));
 	this->console->AddLine(L"info - information about this component", RGB(255, 255, 0));
-	this->console->AddLine(L"execute::[modul] - starts the requested modul", RGB(255, 255, 0));
+	//this->console->AddLine(L"execute::[modul] - starts the requested modul", RGB(255, 255, 0));
 	this->console->AddLine(L"showdata::[segment] - shows the requested data segment", RGB(255, 255, 0));
 	this->console->AddLine(L"setvalue::[value ID]::[new value] - sets the value from the given ID", RGB(255, 255, 0));
-	this->console->AddLine(L"overwritecolor::[color ID]::[RGB Color Value(hexadecimal)] - overwrites the desired color", RGB(255, 255, 0));
+	this->console->AddLine(L"getvalue::[value ID] - shows the value from the given ID", RGB(255, 255, 0));
+	//this->console->AddLine(L"overwritecolor::[color ID]::[RGB Color Value(hexadecimal)] - overwrites the desired color", RGB(255, 255, 0));
 
 	this->console->AddEmptyLine();
 }
@@ -222,7 +225,7 @@ void CnCS_CommandLine::onInfoCommand(LPCWSTR command)
 	UNREFERENCED_PARAMETER(command);
 
 	this->console->AddEmptyLine();
-	this->console->AddLine(L"CnC Suite Console (C)2018 by Hans Philipp Zimmermann", RGB(0,255,0));
+	this->console->AddLine(L"CnC Suite Console (C)2018 by Hans Philipp Zimmermann (LaroomySoft)", RGB(0,255,0));
 	this->console->AddEmptyLine();
 }
 
@@ -260,7 +263,7 @@ void CnCS_CommandLine::onDataCommand(iString& command)
 	//else if(...){   }// more data commands!!!!
 	else
 	{
-		this->console->AddLine(L"Error - invalid show command", ERROR_COLOR);
+		this->console->AddLine(L"Error - invalid segment", ERROR_COLOR);
 	}
 
 }
@@ -281,6 +284,25 @@ void CnCS_CommandLine::onSetValueCommand(iString & command)
 	{
 		this->console->AddLine(L"Error - invalid set command", ERROR_COLOR);
 	}
+}
+
+void CnCS_CommandLine::onGetValueCommand(iString & command)
+{
+	command.Remove(L"getvalue::");
+
+	if (command.Contains(L"driveloadingblocker"))
+	{
+		auto dlb =
+			reinterpret_cast<ApplicationData*>(
+				getApplicationDataContainerFromFilekey(FILEKEY_INTERNAL_SETTINGS)
+				)->getBooleanData(DATAKEY_INTSET_BLOCKDRIVELOADING, true);
+		if(dlb)
+			this->console->AddLine(L"ID::driveloadingblocker - value: <true>", COLOR_SUCCESS);
+		else
+			this->console->AddLine(L"ID::driveloadingblocker - value: <false>", COLOR_SUCCESS);
+	}
+	else
+		this->console->AddLine(L"Error - invalid ID", ERROR_COLOR);
 }
 
 void CnCS_CommandLine::onDriveLoadingBlockerCommand(iString & command)
