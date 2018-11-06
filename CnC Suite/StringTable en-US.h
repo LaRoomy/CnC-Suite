@@ -299,6 +299,12 @@
 #define				_UI_GNRL_LINEENDFORMAT				L"End of Line:"
 #define				_UI_GNRL_HISTORY					L"Chronicle"
 
+#define				_UI_FILETIME_CREATED				L"Created:      "
+#define				_UI_FILETIME_LASTWRITE				L"Last modified:"
+#define				_UI_FILETIME_LASTACCESS				L"Last accessed:"
+#define				_UI_FILEINFO						L"File"
+#define				_UI_FILESIZE						L"Filesize:     "
+
 // ERROR MESSAGES >>
 
 #define				_UI_XML_ERR_UNEXPECTEDCLOSINGTAG	L"XML-Syntaxerror: unexpected closing-tag  Index: \0"

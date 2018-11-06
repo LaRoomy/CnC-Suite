@@ -52,6 +52,46 @@ BOOL BasicFileNPathOperations::GetFileTimes(LPCTSTR path, LPSYSTEMTIME created, 
 	return res;
 }
 
+BOOL BasicFileNPathOperations::SetFileTimes(LPCTSTR path, LPSYSTEMTIME created, LPSYSTEMTIME lastAccessed, LPSYSTEMTIME lastWritten)
+{
+	BOOL result;
+	HANDLE hFile;
+	FILETIME createdTime, lastAccessedTime, lastWrittenTime;
+
+	if(created != nullptr)
+		SystemTimeToFileTime(created, &createdTime);
+	if (lastAccessed != nullptr)
+		SystemTimeToFileTime(lastAccessed, &lastAccessedTime);
+	if (lastWritten != nullptr)
+		SystemTimeToFileTime(lastWritten, &lastWrittenTime);
+
+	hFile = CreateFile(
+		path,
+		GENERIC_WRITE,
+		FILE_SHARE_WRITE,
+		nullptr,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		nullptr
+	);
+	result =
+		(hFile != INVALID_HANDLE_VALUE)
+		? TRUE : FALSE;
+	if (result)
+	{
+		result =
+			SetFileTime(
+				hFile,
+				(created != nullptr) ? &createdTime : nullptr,
+				(lastAccessed != nullptr) ? &lastAccessedTime : nullptr,
+				(lastWritten != nullptr) ? &lastWrittenTime : nullptr
+			);
+
+		CloseHandle(hFile);
+	}
+	return result;
+}
+
 BOOL BasicFileNPathOperations::pSaveBuffer(LPCTSTR buffer, LPCTSTR path, UINT codePage)
 {
 	BOOL result = TRUE;

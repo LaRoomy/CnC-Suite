@@ -66,7 +66,7 @@ public:
 		this->Clear();
 	}
 
-	iString getDataInRow(int rowIndex)
+	iString getDataInRow(int rowIndex) const
 	{
 		if (rowIndex < this->rowItem->GetCount())
 		{
@@ -113,6 +113,18 @@ public:
 	{
 		this->Replace(item);
 		return *this;
+	}
+	bool operator== (const listViewItem& item) {
+
+		auto nItems = item.getRowCount();
+		for (int i = 0; i < nItems; i++)
+		{
+			if (this->getDataInRow(i) != item.getDataInRow(i))
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	listViewItem* listViewItem::getInstance() { return this; }

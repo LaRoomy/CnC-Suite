@@ -65,4 +65,5 @@ private:
 	// sublevel commands
 	void onDriveLoadingBlockerCommand(iString& command);
 	void onFocusrectCommand(iString& command);
+	void onTvFontHeightCommand(iString& command);
 };

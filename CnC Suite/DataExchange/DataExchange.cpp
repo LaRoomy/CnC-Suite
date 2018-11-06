@@ -7,12 +7,11 @@
 #include"..\\Colors.h"
 #include"..\\EditorContentManager.h"
 
-SerialComm::SerialComm( HWND MainWnd, HINSTANCE hInstance, WCHAR* Root_Directory)
+SerialComm::SerialComm( HWND MainWnd, HINSTANCE hInstance, LPCTSTR Root_Directory)
 	: ParentWindow( MainWnd ),
 	hInst( hInstance ),
 	Configuration(nullptr),
 	threadInterruptCtrl(0),
-	Root_Dir(nullptr),
 	SRtext(nullptr),
 	threadActive(FALSE),
 	DataTrafficWnd(nullptr),
@@ -23,11 +22,10 @@ SerialComm::SerialComm( HWND MainWnd, HINSTANCE hInstance, WCHAR* Root_Directory
 	DeviceSelectionWnd(nullptr),
 	deviceSelectionListview(nullptr)
 {
-	this->Root_Dir = new WCHAR[ COMMONARRAYSIZE ]; // make this array dynamic!!!
+	this->Root_Dir = nullptr;
+	CopyStringToPtr(Root_Directory, &this->Root_Dir);
 
 	SecureZeroMemory(&this->IO_Info, sizeof(INOUTINFO));
-
-	StringCbPrintf( this->Root_Dir, sizeof( WCHAR ) * COMMONARRAYSIZE,L"%s\\CnC Suite\\AppData\\comsetup.sys", Root_Directory );
 
 	_MSG_TO_MAIN(WM_GETSTYLEINFO, 0, reinterpret_cast<LPARAM>(&this->sInfo));
 
@@ -67,22 +65,8 @@ SerialComm::~SerialComm(void)
 	DeleteObject( this->TrafBackground );
 	DeleteObject(this->controlFont);
 
-	//if( this->threadInterruptCtrl == SETUPMODE )
-	//	UnregisterClass( L"CONFIG_CLASS", this->hInst );
-	//else
 	UnregisterClass( CNCS_DATAX_CLASS, this->hInst );
 
-	//if( this->Configuration != NULL )
-	//{
-	//	delete this->Configuration;
-	//	this->Configuration = NULL;
-	//}
-	//if( this->Root_Dir != NULL )
-	//{
-	//	delete this->Root_Dir;
-	//	this->Root_Dir = NULL;
-	//}
-	//if(this->SRtext != nullptr)
 	SafeDelete(&this->Configuration);
 	SafeDeleteArray(&this->Root_Dir);
 	SafeDeleteArray(&this->SRtext);

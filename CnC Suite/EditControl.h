@@ -121,6 +121,12 @@ public:
 		this->color = ccv.getColor();
 		return *this;
 	}
+	bool operator== (const ColorConversion& ccv) {
+		return
+			((this->color == ccv.color) && (this->end == ccv.end) && (this->start == ccv.start))
+			? true : false;
+	}
+
 	ColorConversion* getInstance() {
 		return this;
 	}
@@ -304,7 +310,7 @@ public:
 
 	bool checkBufferForWordMatches(LPCTSTR buffer);
 
-	int getWordCount() { return this->words.GetCount(); }
+	int getWordCount() const { return this->words.GetCount(); }
 	itemCollection<iString> getWords() const { return this->words; }
 
 	void clear() {
@@ -315,6 +321,17 @@ public:
 	{
 		this->words = twc.words;
 		return *this;
+	}
+	bool operator== (const TriggerWordContainer& twc) {
+		auto nWords = twc.getWordCount();
+		for (int i = 0; i < nWords; i++)
+		{
+			if (this->words.GetAt(i) != twc.words.GetAt(i))
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 	TriggerWordContainer* getInstance() { return this; }
 

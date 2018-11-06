@@ -236,9 +236,15 @@ int CreateRandomInteger(int min, int max);
 // checks if the path is a drive - TRUE if yes, FALSE if not
 BOOL isDrive(LPCTSTR path);
 
+// sets the last-accessed time in the file at the path location
+BOOL setFileAccessTime(LPCTSTR path);
+
+// retrieves the size of the file at the path loacation or 0 in case of error (or the filesize is 0)
+LARGE_INTEGER getFileSizeX(LPCTSTR path);
+
 // checks if the length of the string printed in a device-context is possible and morphes
 // the string to the desired length
-
+// TODO: !
 
 
 

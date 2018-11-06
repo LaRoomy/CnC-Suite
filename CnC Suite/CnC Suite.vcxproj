@@ -165,6 +165,7 @@
     <ClInclude Include="AutosyntaxManager.h" />
     <ClInclude Include="BasicFPO.h" />
     <ClInclude Include="CnC Suite.h" />
+    <ClInclude Include="CnC3FileManager.h" />
     <ClInclude Include="CnCSuite_CBox.h" />
     <ClInclude Include="CnCSuite_FileNavigator.h" />
     <ClInclude Include="CnCSuite_Property.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="CommonControls\SingleLineEdit.h" />
     <ClInclude Include="CommonControls\StringClass.h" />
     <ClInclude Include="CommonControls\textField.h" />
+    <ClInclude Include="CommonControls\Xmap.h" />
     <ClInclude Include="dataAccessorID.h" />
     <ClInclude Include="DataExchange\DataExchange.h" />
     <ClInclude Include="DateTime.h" />
@@ -229,6 +231,7 @@
     <ClInclude Include="TVComp\TreeViewClass.h" />
     <ClInclude Include="uClipboard.h" />
     <ClInclude Include="UpdateAgent.h" />
+    <ClInclude Include="Url.h" />
     <ClInclude Include="XML Parsing\XML_Parsing.h" />
   </ItemGroup>
   <ItemGroup>
@@ -241,6 +244,7 @@
     <ClCompile Include="autocompleteStrings.cpp" />
     <ClCompile Include="AutosyntaxManager.cpp" />
     <ClCompile Include="CnC Suite.cpp" />
+    <ClCompile Include="CnC3FileManager.cpp" />
     <ClCompile Include="CnCS_CB.cpp" />
     <ClCompile Include="CnCS_FN.cpp" />
     <ClCompile Include="CnCS_PI.cpp" />
@@ -282,6 +286,7 @@
     <ClCompile Include="TVComp\TreeViewClass.cpp" />
     <ClCompile Include="uClipboard.cpp" />
     <ClCompile Include="UpdateAgent.cpp" />
+    <ClCompile Include="Url.cpp" />
     <ClCompile Include="XML Parsing\XML_Parsing.cpp" />
   </ItemGroup>
   <ItemGroup>

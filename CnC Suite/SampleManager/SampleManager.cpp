@@ -5,6 +5,7 @@
 #include"..//CnCSuite_Tabcontrol.h"
 #include"..//BasicFPO.h"
 #include"..//uClipboard.h"
+#include"..//ApplicationData.h"
 
 #define		MAX_TBBUTTON	6
 
@@ -3048,9 +3049,14 @@ BOOL SampleManager::isSelectionValid()
 
 void SampleManager::_createDpiDependendResources()
 {
+	auto fontHeight =
+		reinterpret_cast<ApplicationData*>(
+			getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
+		)->getIntegerData(DATAKEY_EXSETTINGS_TREEVIEW_FONTHEIGHT, 16);
+
 	this->obj.font = CreateScaledFont(20, FW_BOLD, APPLICATION_PRIMARY_FONT);
 
-	this->obj.tvFont = CreateScaledFont(16, FW_MEDIUM, APPLICATION_PRIMARY_FONT);
+	this->obj.tvFont = CreateScaledFont(fontHeight, FW_MEDIUM, APPLICATION_PRIMARY_FONT);
 }
 
 DWORD SampleManager::getDWButtonEnableInfo(int type)

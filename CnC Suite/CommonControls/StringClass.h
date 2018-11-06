@@ -205,9 +205,21 @@ public:
 	{
 		return this->Equals(S);
 	}
+	bool operator== (LPCTSTR s)
+	{
+		return this->Equals(s);
+	}
 	bool operator& (const iString& S)
 	{
 		return this->Contains(S, nullptr, 0, true);
+	}
+	bool operator!= (const iString& S)
+	{
+		return !this->Equals(S);
+	}
+	bool operator!= (LPCTSTR s)
+	{
+		return !this->Equals(s);
 	}
 private:
 	int referenceCounter;

@@ -52,6 +52,12 @@ public:
 		this->langID = hi.langID;
 		return *this;
 	}
+	bool operator== (const HistoryItem& hi) {
+		return
+			(this->path.Equals(hi.path)
+				&& this->historyAction == hi.historyAction)
+			? true : false;
+	}
 
 	void Clear();
 
@@ -164,6 +170,8 @@ public:
 	}
 
 	HistoryItem& GetHistoryItemAt(int index);
+
+	bool CompareHistoryItemPathAt(int index, LPCTSTR path);
 
 	bool ToFile(LPCTSTR path);
 	bool FromFile(LPCTSTR path);

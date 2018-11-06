@@ -15,6 +15,7 @@
 #include"DataExchange\DataExchange.h"
 #include"DateTime.h"
 #include"history.h"
+#include"CnC3FileManager.h"
 
 CnCS_TC::CnCS_TC(HINSTANCE hInst, HWND MainWindow) : hInstance(hInst), Main(MainWindow), TABCount(0), _thisThreadId(0)
 {
@@ -1069,6 +1070,8 @@ LRESULT CnCS_TC::OnLButtonDown_inTab(HWND Tab, LPARAM lParam)
 			ptp_new->Editcontrol->UpdateFocusRect();
 		}
 		this->RefreshTabAlignment();
+
+		this->updateFileInfoArea();
 	}
 	else
 	{
@@ -1603,13 +1606,30 @@ LRESULT CnCS_TC::OnPaint_inDescWnd(HWND descWnd)
 				GetTextExtentPoint32(hdc, this->iParam.DESC_property3, charcount, &sz);
 				TextOut(hdc, (rc.right / 2) - (sz.cx / 2), DPIScale(210), this->iParam.DESC_property3, charcount);
 
+				auto infoDrawn = 
+					this->displayFileInfos(
+						hdc,
+						DPIScale(FILEINFOAREA_STARTHEIGHT + 32)
+					);
+
 				charcount = GetCharCount(heading);
 				if (charcount != -1)
 				{
+					SelectObject(hdc, this->tcObj.desc_propertyfont);
+
 					SetTextColor(hdc, this->styleInfo.specialTextcolor);//RGB(255, 128, 64));
 
 					GetTextExtentPoint32(hdc, heading, charcount, &sz);
 					TextOut(hdc, DPIScale(10), DPIScale(10), heading, charcount);
+
+					if (infoDrawn)
+					{
+						charcount = GetCharCount(
+							getStringFromResource(UI_FILEINFO)
+						);
+						GetTextExtentPoint32(hdc, getStringFromResource(UI_FILEINFO), charcount, &sz);
+						TextOut(hdc, DPIScale(18), DPIScale(FILEINFOAREA_STARTHEIGHT + 3), getStringFromResource(UI_FILEINFO), charcount);
+					}
 
 					SelectObject(hdc, this->tcObj.cPen);
 					MoveToEx(hdc, rc.right, DPIScale(32), NULL);
@@ -1625,6 +1645,54 @@ LRESULT CnCS_TC::OnPaint_inDescWnd(HWND descWnd)
 					LineTo(hdc, 0, DPIScale(168));
 					MoveToEx(hdc, rc.right, DPIScale(238), NULL);
 					LineTo(hdc, 0, DPIScale(238));
+
+					if (infoDrawn)
+					{
+						if (rc.right > DPIScale(300))
+						{
+							MoveToEx(
+								hdc,
+								rc.right - DPIScale(16),
+								rc.bottom,
+								nullptr
+							);
+							LineTo(
+								hdc,
+								rc.right - DPIScale(16),
+								DPIScale(FILEINFOAREA_STARTHEIGHT + 1)
+							);
+						}
+						else
+						{
+							MoveToEx(
+								hdc,
+								rc.right,
+								DPIScale(FILEINFOAREA_STARTHEIGHT + 1),
+								nullptr
+							);
+						}
+						LineTo(
+							hdc,
+							DPIScale(20) + sz.cx,
+							DPIScale(FILEINFOAREA_STARTHEIGHT + 1)
+						);
+						LineTo(
+							hdc,
+							DPIScale(20) + sz.cx,
+							DPIScale(FILEINFOAREA_STARTHEIGHT + sz.cy + 2)
+						);
+
+						LineTo(
+							hdc,
+							DPIScale(16),
+							DPIScale(FILEINFOAREA_STARTHEIGHT + sz.cy + 2)
+						);
+						LineTo(
+							hdc,
+							DPIScale(16),
+							rc.bottom
+						);
+					}
 				}
 			}
 		}
@@ -1926,7 +1994,41 @@ void CnCS_TC::OnVerticalToolBar_NumSequence()
 
 void CnCS_TC::OnVerticalToolBar_ErrorCheck()
 {
-	RaiseException(EXCEPTION_ARRAY_BOUNDS_EXCEEDED, EXCEPTION_NONCONTINUABLE, 0, nullptr);
+	Xmap<iString, int> testmap;
+
+	testmap.Add(L"newkey123", 123);
+	testmap.Add(L"key987", 987);
+	testmap.Add(L"key456", 456);
+
+
+	auto data = testmap.GetDataForKey(L"key987");
+	if (data)
+	{
+		testmap.Remove(L"key987");
+	}
+
+	//TCHAR *folder = nullptr;
+	//CnC3FileManager fMngr;
+
+	//auto ptp = this->GetActiveTabProperty();
+	//CopyStringToPtr(ptp->Path, &folder);
+
+	//CreateBasicFPO()->RemoveFilenameFromPath(folder);
+
+	//fMngr.SetDialogText(L"Testdialog", L"Öffnen", L"file");
+	//fMngr.SetTargetFolder(folder);
+
+	//auto files = fMngr.Open();
+	//auto numFiles = files.GetCount();
+	//if (numFiles > 0)
+	//{
+	//	for (int i = 0; i < numFiles; i++)
+	//	{
+	//		auto file = files.GetAt(i);
+
+	//		MessageBox(this->Main, file.GetPath(), L"test", MB_OK);
+	//	}
+	//}
 
 	//SYSTEMTIME past;
 	//SYSTEMTIME present;
@@ -2202,12 +2304,16 @@ BOOL CnCS_TC::ADD_Tab(LPCTSTR Path)
 									this->iParam.hwndActiveTab = Tab;
 
 									this->OpenDisplayAndFormat(Path, NO_EXECUTE);
+
+									this->updateFileInfoArea();
 								}
 								else
 								{
 									// its an empty tab, so set placeholder descriptions and default text if desired
 									this->SetDescriptions(L"...", L"...", L"...");
 									this->initDescriptionBuffer(tabProperty);
+
+									this->eraseFileInfoArea(nullptr);
 
 									auto dataContainer =
 										reinterpret_cast<ApplicationData*>(
@@ -2259,6 +2365,8 @@ BOOL CnCS_TC::CLOSE_Tab(HWND Tab, BOOL performSavecheck)
 	result = (ptp != NULL) ? TRUE : FALSE;
 	if (result)
 	{
+		setFileAccessTime(ptp->Path);
+
 		if ((this->TABCount == 1) && (ptp->Path == nullptr)) // there is only one tab without a valid path -> notify the user
 		{
 			DispatchEWINotification(
@@ -2338,7 +2446,10 @@ BOOL CnCS_TC::CLOSE_Tab(HWND Tab, BOOL performSavecheck)
 				this->RefreshTabAlignment();
 
 				this->GetActiveTabProperty()
-					->Editcontrol->UpdateFocusRect();
+					->Editcontrol
+					->UpdateFocusRect();
+
+				this->updateFileInfoArea();
 			}
 		}
 	}
@@ -2390,6 +2501,8 @@ void CnCS_TC::selectTab(DWORD tabNr)
 		}
 		this->RefreshTabAlignment();
 		ptp_new->Editcontrol->UpdateFocusRect();
+
+		this->updateFileInfoArea();
 	}
 	else
 	{
@@ -2439,6 +2552,7 @@ void CnCS_TC::eraseTab(LPTABPROPERTY ptp)
 	SafeDeleteArray((void**)&ptp->DESC3);
 
 	this->SetDescriptions(L"...", L"...", L"...");
+	this->eraseFileInfoArea(nullptr);
 
 	CopyStringToPtr(
 		getStringFromResource(UI_TABCTRL_NEWTAB),
@@ -2486,6 +2600,8 @@ void CnCS_TC::Open(LPTSTR path, BOOL openInNewTab, BOOL setFocus)
 				}
 				else
 				{
+					this->updateFileInfoArea();
+
 					if (setFocus)
 					{
 						auto _async = new Async();
@@ -2566,6 +2682,7 @@ BOOL CnCS_TC::SaveAs(TCHAR ** path_out, LPTABPROPERTY _ptp)
 							if (GetFilenameOutOfPath(*path_out, &ptp->displayname, TRUE) == TRUE)
 							{
 								this->RedrawTab_s(REDRAW_CURRENT);
+								this->updateFileInfoArea();
 
 								result = fOverwritten ? FILE_OVERWRITTEN : TRUE;
 							}
@@ -2629,6 +2746,7 @@ BOOL CnCS_TC::Save(DWORD mode, LPTABPROPERTY _ptp)
 							{
 								ptp->Content_Changed = FALSE;
 								this->RedrawTab_s(REDRAW_CURRENT);
+								this->updateFileInfoArea();
 							}
 						}
 						else
@@ -3092,8 +3210,6 @@ void CnCS_TC::CleanUpTabStructForNewContent(LPTABPROPERTY ptc)
 
 BOOL CnCS_TC::onClose()
 {
-	// maybe include a save manager here...
-
 	auto appDataCont
 		= reinterpret_cast<ApplicationData*>(
 			getDefaultApplicationDataContainer()
@@ -3108,6 +3224,17 @@ BOOL CnCS_TC::onClose()
 		auto saveUnsaved = appDataCont->getBooleanData(DATAKEY_SETTINGS_SAVE_UNSAVED_CONTENT, false);
 		if (saveUnsaved)
 		{
+			for (DWORD i = 0; i < this->TABCount; i++)
+			{
+				auto ptp = this->GetTabProperty(i);
+				if (ptp != nullptr)
+				{
+					if (ptp->Path != nullptr)
+					{
+						setFileAccessTime(ptp->Path);
+					}
+				}
+			}
 			return TRUE;
 		}
 	}
@@ -3124,6 +3251,10 @@ BOOL CnCS_TC::onClose()
 			{
 				unsavedTabs++;
 				singleTabNr = i;
+			}
+			if (ptp->Path != nullptr)
+			{
+				setFileAccessTime(ptp->Path);
 			}
 		}
 	}
@@ -4623,7 +4754,8 @@ void CnCS_TC::LoadFontResource()
 	bool exit = false;
 
 	AppPath aPath;
-	auto path = aPath.Get(PATHID_FOLDER_CNCSUITE_APPLICATIONFOLDER_FONTS);
+	auto path =
+		aPath.Get(PATHID_FOLDER_CNCSUITE_APPLICATIONFOLDER_FONTS);
 
 	iString wcPath(L"\\\\?\\");
 	wcPath.Append(path);
@@ -5481,6 +5613,189 @@ LPCTSTR CnCS_TC::getDefaultInsertText()
 		return this->defaultInsertText.GetData();
 	}
 	return STARTUP_TEXT_PLACEHOLDER;
+}
+
+bool CnCS_TC::displayFileInfos(HDC hdc, int fromPos)
+{
+	auto ptp =
+		this->GetActiveTabProperty();
+
+	if (ptp != nullptr)
+	{
+		if (ptp->Path != nullptr)
+		{
+			SYSTEMTIME lastAccess, lastWrite, creationTime, local;
+
+			auto bfpo = CreateBasicFPO();
+			if (bfpo != nullptr)
+			{
+				if (bfpo->GetFileTimes(ptp->Path, &creationTime, &lastAccess, &lastWrite))
+				{
+					auto font = CreateScaledFont(14, FW_MEDIUM, L"Consolas");
+					if (font)
+					{
+						SelectObject(hdc, font);
+
+						DateTime dateTime;
+						dateTime.SetLangID(
+							(LANGID)getCurrentAppLanguage()
+						);
+						SystemTimeToTzSpecificLocalTime(nullptr, &creationTime, &local);
+						dateTime.SetTime(&local);
+
+						iString outString(
+							getStringFromResource(UI_FILETIME_CREATED)
+						);
+						outString += L" ";
+						outString += dateTime.SimpleDateAsString();
+						outString += L"  ";
+						outString += dateTime.SimpleTimeAsString();
+
+						TextOut(
+							hdc,
+							DPIScale(30),
+							fromPos,
+							outString.GetData(),
+							outString.GetLength()
+						);
+
+						fromPos += DPIScale(20);// next line
+
+						dateTime.Clear();
+						dateTime.SetLangID(
+							(LANGID)getCurrentAppLanguage()
+						);
+						SystemTimeToTzSpecificLocalTime(nullptr, &lastAccess, &local);
+						dateTime.SetTime(&local);
+
+						outString.Replace(
+							getStringFromResource(UI_FILETIME_LASTACCESS)
+						);
+
+						outString += L" ";
+						outString += dateTime.SimpleDateAsString();
+						outString += L"  ";
+						outString += dateTime.SimpleTimeAsString();
+
+						TextOut(
+							hdc,
+							DPIScale(30),
+							fromPos,
+							outString.GetData(),
+							outString.GetLength()
+						);
+
+						fromPos += DPIScale(20);// next line
+
+						dateTime.Clear();
+						dateTime.SetLangID(
+							(LANGID)getCurrentAppLanguage()
+						);
+						SystemTimeToTzSpecificLocalTime(nullptr, &lastWrite, &local);
+						dateTime.SetTime(&local);
+
+						outString.Replace(
+							getStringFromResource(UI_FILETIME_LASTWRITE)
+						);
+						outString += L" ";
+						outString += dateTime.SimpleDateAsString();
+						outString += L"  ";
+						outString += dateTime.SimpleTimeAsString();
+
+						TextOut(
+							hdc,
+							DPIScale(30),
+							fromPos,
+							outString.GetData(),
+							outString.GetLength()
+						);
+
+						fromPos += DPIScale(20);// next line
+
+						// display filesize
+						auto li = getFileSizeX(ptp->Path);
+
+						outString.Replace(
+							getStringFromResource(UI_FILESIZE)
+						);
+						outString += L" ";
+						outString += li.LowPart;
+						outString += L" Bytes";
+
+						TextOut(
+							hdc,
+							DPIScale(30),
+							fromPos,
+							outString.GetData(),
+							outString.GetLength()
+						);
+
+						DeleteObject(font);
+
+						return true;
+					}
+				}
+				SafeRelease(&bfpo);
+			}
+		}
+		else
+		{
+			this->eraseFileInfoArea(hdc);
+		}
+	}
+	return false;
+}
+
+void CnCS_TC::updateFileInfoArea()
+{
+	if (this->iParam.descWnd_exists)
+	{
+		auto descWnd =
+			GetDlgItem(this->TCFrame, ID_DESCFRAME);
+
+		if (descWnd)
+		{
+			RECT rc;
+			GetClientRect(descWnd, &rc);
+
+			rc.top = DPIScale(FILEINFOAREA_STARTHEIGHT);
+
+			InvalidateRect(descWnd, &rc, FALSE);
+
+			RedrawWindow(descWnd, nullptr, nullptr, RDW_NOCHILDREN | RDW_NOERASE | RDW_UPDATENOW);
+		}
+	}
+}
+
+void CnCS_TC::eraseFileInfoArea(HDC hdc)
+{
+	bool wasAllocated = false;
+
+	auto descWnd =
+		GetDlgItem(this->TCFrame, ID_DESCFRAME);
+
+	if (descWnd)
+	{
+		if (hdc == nullptr)
+		{
+			hdc =
+				GetDC(descWnd);
+
+			wasAllocated = true;
+		}
+		if (hdc)
+		{
+			RECT rc;
+			GetClientRect(descWnd, &rc);
+			rc.left = DPIScale(10);
+			rc.top = DPIScale(FILEINFOAREA_STARTHEIGHT);
+
+			FillRect(hdc, &rc, this->tcObj.tabbkgnd);
+
+			if (wasAllocated)
+				ReleaseDC(descWnd, hdc);
+		}
+	}
 }
 
 void CnCS_TC::_createDpiDependendResources()

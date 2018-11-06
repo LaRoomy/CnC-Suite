@@ -80,6 +80,8 @@
 
 #define		POPUPTYPE_FONTPROPERTY	420
 
+#define		FILEINFOAREA_STARTHEIGHT 350
+
 #define		TOOLWINDOWPOPUPCLASS		L"TOOLPOPUPCLASS"
 
 typedef struct _TCGDIOBJECTS {
@@ -523,6 +525,9 @@ private:
 	void deleteAllTags();
 	void setSelectedTabBackground();
 	LPCTSTR getDefaultInsertText();
+	bool displayFileInfos(HDC hdc, int fromPos);
+	void updateFileInfoArea();
+	void eraseFileInfoArea(HDC hdc);
 
 	void _createDpiDependendResources();
 	void _defineMenuEntry(MenuEntry &entry, int eID, int iconID, int iconSQsize, LPCTSTR text);

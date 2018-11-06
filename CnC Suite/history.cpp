@@ -2,6 +2,7 @@
 #include "BasicFPO.h"
 #include "HelperF.h"
 #include "AppPath.h"
+#include "Error dispatcher.h"
 
 HistoryItem::HistoryItem()
 	: historyAction(HistoryItem::NOT_DEFINED), langID(LANG_ENGLISH)
@@ -191,6 +192,43 @@ HistoryItem & History::GetHistoryItemAt(int index)
 		this->historyList.GetLine(index)
 	);
 	return curItem;
+}
+
+bool History::CompareHistoryItemPathAt(int index, LPCTSTR path)
+{
+	if (path != nullptr)
+	{
+		auto cItems = this->historyList.GetLineCount();
+		if (cItems < index)
+		{
+			auto itemPath = this->historyList.GetLine(index);
+			if (itemPath != nullptr)
+			{
+				int counter = 0;
+				bool isEqual = false;
+
+				while (itemPath[counter] != L'|')
+				{
+					if (itemPath[counter] != path[counter])
+					{
+						break;
+					}
+					if ((itemPath[counter] == L'\0') || (path[counter] == L'\0'))
+					{
+						break;
+					}
+					counter++;
+				}
+
+				if ((itemPath[counter] == L'|') && (path[counter] == L'\0'))
+				{
+					isEqual = true;
+				}
+				return isEqual;
+			}
+		}
+	}
+	return false;
 }
 
 bool History::ToFile(LPCTSTR path)
@@ -508,6 +546,10 @@ void UIHistory::SetColors(COLORREF BackgroundColor, COLORREF ItemColor, COLORREF
 
 void UIHistory::OnFilesystemModification(LPFILESYSTEMOBJECT fso)
 {
+	auto ctclSec = GetCriticalSection();
+
+	EnterCriticalSection(ctclSec);
+
 	if (fso != nullptr)
 	{
 		switch (fso->FileSystemOperation)
@@ -526,6 +568,8 @@ void UIHistory::OnFilesystemModification(LPFILESYSTEMOBJECT fso)
 		}
 		this->Save();
 	}
+
+	LeaveCriticalSection(ctclSec);
 }
 
 void UIHistory::onCustomButtonClick(cObject sender, CTRLID ID)
@@ -976,19 +1020,32 @@ void UIHistory::onItemRenamed(LPFILESYSTEMOBJECT fso)
 	auto cItems = this->historyData.GetItemCount();
 	if (cItems > 0)
 	{
-		for (int i = 0; i < cItems; i++)
+		auto oldPath = fso->OldPath.GetPathData();
+		if (oldPath != nullptr)
 		{
-			auto item = this->historyData.GetHistoryItemAt(i);
-			auto path = item.GetItemPath();
-
-			if (path.Equals(
-				fso->OldPath.GetPathData()
-				))
+			for (int i = 0; i < cItems; i++)
 			{
-				item.SetItemPath(
-					fso->Path.GetPathData()
-				);
-				this->historyData.ReplaceHistoryItemAt(item, i);
+				//auto item = this->historyData.GetHistoryItemAt(i);
+				//auto path = item.GetItemPath();
+
+				//if (path.Equals(
+				//	fso->OldPath.GetPathData()
+				//	))
+				//{
+				//	item.SetItemPath(
+				//		fso->Path.GetPathData()
+				//	);
+				//	this->historyData.ReplaceHistoryItemAt(item, i);
+				//}
+				
+
+				// if this is a folder -> check if the path is inside of the filepath and change it respectively!!!!!!!!!!!!!!!!!!!!!!
+
+				if (this->historyData.CompareHistoryItemPathAt(i, oldPath))
+				{
+					auto item = this->historyData.GetHistoryItemAt(i);
+				}
+
 			}
 		}
 	}

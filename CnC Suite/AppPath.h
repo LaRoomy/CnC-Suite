@@ -27,7 +27,9 @@
 #define			PATHID_FILE_ALREADYINSTALLED	34
 #define			PATHID_FILE_FIRSTUSEEXAMPLE		35
 
-#define			PATHID_FILE_HISTORY			36
+#define			PATHID_FILE_HISTORY				36
+#define			PATHID_FILE_HELPHTML_GERMAN		37
+#define			PATHID_FILE_HELPHTML_ENGLISH	38
 
 // ##########################################################################
 // important: this ID's must have successive numbers for iteration
@@ -71,6 +73,8 @@
 #define			PATHTOFILE_TREEVIEWIMAGE					L"\\CnC Suite\\AppData\\Session\\TVimage.dat"
 #define			PATHTOFILE_LASTEXCEPTIONINFO				L"\\CnC Suite\\AppData\\Session\\lastExeptionInfo.dat"
 #define			PATHTOFILE_SEARCHSETTINGS					L"\\CnC Suite\\AppData\\srchset.sys"
+#define			PATHTOFILE_HELP_GERMAN						L"\\CnC Suite\\Manual\\Handbuch.html"
+#define			PATHTOFILE_HELP_ENGLISH						L"\\CnC Sutie\\Manual\\manual.html"
 
 #define			PATHTOFILE_DESCPROPERTY_ONE					L"\\CnC Suite\\AppData\\Strings\\Dproperty1.dat"
 #define			PATHTOFILE_DESCPROPERTY_TWO					L"\\CnC Suite\\AppData\\Strings\\Dproperty2.dat"
@@ -92,7 +96,7 @@
 #define			PATHTOFOLDER_CNCSUITE_APPDATA_SETTINGS			L"\\CnC Suite\\AppData\\Settings"
 #define			PATHTOFOLDER_CNCSUITE_APPDATA_STRINGS			L"\\CnC Suite\\AppData\\Strings"
 #define			PATHTOFOLDER_CNCSUITE_PROJECTS					L"\\CnC Suite\\Projects"
-#define			PATHTOFOLDER_CNCSUITE_SAMPLES					L"\\CnC Suite\\Samples"
+#define			PATHTOFOLDER_CNCSUITE_SAMPLES					L"\\CnC Suite\\Templates"
 #define			PATHTOFOLDER_CNCSUITE_USERSTYLES				L"\\CnC Suite\\UserStyles"
 #define			PATHTOFOLDER_CNCSUITE_USERSTYLES_EDITOR			L"\\CnC Suite\\UserStyles\\Editor"
 
@@ -179,6 +183,10 @@ public:
 			return this->localAppDataPath + PATHTOFILE_FILEHISTORY_DATA;		// local app data
 		case PATHID_FILE_EXCEPTIONINFO:
 			return this->localAppDataPath + PATHTOFILE_LASTEXCEPTIONINFO;		// local app data
+		case PATHID_FILE_HELPHTML_GERMAN:
+			return this->localAppDataPath + PATHTOFILE_HELP_GERMAN;				// local app data
+		case PATHID_FILE_HELPHTML_ENGLISH:
+			return this->localAppDataPath + PATHTOFILE_HELP_ENGLISH;			// local app data
 
 
 		case PATHID_FOLDER_CNCSUITE_USERFOLDER:

@@ -574,6 +574,17 @@ TCHAR* LanguageDispatcher::getEnglishString(int ID)
 	case UI_GNRL_HISTORY:
 		return _UI_GNRL_HISTORY;
 
+	case UI_FILETIME_CREATED:
+		return _UI_FILETIME_CREATED;
+	case UI_FILETIME_LASTWRITE:
+		return _UI_FILETIME_LASTWRITE;
+	case UI_FILETIME_LASTACCESS:
+		return _UI_FILETIME_LASTACCESS;
+	case UI_FILEINFO:
+		return _UI_FILEINFO;
+	case UI_FILESIZE:
+		return _UI_FILESIZE;
+
 		// error messages
 	case UI_XML_ERR_DOCUMENTFORMAT_INVALID:
 		return _UI_XML_ERR_DOCUMENTFORMAT_INVALID;

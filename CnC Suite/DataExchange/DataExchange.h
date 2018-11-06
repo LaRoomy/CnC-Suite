@@ -150,7 +150,7 @@ public:
 	// the default constructor is for the config setter/getter methods only !!
 	SerialComm();
 	// the special constructor must be used for the data transmission and the device-listing
-	SerialComm(HWND Parent,HINSTANCE hInstance,WCHAR* Root_Directory);
+	SerialComm(HWND Parent,HINSTANCE hInstance,LPCTSTR Root_Directory);
 	
 	~SerialComm();
 

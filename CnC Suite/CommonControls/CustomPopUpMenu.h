@@ -66,6 +66,10 @@ public:
 		return *this;
 	}
 
+	bool operator== (const MenuEntry& entry) {
+		return (this->ENTRY_ID == entry.ENTRY_ID) ? true : false;
+	}
+
 	void Clear()
 	{
 		this->text.Clear();

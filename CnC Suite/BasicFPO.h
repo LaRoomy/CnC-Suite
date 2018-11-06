@@ -39,6 +39,7 @@ public:
 	virtual BOOL VerifyCommandline(LPCTSTR nCmdLine, TCHAR** path_out) = 0;
 	virtual BOOL VerifyFilename(LPCTSTR fileName) = 0;
 	virtual BOOL GetFileTimes(LPCTSTR path, LPSYSTEMTIME created, LPSYSTEMTIME lastAccessed, LPSYSTEMTIME lastWritten) = 0;
+	virtual BOOL SetFileTimes(LPCTSTR path, LPSYSTEMTIME created, LPSYSTEMTIME lastAccessed, LPSYSTEMTIME lastWritten) = 0;
 	virtual void Release() = 0;
 };
 

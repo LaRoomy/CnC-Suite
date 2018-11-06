@@ -270,6 +270,15 @@
     <ClInclude Include="DateTime.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Url.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CnC3FileManager.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonControls\Xmap.h">
+      <Filter>CommonControls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CnC Suite.rc">
@@ -413,6 +422,12 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="DateTime.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Url.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="CnC3FileManager.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

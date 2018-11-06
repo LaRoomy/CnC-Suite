@@ -9,6 +9,7 @@
 #include"ThreadWatcher.h"
 #include"CommandLineTool.h"
 #include"EditorContentManager.h"
+#include"Url.h"
 
 Application::Application(HINSTANCE hInst)
 	:hInstance( hInst ),
@@ -1448,6 +1449,7 @@ void Application::OnFileConverted(LPTSTR filename)
 
 void Application::Send()
 {
+	AppPath appPath;
 	TCHAR* buffer = nullptr;
 
 	auto isAlreadyOpen =
@@ -1473,30 +1475,40 @@ void Application::Send()
 
 				if (res > 0)
 				{
-					auto dataTraffic = new SerialComm(this->MainWindow, this->hInstance, this->AppData.UserPath);
-					if (dataTraffic != nullptr)
+					auto commsetuppath = appPath.Get(PATHID_FILE_COMSETUP);
+
+					if (commsetuppath.succeeded())
 					{
-						HWND cBox = this->UserInterface->GetFrameHandles(GFWH_CBOXFRAME);
-						if (cBox)
-						{
-							RECT rc;
-							GetWindowRect(cBox, &rc);
-
-
-							if (dataContainer->getBooleanData(DATAKEY_EXSETTINGS_EXCHANGEWND_MONITORTRANSMISSION, true))
-							{
-								if ((rc.bottom - rc.top) < DPIScale(250))
-									rc.top = rc.top - (DPIScale(250) - (rc.bottom - rc.top));
-							}
-							else
-							{
-								rc.top = rc.bottom - DPIScale(30);
-							}
-
-							dataTraffic->enableVerboseMessaging(
-								dataContainer->getBooleanData(DATAKEY_EXSETTINGS_EXCHANGEWND_VERBOSETRANSMISSION, false)
+						auto dataTraffic =
+							new SerialComm(
+								this->MainWindow,
+								this->hInstance,
+								commsetuppath.GetData()
 							);
-							dataTraffic->InitDataTransmission(SEND_BUFFER, buffer, &rc);
+						if (dataTraffic != nullptr)
+						{
+							HWND cBox = this->UserInterface->GetFrameHandles(GFWH_CBOXFRAME);
+							if (cBox)
+							{
+								RECT rc;
+								GetWindowRect(cBox, &rc);
+
+
+								if (dataContainer->getBooleanData(DATAKEY_EXSETTINGS_EXCHANGEWND_MONITORTRANSMISSION, true))
+								{
+									if ((rc.bottom - rc.top) < DPIScale(250))
+										rc.top = rc.top - (DPIScale(250) - (rc.bottom - rc.top));
+								}
+								else
+								{
+									rc.top = rc.bottom - DPIScale(30);
+								}
+
+								dataTraffic->enableVerboseMessaging(
+									dataContainer->getBooleanData(DATAKEY_EXSETTINGS_EXCHANGEWND_VERBOSETRANSMISSION, false)
+								);
+								dataTraffic->InitDataTransmission(SEND_BUFFER, buffer, &rc);
+							}
 						}
 					}
 				}
@@ -1842,14 +1854,35 @@ void Application::LaunchWebsite()
 void Application::ShowHelpExtension()
 {
 	auto lang = getCurrentAppLanguage();
+	AppPath appPath;
+	iString pathToManual;
+	Url manualUrl;
 
 	switch (lang)
 	{
 	case LANG_GERMAN:
-		ShellExecute(nullptr, nullptr, L"file:///C:/Program%20Files%20(x86)/CnC%20Suite/manual/Handbuch.html", nullptr, nullptr, SW_SHOW);
+		pathToManual = appPath.Get(PATHID_FILE_HELPHTML_GERMAN);
+		manualUrl.SetUrlFromLocalPath(
+			pathToManual
+		);
+		ShellExecute(
+			nullptr, nullptr,
+			manualUrl.GetUrl(),
+			nullptr, nullptr,
+			SW_SHOW
+		);
 		break;
 	case LANG_ENGLISH:
-		ShellExecute(nullptr, nullptr, L"file:///C:/Program%20Files%20(x86)/CnC%20Suite/manual/manual.html", nullptr, nullptr, SW_SHOW);
+		pathToManual = appPath.Get(PATHID_FILE_HELPHTML_ENGLISH);
+		manualUrl.SetUrlFromLocalPath(
+			pathToManual
+		);
+		ShellExecute(
+			nullptr, nullptr,
+			manualUrl.GetUrl(),
+			nullptr, nullptr,
+			SW_SHOW
+		);
 		break;
 	default:
 		break;

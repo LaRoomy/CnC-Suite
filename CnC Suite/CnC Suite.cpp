@@ -8,6 +8,7 @@ Application* pApplication = nullptr;
 ApplicationData* ApplicationDataContainer = nullptr;
 itemCollection<ApplicationData> extendedApplicationDataContainer;
 DPI_Assist* dpiAssist = nullptr;
+CRITICAL_SECTION CriticalSection;
 
 // Application entry:
 extern int APIENTRY _tWinMain(
@@ -20,6 +21,7 @@ extern int APIENTRY _tWinMain(
 	UNREFERENCED_PARAMETER(nCmdShow);
 
 	SetUnhandledExceptionFilter(lpTopLevelExceptionFilter);
+	InitializeCriticalSectionAndSpinCount(&CriticalSection, 0x00000400);
 
 	int result = I_ERROR_DPI_FAILED;
 	DWORD restart = NO_RESTART;
@@ -62,6 +64,7 @@ extern int APIENTRY _tWinMain(
 		SafeRelease(&dpiAssist);
 	}
 	SafeRelease(&ApplicationDataContainer);
+	DeleteCriticalSection(&CriticalSection);
 
 	if (restart != NO_RESTART)
 	{
@@ -428,5 +431,10 @@ BOOL GetApplicationStyleInformation(LPAPPSTYLEINFO pSInfo)
 		return (BOOL)SendMessage(mWnd, WM_GETSTYLEINFO, 0, reinterpret_cast<LPARAM>(pSInfo));
 	}
 	return FALSE;
+}
+
+LPCRITICAL_SECTION GetCriticalSection()
+{
+	return &CriticalSection;
 }
 

@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef _CNCSUITE_HEADER_
+#define _CNCSUITE_HEADER_
+
 #pragma comment( lib, "Kernel32.lib" )
 #pragma comment( lib, "User32.lib" )
 #pragma comment(lib,"comctl32.lib")
@@ -84,7 +88,6 @@ typedef DWORD32 uintX;
 typedef int intX;
 #endif
 
-
 // TODO: remove that and clean all existing references!
 #define		GERMAN		0x07
 #define		ENGLISH		0x09
@@ -146,6 +149,7 @@ bool isCnC3Path(LPCTSTR path);
 LONG WINAPI lpTopLevelExceptionFilter(_EXCEPTION_POINTERS *exceptionInfo);
 void ScheduleRestart(DWORD restartOption);
 BOOL GetApplicationStyleInformation(LPAPPSTYLEINFO pSInfo);
+LPCRITICAL_SECTION GetCriticalSection();
 
 
 /* TODO GLOBAL !!!
@@ -190,3 +194,5 @@ bld/
 [Ll]og/
 
 */
+
+#endif

@@ -280,6 +280,10 @@ void CnCS_CommandLine::onSetValueCommand(iString & command)
 	{
 		this->onFocusrectCommand(command);
 	}
+	else if (command.Contains(L"treeviewfontheight"))
+	{
+		this->onTvFontHeightCommand(command);
+	}
 	else
 	{
 		this->console->AddLine(L"Error - invalid set command", ERROR_COLOR);
@@ -300,6 +304,43 @@ void CnCS_CommandLine::onGetValueCommand(iString & command)
 			this->console->AddLine(L"ID::driveloadingblocker - value: <true>", COLOR_SUCCESS);
 		else
 			this->console->AddLine(L"ID::driveloadingblocker - value: <false>", COLOR_SUCCESS);
+	}
+	else if (command.Contains("treeviewfontheight"))
+	{
+		auto height =
+			reinterpret_cast<ApplicationData*>(
+				getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
+				)->getIntegerData(DATAKEY_EXSETTINGS_TREEVIEW_FONTHEIGHT, 16);
+
+		iString msg(L"ID::treeviewfontheight - value: ");
+		msg += height;
+
+		this->console->AddLine(
+			msg.GetData(),
+			COLOR_SUCCESS
+		);
+	}
+	else if (command.Contains(L"focusrectoffset"))
+	{
+		auto internalSettings =
+			reinterpret_cast<ApplicationData*>(
+				getApplicationDataContainerFromFilekey(FILEKEY_INTERNAL_SETTINGS)
+			);
+		if (internalSettings != nullptr)
+		{
+			iString msg(L"ID::focusrectoffset - values: <top: ");
+			msg +=
+				internalSettings->getIntegerData(DATAKEY_INTSET_EDITOR_FOCUSRECTOFFSET_TOP, 1);
+			msg += L"> : <bottom: ";
+			msg +=
+				internalSettings->getIntegerData(DATAKEY_INTSET_EDITOR_FOCUSRECTOFFSET_BOTTOM, 5);
+			msg += L">";
+
+			this->console->AddLine(
+				msg.GetData(),
+				COLOR_SUCCESS
+			);
+		}
 	}
 	else
 		this->console->AddLine(L"Error - invalid ID", ERROR_COLOR);
@@ -416,4 +457,27 @@ void CnCS_CommandLine::onFocusrectCommand(iString & command)
 	successMsg += L">";
 
 	this->console->AddLine(successMsg.GetData(), COLOR_SUCCESS);
+}
+
+void CnCS_CommandLine::onTvFontHeightCommand(iString & command)
+{
+	command.Remove(L"treeviewfontheight::");
+
+	auto fontHeight = command.getAsInt();
+	if (fontHeight > 0)
+	{
+		if (fontHeight > 51)
+		{
+			this->console->AddLine(L"invalid value -> maximum accepted value is 50!", ERROR_COLOR);
+		}
+		else
+		{
+			reinterpret_cast<ApplicationData*>(
+				getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
+			)->saveValue(DATAKEY_EXSETTINGS_TREEVIEW_FONTHEIGHT, fontHeight);
+
+			this->console->AddLine(L"treeviewfontheight successful set", COLOR_SUCCESS);
+			this->console->AddLine(L"please restart the application to apply the changes", COLOR_SUCCESS);
+		}
+	}
 }

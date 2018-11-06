@@ -67,10 +67,12 @@ HRESULT CnCS_FN::_Init(HWND NavFrame, LPTSTR AppDir)
 				SendMessage(this->fnParam.Main, WM_GETSTYLEINFO, 0, reinterpret_cast<LPARAM>(&StyleInfo));
 
 				DWORD additionalStyles = WS_BORDER;
+
 				auto aDataC =
 					reinterpret_cast<ApplicationData*>(
 						getDefaultApplicationDataContainer()
 					);
+
 				if (aDataC != nullptr)
 				{
 					auto usePropAsTooltip = aDataC->getBooleanData(DATAKEY_SETTINGS_USEFILETAGSASTOOLTIP, true);
@@ -85,13 +87,19 @@ HRESULT CnCS_FN::_Init(HWND NavFrame, LPTSTR AppDir)
 					}
 				}
 
+				int fontheight =
+					reinterpret_cast<ApplicationData*>(
+						getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
+					)->getIntegerData(DATAKEY_EXSETTINGS_TREEVIEW_FONTHEIGHT, 16);
+
 				hr = this->pTV->InitTreeView(
 					StyleInfo.Stylecolor,
-					CreateScaledFont(16, FW_MEDIUM, APPLICATION_PRIMARY_FONT),
+					CreateScaledFont(fontheight, FW_MEDIUM, APPLICATION_PRIMARY_FONT),
 					StyleInfo.TextColor,
 					&rc,
 					additionalStyles
 				);
+
 				if (SUCCEEDED(hr))
 				{
 					this->pTV->setInfoSink(dynamic_cast<ITreeViewUserEvents*>(this));

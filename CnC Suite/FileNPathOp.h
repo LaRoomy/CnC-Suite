@@ -26,6 +26,7 @@ public:
 	 BOOL BasicFileNPathOperations::VerifyCommandline(LPCTSTR nCmdLine, TCHAR** Path_out) { return this->pVerifyCmdLine(nCmdLine, Path_out); }
 	 BOOL BasicFileNPathOperations::VerifyFilename(LPCTSTR fileName) { return this->pVerifyFilename(fileName); }
 	 BOOL BasicFileNPathOperations::GetFileTimes(LPCTSTR path, LPSYSTEMTIME created, LPSYSTEMTIME lastAccessed, LPSYSTEMTIME lastWritten);
+	 BOOL BasicFileNPathOperations::SetFileTimes(LPCTSTR path, LPSYSTEMTIME created, LPSYSTEMTIME lastAccessed, LPSYSTEMTIME lastWritten);
 
 private:
 	BOOL pSaveBuffer(LPCTSTR, LPCTSTR, UINT);

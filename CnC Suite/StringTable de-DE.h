@@ -246,7 +246,7 @@
 #define				_UI_PROPWND_OUTWINDOWSETTINGS				L"Ein-/Ausgabefenster"
 #define				_UI_PROPWND_OUTFORMATSETTINGS				L"Ausgabeformat"
 #define				_UI_PROPWND_ANCHOROUTPUTWINDOW				L"Ein-/Ausgabefenster andocken"
-#define				_UI_PROPWND_MONITORTRANSMISSON				L"Ein-/Ausgabe überwachen"
+#define				_UI_PROPWND_MONITORTRANSMISSON				L"Ein-/Ausgabe überwachen (Monitor)"
 #define				_UI_PROPWND_VERBOSETRANSMISSION				L"Ausführliche Ausgabe"
 #define				_UI_PROPWND_AUTOCLOSE						L"Automatisch schließen"
 #define				_UI_PROPWND_RESETBUTTON						L"Anwendung ganz oder teilweise zurücksetzen"
@@ -306,6 +306,13 @@
 #define				_UI_GNRL_NEWSUBFOLDER				L"Neuer Unterordner"
 #define				_UI_GNRL_LINEENDFORMAT				L"Zeilenende:"
 #define				_UI_GNRL_HISTORY					L"Chronik"
+
+#define				_UI_FILETIME_CREATED				L"Erstellt:        "
+#define				_UI_FILETIME_LASTWRITE				L"Zuletzt geändert:"
+#define				_UI_FILETIME_LASTACCESS				L"Letzter Zugriff: "
+#define				_UI_FILEINFO						L"Datei"
+#define				_UI_FILESIZE						L"Dateigröße:      "
+
 
 
 

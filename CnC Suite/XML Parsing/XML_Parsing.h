@@ -94,6 +94,9 @@ public:
 		this->propertyContent = xtp.propertyContent;
 		return *this;
 	}
+	bool operator== (const XML_TAG_Property& xtp) {
+		return this->propertyName.Equals(xtp.propertyName);
+	}
 };
 
 class iXML_Tag
@@ -197,6 +200,10 @@ public:
 		this->hasProperties = xmlTag.hasProperties;
 		this->initallyClosed = xmlTag.initallyClosed;
 		return *this;
+	}
+	bool operator== (const iXML_Tag& xmlTag) {
+		return (this->tagName.Equals(xmlTag.tagName)
+			&& this->tagContent.Equals(xmlTag.tagContent));
 	}
 };
 

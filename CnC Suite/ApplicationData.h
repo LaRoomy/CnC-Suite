@@ -122,6 +122,12 @@ public:
 		return *this;
 	}
 
+	bool operator== (const ApplicationData& aData) {
+		return
+			this->filekey.Equals(aData.filekey);
+	}
+
+
 	ApplicationData* getInstance() { return this; }
 
 	const wchar_t* ToString() {

@@ -1963,3 +1963,72 @@ BOOL isDrive(LPCTSTR path)
 	}
 	return FALSE;
 }
+
+BOOL setFileAccessTime(LPCTSTR path)
+{
+	BOOL result;
+	HANDLE hFile;
+	FILETIME fTime;
+	SYSTEMTIME sTime;
+
+	result =
+		(path != nullptr)
+		? TRUE : FALSE;
+
+	if(result)
+	{
+		GetSystemTime(&sTime);
+		SystemTimeToFileTime(&sTime, &fTime);
+
+		hFile = CreateFile(
+			path,
+			GENERIC_WRITE,
+			FILE_SHARE_WRITE,
+			nullptr,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL,
+			nullptr
+		);
+		result =
+			(hFile != INVALID_HANDLE_VALUE)
+			? TRUE : FALSE;
+		if (result)
+		{
+			result =
+				SetFileTime(
+					hFile,
+					nullptr,
+					&fTime,
+					nullptr
+				);
+
+			CloseHandle(hFile);
+		}
+	}
+	return result;
+}
+
+LARGE_INTEGER getFileSizeX(LPCTSTR path)
+{
+	LARGE_INTEGER li;
+	HANDLE hFile;
+
+	SecureZeroMemory(&li, sizeof(LARGE_INTEGER));
+
+	hFile = CreateFile(
+		path,
+		GENERIC_READ,
+		FILE_SHARE_READ,
+		nullptr,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		nullptr
+	);
+	if (hFile != INVALID_HANDLE_VALUE)
+	{
+		GetFileSizeEx(hFile, &li);
+
+		CloseHandle(hFile);
+	}
+	return li;
+}
