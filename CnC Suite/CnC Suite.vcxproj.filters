@@ -430,6 +430,9 @@
     <ClCompile Include="CnC3FileManager.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="Async.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\CnC_Suite_mIcon.ico">

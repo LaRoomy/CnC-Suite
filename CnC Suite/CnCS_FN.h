@@ -55,6 +55,7 @@ typedef struct _FILENAVPARAMS {
 	BOOL UseInfoTip;
 	BOOL toolbarDualLine;
 	BOOL dataCollectionComplete;
+	BOOL blockFileSystemWatcher;
 
 	UINT32 interruptFileSystemWatcher;
 
@@ -329,6 +330,9 @@ private:
 
 	void onFileSystemChanged(BYTE* buffer, DWORD max_buffer);
 	void onRootFolderInvalidated();
+
+	// the watcher will only be blocked once, if the watcher reads the blocker, the value will be reset
+	void blockWatcher(BOOL block);
 };
 
 CnCSuite_FileNavigator* CreateFileNavigator(HINSTANCE hInst, HWND MainWindow) { return new CnCS_FN(hInst, MainWindow); }

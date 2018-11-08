@@ -1316,6 +1316,12 @@ intX EditControl::GetTextContent(TCHAR ** text)
 	return res;
 }
 
+int EditControl::GetTextLength()
+{
+	this->updateContentBuffer();
+	return _lengthOfString(this->editboxContent);
+}
+
 void EditControl::InsertText(LPCTSTR text, BOOL addToUndoStack)
 {
 	if (text != nullptr)
@@ -4928,19 +4934,39 @@ void EditControl::applyColorToSelection(CHARRANGE * colorSegment, CHARRANGE * re
 
 	if (suppressSelNotification)
 		this->suppressSelectionNotification = TRUE;
-	if (overrideSystemSelectionColor)
-		this->eraseSystemHighlightColor();
 
-	SendMessage(this->EditWnd, EM_EXSETSEL, static_cast<WPARAM>(0), reinterpret_cast<LPARAM>(colorSegment));
-	this->SetColor(colorToSet);
+	//if (overrideSystemSelectionColor)
+		//this->eraseSystemHighlightColor();
+
+	bool updateFocusRect = false;
+
+	CHARRANGE cr_t;
+	cr_t.cpMin = colorSegment->cpMax;
+	cr_t.cpMax = cr_t.cpMin;
+
+	SendMessage(this->EditWnd, EM_EXSETSEL, static_cast<WPARAM>(0), reinterpret_cast<LPARAM>(&cr_t));
+
+	CHARFORMAT cf_t;
+	cf_t.cbSize = sizeof(CHARFORMAT);
+	cf_t.dwMask = CFM_COLOR;
+
+	SendMessage(this->EditWnd, EM_GETCHARFORMAT, (WPARAM)SCF_SELECTION, reinterpret_cast<LPARAM>(&cf_t));
+
+	if (cf_t.crTextColor != colorToSet)
+	{
+		SendMessage(this->EditWnd, EM_EXSETSEL, static_cast<WPARAM>(0), reinterpret_cast<LPARAM>(colorSegment));
+		this->SetColor(colorToSet);
+		updateFocusRect = true;
+	}
 	SendMessage(this->EditWnd, EM_EXSETSEL, static_cast<WPARAM>(0), reinterpret_cast<LPARAM>(restoreRange));
 
-	if (overrideSystemSelectionColor)
-		this->restoreSystemHighlightColor();
+	//if (overrideSystemSelectionColor)
+		//this->restoreSystemHighlightColor();
 	if (suppressSelNotification)
 		this->suppressSelectionNotification = FALSE;
 
-	this->UpdateFocusRect();
+	if(updateFocusRect)
+		this->UpdateFocusRect();
 }
 
 COLORREF EditControl::getFocusMarkColor()

@@ -312,6 +312,7 @@
 #define				_UI_FILETIME_LASTACCESS				L"Letzter Zugriff: "
 #define				_UI_FILEINFO						L"Datei"
 #define				_UI_FILESIZE						L"Dateigröße:      "
+#define				_UI_OUTPUTSIZE						L"Ausgabegröße:    "
 
 
 

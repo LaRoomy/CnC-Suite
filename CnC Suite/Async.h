@@ -6,6 +6,13 @@ typedef void(*async_parameter)(LPVOID);
 
 typedef LPVOID FUNCTION_PTR;
 
+typedef struct _DUALVALUE {
+
+	ULONG_PTR	valueOne;
+	ULONG_PTR	valueTwo;
+
+}DUALVALUE, *LPDUALVALUE;
+
 class Async
 	: public ClsObject<Async>
 {
@@ -113,3 +120,9 @@ public:
 		((async_smpl)method)();
 	}
 };
+
+ULONG_PTR InterlockedRead(ULONG_PTR* value);
+
+void exchangeFunction(LPVOID data);
+
+void InterlockedExchangeDelayed(ULONG_PTR* destination, ULONG_PTR value, DWORD milliseconds);

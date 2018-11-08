@@ -2,6 +2,7 @@
 #include "Error dispatcher.h"
 #include "ApplicationData.h"
 #include "ProgressDialog.h"
+#include "Async.h"
 
 CnCS_FN::CnCS_FN(HINSTANCE hInst, HWND MainWindow)
 	: hInstance(hInst),
@@ -266,6 +267,8 @@ DWORD CnCS_FN::fileSystemWatcher(LPVOID lParam)
 							auto result = GetOverlappedResult(hDir, &ovl, &numBytesTransferred, FALSE);
 							if (result)
 							{
+								auto blockEvent = (BOOL)InterlockedRead((ULONG_PTR*)&fileNavigator->fnParam.blockFileSystemWatcher);
+
 								switch (ovl.Internal)
 								{
 								case 0x10C:	//STATUS_NOTIFY_ENUM_DIR
@@ -273,8 +276,15 @@ DWORD CnCS_FN::fileSystemWatcher(LPVOID lParam)
 									break;
 								case 0x108: //STATUS_PENDING
 									break;
-								case 0x0:	//STATUS_SUCCESS								
-									fileNavigator->onFileSystemChanged(buffer, 2048);
+								case 0x0:	//STATUS_SUCCESS
+									if (!blockEvent)
+									{
+										fileNavigator->onFileSystemChanged(buffer, 2048);
+									}
+									else
+									{
+										InterlockedExchangeDelayed((ULONG_PTR*)&fileNavigator->fnParam.blockFileSystemWatcher, FALSE, 100);
+									}
 									SecureZeroMemory(buffer, 2048);
 									break;
 								default:
@@ -496,6 +506,9 @@ LRESULT CnCS_FN::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		break;
 	case ICOMMAND_TVRECOVERSCROLL:
 		this->pTV->SetScrollPosition(nullptr);
+		break;
+	case ICOMMAND_ACTIVATE_FSW_BLOCKER:
+		this->blockWatcher(static_cast<BOOL>(lParam));
 		break;
 	default:
 		return DefSubclassProc(hWnd, WM_COMMAND, wParam, lParam);
@@ -1321,6 +1334,7 @@ void CnCS_FN::InsertNewProgram()
 
 void CnCS_FN::InsertNewFolder()
 {
+
 	this->pTV->PerformFileOperation(FOP_NEWFOLDER);
 }
 
@@ -1861,4 +1875,9 @@ void CnCS_FN::onRootFolderInvalidated()
 		getStringFromResource(ERROR_MSG_ROOTFOLDERINVALIDATED),
 		getStringFromResource(UI_FILENAVIGATOR)
 	);
+}
+
+void CnCS_FN::blockWatcher(BOOL block)
+{
+	InterlockedExchange((ULONG_PTR*)&this->fnParam.blockFileSystemWatcher, (ULONG_PTR)block);
 }

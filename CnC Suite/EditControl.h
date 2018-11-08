@@ -445,9 +445,10 @@ public:
 
 	void SetTextContent(LPCTSTR text, BOOL convertIt, BOOL resetUndoStack, BOOL addToUndoStack);
 
-	// this method returns the amount of TCHAR's copied into 'text' of a negative value to indicate an error
+	// this method returns the amount of TCHAR's copied into 'text' or a negative value to indicate an error
 	// NOTE: the caller is responsible for freeing the string!!!
 	intX GetTextContent(TCHAR** text);
+	int GetTextLength();
 	void InsertText(LPCTSTR text, BOOL addToUndoStack);
 	void DeleteAllandReset(LPCTSTR defaultText);
 	void SetSelection(CHARRANGE* cr, BOOL activateBlocker);

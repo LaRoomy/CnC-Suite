@@ -194,18 +194,18 @@ HistoryItem & History::GetHistoryItemAt(int index)
 	return curItem;
 }
 
-bool History::CompareHistoryItemPathAt(int index, LPCTSTR path)
+BOOL History::CompareHistoryItemPathAt(int index, LPCTSTR path)
 {
 	if (path != nullptr)
 	{
 		auto cItems = this->historyList.GetLineCount();
-		if (cItems < index)
+		if (index < cItems)
 		{
 			auto itemPath = this->historyList.GetLine(index);
 			if (itemPath != nullptr)
 			{
 				int counter = 0;
-				bool isEqual = false;
+				BOOL isEqual = FALSE;
 
 				while (itemPath[counter] != L'|')
 				{
@@ -222,13 +222,20 @@ bool History::CompareHistoryItemPathAt(int index, LPCTSTR path)
 
 				if ((itemPath[counter] == L'|') && (path[counter] == L'\0'))
 				{
-					isEqual = true;
+					isEqual = TRUE;
+				}
+				else if ((itemPath[counter] != L'|') && (path[counter] == L'\0'))
+				{
+					if (itemPath[counter] != L'\0')
+					{
+						isEqual = 2;
+					}
 				}
 				return isEqual;
 			}
 		}
 	}
-	return false;
+	return -1;
 }
 
 bool History::ToFile(LPCTSTR path)
@@ -1041,9 +1048,37 @@ void UIHistory::onItemRenamed(LPFILESYSTEMOBJECT fso)
 
 				// if this is a folder -> check if the path is inside of the filepath and change it respectively!!!!!!!!!!!!!!!!!!!!!!
 
-				if (this->historyData.CompareHistoryItemPathAt(i, oldPath))
+				auto isEqual = this->historyData.CompareHistoryItemPathAt(i, oldPath);
+
+				if (isEqual > 0)
 				{
-					auto item = this->historyData.GetHistoryItemAt(i);
+					auto item = this->historyData.GetHistoryItemAt(i);					
+
+					if (isEqual == TRUE)
+					{
+						item.SetItemPath(
+							fso->Path.GetPathData()
+						);
+						this->historyData.ReplaceHistoryItemAt(item, i);
+					}
+					else if (isEqual == 2)
+					{
+						iString newPath(
+							fso->Path.GetPathData()
+						);
+
+						auto path = item.GetItemPath();
+
+						path.Remove(
+							fso->OldPath.GetPathData()
+						);
+						newPath += path;
+
+						item.SetItemPath(
+							newPath.GetData()
+						);
+						this->historyData.ReplaceHistoryItemAt(item, i);
+					}
 				}
 
 			}

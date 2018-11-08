@@ -131,6 +131,7 @@ void CnC3File::copy(const CnC3File & file)
 
 	this->ncContent = file.ncContent;
 	this->pathToFile = file.pathToFile;
+	this->status = file.status;
 
 	this->cnc3PropertyMap = file.cnc3PropertyMap;
 
@@ -161,8 +162,15 @@ HRESULT CnC3File::CnC3Object_toBuffer(iString& buffer)
 		buffer += propString;
 	}
 	buffer += L"[PROPERTY-SECTION END]\r\n";
+	buffer += L"[NCCONTENT-SECTION START]";
+	buffer += this->ncContent;
+	buffer += L"[NCCONTENT-SECTION END]\r\n";
 
-	return E_NOTIMPL;
+
+	// TODO: save Undostack or other things
+
+
+	return S_OK;
 }
 
 HRESULT CnC3File::Buffer_toCnC3Object(LPCTSTR buffer)
@@ -207,7 +215,9 @@ HRESULT CnC3File::Buffer_toCnC3Object(LPCTSTR buffer)
 		}
 		else // normal procedure
 		{
-			hr = this->ReadPropertySection(buffer);
+			CHARSCOPE Section = { 0 };
+
+			hr = this->ReadPropertySection(buffer, &Section);
 			if (SUCCEEDED(hr))
 			{
 				hr = this->ReadContentSection(buffer);
@@ -221,14 +231,112 @@ HRESULT CnC3File::Buffer_toCnC3Object(LPCTSTR buffer)
 	return hr;
 }
 
-HRESULT CnC3File::ReadPropertySection(LPCTSTR buffer)
+HRESULT CnC3File::ReadPropertySection(LPCTSTR buffer, LPCHARSCOPE sectionScope)
 {
-	return E_NOTIMPL;
+	iString completeContent(buffer);
+	CHARSCOPE cs = { 0 };
+	CHARSCOPE section = { 0 };
+
+	auto hr =
+		completeContent.Contains("[PROPERTY-SECTION START]", &cs)
+		? S_OK : E_UNEXPECTED;
+
+	if (SUCCEEDED(hr))
+	{
+		section.startChar = cs.endChar + 1;
+
+		hr =
+			completeContent.Contains(L"[PROPERTY-SECTION END]", &cs)
+			? S_OK : E_UNEXPECTED;
+
+		if (SUCCEEDED(hr))
+		{
+			section.endChar = cs.startChar - 1;
+
+			if (sectionScope != nullptr)
+			{
+				*sectionScope = section;
+			}
+
+			auto propSection =
+				completeContent.GetSegment(&section);
+
+			int startIndex = 0;
+
+			while (1)
+			{
+				auto res = propSection.Contains(L"CNC3PKEY[", &cs, startIndex);
+				if(res)
+				{
+					startIndex = cs.endChar + 1;
+					section.startChar = startIndex;
+
+					res = propSection.Contains(L"]KEYEND", &cs, startIndex);
+					if(res)
+					{
+						section.endChar = cs.startChar - 1;
+
+						auto pKey = propSection.GetSegment(&section);
+
+						startIndex = cs.endChar + 1;
+
+						res = propSection.Contains(L"CNC3KEYPDATA[", &cs, startIndex);
+						if (res)
+						{
+							startIndex = cs.endChar + 1;
+							section.startChar = startIndex;
+
+							res = propSection.Contains(L"]DATAEND", &cs, startIndex);
+							if (res)
+							{
+								section.endChar = cs.startChar - 1;
+
+								auto pData = propSection.GetSegment(&section);
+
+								startIndex = cs.endChar + 1;
+
+								this->cnc3PropertyMap.Add(pKey, pData);
+							}
+						}
+					}
+				}
+				if (!res)
+					break;
+
+			}// end while (1)
+		}
+	}
+	return hr;
 }
 
 HRESULT CnC3File::ReadContentSection(LPCTSTR buffer)
 {
-	return E_NOTIMPL;
+	iString completeContent(buffer);
+	CHARSCOPE cs = { 0 };
+	CHARSCOPE section = { 0 };
+
+	auto hr =
+		completeContent.Contains(L"[NCCONTENT-SECTION START]", &cs)
+		? S_OK : E_UNEXPECTED;
+
+	if (SUCCEEDED(hr))
+	{
+		section.startChar = cs.endChar + 1;
+
+		hr =
+			completeContent.Contains(L"[NCCONTENT-SECTION END]", &cs, cs.endChar + 1)
+			? S_OK : E_UNEXPECTED;
+		
+		if (SUCCEEDED(hr))
+		{
+			section.endChar = cs.startChar - 1;
+
+			auto ncCont = completeContent.GetSegment(&section);
+
+			this->ncContent.Replace(ncCont);
+		}
+	}
+	return hr;
 }
 
 BOOL CnC3File::Extract(LPCTSTR buffer)
@@ -408,12 +516,12 @@ int CnC3File::Get_Property(int start_pos, int prop_number, LPCTSTR buffer)
 }
 
 CnC3FileManager::CnC3FileManager()
-	: owner(nullptr)
+	: owner(nullptr), exportFormatHandler(nullptr)
 {
 }
 
 CnC3FileManager::CnC3FileManager(HWND _owner_)
-	: owner(_owner_)
+	: owner(_owner_), exportFormatHandler(nullptr)
 {
 }
 
@@ -495,11 +603,11 @@ CnC3FileCollection& CnC3FileManager::Open()
 
 															CoTaskMemFree(filepath);
 														}
-														sItem->Release();
+														SafeRelease(&sItem);
 													}
 												}
 											}
-											dlgResults->Release();
+											SafeRelease(&dlgResults);
 										}
 									}
 								}
@@ -509,7 +617,7 @@ CnC3FileCollection& CnC3FileManager::Open()
 				}
 			}
 		}
-		Ifd->Release();
+		SafeRelease(&Ifd);
 	}
 	this->openResult = hr;
 	return this->openResult;
@@ -532,15 +640,274 @@ CnC3File& CnC3FileManager::Open(LPCTSTR path)
 
 CnC3File & CnC3FileManager::SaveAs(const CnC3File & file)
 {
-	// TODO:
+	IFileSaveDialog* Ifd;
+	this->currentFile.Clear();
+	this->openResult.Clear();
 
+	this->currentFile = file;
+
+	auto hr =
+		CoCreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&Ifd));
+
+	if (SUCCEEDED(hr))
+	{
+		// set options on the dialog
+		FILEOPENDIALOGOPTIONS fOptions;
+
+		hr = Ifd->GetOptions(&fOptions);
+		if (SUCCEEDED(hr))
+		{
+			hr = Ifd->SetOptions(fOptions | FOS_FORCEFILESYSTEM | FOS_STRICTFILETYPES);
+			if (SUCCEEDED(hr))
+			{
+				// set the initial targetfolder for the dialog
+				hr = this->setTargetFolder(Ifd);
+				if (SUCCEEDED(hr))
+				{
+					// set custom dialog text if requested
+					hr = this->setDialogText(Ifd);
+					if (SUCCEEDED(hr))
+					{
+						// make the filetype settings: in this dialog is the only permitted filetype .cnc3 !
+						hr = Ifd->SetFileTypes(ARRAYSIZE(CnC3DataType), CnC3DataType);
+						if (SUCCEEDED(hr))
+						{
+							hr = Ifd->SetFileTypeIndex(0);
+							if (SUCCEEDED(hr))
+							{
+								hr = Ifd->SetDefaultExtension(L".cnc3");
+								if (SUCCEEDED(hr))
+								{
+									// show the dialog
+									hr = Ifd->Show(this->owner);
+									if (SUCCEEDED(hr))
+									{
+										// obtain the result
+										IShellItem* sItem;
+
+										hr = Ifd->GetResult(&sItem);
+										if (SUCCEEDED(hr))
+										{
+											PTSTR filePath = nullptr;
+
+											hr = sItem->GetDisplayName(SIGDN_FILESYSPATH, &filePath);
+											if (SUCCEEDED(hr))
+											{
+												// update the file with the new valid path and save
+												this->currentFile.SetPath(filePath);
+												this->currentFile.Save();
+
+												CoTaskMemFree(filePath);
+											}
+											SafeRelease(&sItem);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		SafeRelease(&Ifd);
+	}
+	this->currentFile = hr;
 	return this->currentFile;
 }
 
-HRESULT CnC3FileManager::Save(const CnC3File & file)
+HRESULT CnC3FileManager::Save(CnC3File & file)
 {
+	return file.Save();
+}
 
-	return E_NOTIMPL;
+CnC3File & CnC3FileManager::Import(LPCTSTR path)
+{
+	this->currentFile.Clear();
+	
+	auto hr =
+		(path != nullptr)
+		? S_OK : E_INVALIDARG;
+
+	if (SUCCEEDED(hr))
+	{
+		IFileOpenDialog* Ifd;
+
+		hr =
+			CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&Ifd));
+		if (SUCCEEDED(hr))
+		{
+			// set options on the dialog
+			FILEOPENDIALOGOPTIONS fOptions;
+
+			hr = Ifd->GetOptions(&fOptions);
+			if (SUCCEEDED(hr))
+			{
+				hr = Ifd->SetOptions(fOptions | FOS_FORCEFILESYSTEM);
+				if (SUCCEEDED(hr))
+				{
+					// set default file location
+					hr = this->setTargetFolder(Ifd);
+					if (SUCCEEDED(hr))
+					{
+						// set the custom dialog text
+						hr = this->setDialogText(Ifd);
+						if (SUCCEEDED(hr))
+						{
+							// set filetype(s) -> in this case all files are valid
+							hr = Ifd->SetFileTypes(ARRAYSIZE(AllFiles), AllFiles);
+							if (SUCCEEDED(hr))
+							{
+								hr = Ifd->SetFileTypeIndex(0);
+								if (SUCCEEDED(hr))
+								{
+									hr = Ifd->SetDefaultExtension(L".txt");
+									if (SUCCEEDED(hr))
+									{
+										// show the dialog
+										hr = Ifd->Show(this->owner);
+										if (SUCCEEDED(hr))
+										{
+											// obtain the result
+											IShellItem* sItem;
+
+											hr = Ifd->GetResult(&sItem);
+											if (SUCCEEDED(hr))
+											{
+												PTSTR itemPath = nullptr;
+
+												hr = sItem->GetDisplayName(SIGDN_FILESYSPATH, &itemPath);
+												if (SUCCEEDED(hr))
+												{
+													auto bfpo = CreateBasicFPO();
+
+													hr =
+														(bfpo != nullptr)
+														? S_OK : E_OUTOFMEMORY;
+
+													if(SUCCEEDED(hr))
+													{
+														TCHAR* buffer = nullptr;
+
+														hr =
+															bfpo->LoadBufferFmFileAsUtf8(&buffer, itemPath)
+															? S_OK : E_FAIL;
+
+														if (SUCCEEDED(hr))
+														{
+															this->currentFile.SetNCContent(buffer);
+
+															this->currentFile.AddProperty(CnC3File::PID_DESCRIPTION_ONE, EMPTY_PROPERTY_STRING);
+															this->currentFile.AddProperty(CnC3File::PID_DESCRIPTION_TWO, EMPTY_PROPERTY_STRING);
+															this->currentFile.AddProperty(CnC3File::PID_DESCRIPTION_THREE, EMPTY_PROPERTY_STRING);
+
+															SafeDeleteArray(&buffer);
+														}
+														SafeRelease(&bfpo);
+													}
+													CoTaskMemFree(itemPath);
+												}
+												SafeRelease(&sItem);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			SafeRelease(&Ifd);
+		}
+	}
+	this->currentFile = hr;
+	return this->currentFile;
+}
+
+HRESULT CnC3FileManager::ExportAs(const CnC3File & file)
+{
+	IFileDialog* Ifd;
+
+	auto hr =
+		CoCreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&Ifd));
+
+	if (SUCCEEDED(hr))
+	{
+		// set options on the dialog
+		FILEOPENDIALOGOPTIONS fOptions;
+
+		hr = Ifd->GetOptions(&fOptions);
+		if (SUCCEEDED(hr))
+		{
+			hr = Ifd->SetOptions(fOptions | FOS_FORCEFILESYSTEM);
+			if (SUCCEEDED(hr))
+			{
+				// set default location
+				hr = this->setTargetFolder(Ifd);
+				if (SUCCEEDED(hr))
+				{
+					// set custom dialog text if requested
+					hr = this->setDialogText(Ifd);
+					if (SUCCEEDED(hr))
+					{
+						// setup file types (in this case all files)
+						hr = Ifd->SetFileTypes(ARRAYSIZE(AllFiles), AllFiles);
+						if (SUCCEEDED(hr))
+						{
+							hr = Ifd->SetFileTypeIndex(0);
+							if (SUCCEEDED(hr))
+							{
+								hr = Ifd->SetDefaultExtension(L".txt");
+								if (SUCCEEDED(hr))
+								{
+									hr = Ifd->Show(this->owner);
+									if (SUCCEEDED(hr))
+									{
+										// obtain the result
+										IShellItem* sItem;
+
+										hr = Ifd->GetResult(&sItem);
+										if (SUCCEEDED(hr))
+										{
+											PTSTR pathToFile;
+
+											hr = sItem->GetDisplayName(SIGDN_FILESYSPATH, &pathToFile);
+											if (SUCCEEDED(hr))
+											{
+												iString bufferToSave;
+
+												if (this->exportFormatHandler != nullptr)
+												{
+													this->exportFormatHandler->onFormatForExport(file, bufferToSave);
+												}
+												else
+												{
+													bufferToSave = file.GetNCContent();
+												}
+
+												auto bfpo = CreateBasicFPO();
+												if (bfpo != nullptr)
+												{
+													hr =
+														bfpo->SaveBufferToFileAsUtf8(bufferToSave.GetData(), pathToFile)
+														? S_OK : E_FAIL;
+
+													SafeRelease(&bfpo);
+												}
+												CoTaskMemFree(pathToFile);
+											}
+											SafeRelease(&sItem);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		SafeRelease(&Ifd);
+	}
+	return hr;
 }
 
 void CnC3FileManager::SetDialogText(LPCTSTR CaptionText, LPCTSTR ButtonText, LPCTSTR FileText)

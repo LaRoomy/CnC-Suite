@@ -13,6 +13,13 @@ const COMDLG_FILTERSPEC CnC3DataType[] =
 	{ L"Extended Nc-Program (*.cnc3)", L"*.cnc3" }
 };
 
+const COMDLG_FILTERSPEC AllFiles[] =
+{
+	{L"All Documents (*.*)",		L"*.*"}
+};
+
+constexpr auto EMPTY_PROPERTY_STRING = L"...";
+
 class CnC3File
 	:public ClsObject<CnC3File>,
 	public iCollectable<CnC3File>
@@ -37,7 +44,7 @@ public:
 	void SetPath(LPCTSTR path) {
 		this->pathToFile = path;
 	}
-	LPCTSTR GetNCContent() {
+	LPCTSTR GetNCContent() const {
 		return this->ncContent.GetData();
 	}
 	void SetNCContent(LPCTSTR content) {
@@ -104,7 +111,7 @@ private:
 	HRESULT CnC3Object_toBuffer(iString& buffer);
 	HRESULT Buffer_toCnC3Object(LPCTSTR buffer);
 
-	HRESULT ReadPropertySection(LPCTSTR buffer);
+	HRESULT ReadPropertySection(LPCTSTR buffer, LPCHARSCOPE sectionScope);
 	HRESULT ReadContentSection(LPCTSTR buffer);
 
 	// legacy methods to read cnc3 files below version 2.0
@@ -192,6 +199,11 @@ private:
 	itemCollection<CnC3File> data;
 };
 
+__interface IExportFormatProtocol {
+public:
+	void onFormatForExport(const CnC3File& file, iString& buffer_out);
+};
+
 
 class CnC3FileManager
 	:public ClsObject<CnC3FileManager>
@@ -209,11 +221,18 @@ public:
 	// The returned cnc3-object is the full-defined representation of the saved file
 	CnC3File& SaveAs(const CnC3File& file);
 	// Saves the cnc3-object to file at the given location in the cnc3-object
-	HRESULT Save(const CnC3File& file);
+	HRESULT Save(CnC3File& file);
+
+	CnC3File& Import(LPCTSTR path);
+	HRESULT ExportAs(const CnC3File& file);
 
 	void SetDialogText(LPCTSTR CaptionText, LPCTSTR ButtonText, LPCTSTR FileText);
 	void SetTargetFolder(LPCTSTR Path);
 	void SetHwndOwner(HWND Owner);
+
+	void SetExportFormatRoutine(IExportFormatProtocol* routine) {
+		this->exportFormatHandler = routine;
+	}
 
 	const wchar_t* ToString(){
 		return L"not_implemented";
@@ -227,6 +246,8 @@ private:
 	iString buttontext;
 	iString filetext;
 	iString targetfolder;
+
+	IExportFormatProtocol* exportFormatHandler;
 
 	CnC3FileCollection openResult;
 	CnC3File currentFile;

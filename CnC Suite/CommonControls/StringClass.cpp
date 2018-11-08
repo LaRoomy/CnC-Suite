@@ -578,6 +578,11 @@ bool iString::Contains(const TCHAR * strToFind, LPCHARSCOPE scope, int startInde
 	return this->Contains(conti, scope, startIndex, caseSensitive);
 }
 
+bool iString::Contains(const TCHAR * strToFind, LPCHARSCOPE scope, int startIndex)
+{
+	return this->Contains(strToFind, scope, startIndex, true);
+}
+
 iString iString::GetSegment(LPCHARSCOPE cs)
 {
 	if (this->verifyScope(cs))

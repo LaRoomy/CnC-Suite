@@ -171,7 +171,9 @@ public:
 
 	HistoryItem& GetHistoryItemAt(int index);
 
-	bool CompareHistoryItemPathAt(int index, LPCTSTR path);
+	// Return-Values: (TRUE == Equal) (FALSE == Not Equal) (2 == the path is a segment of the itemPath)
+	// (-1 == Error!)
+	BOOL CompareHistoryItemPathAt(int index, LPCTSTR path);
 
 	bool ToFile(LPCTSTR path);
 	bool FromFile(LPCTSTR path);

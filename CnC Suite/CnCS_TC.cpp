@@ -1994,18 +1994,61 @@ void CnCS_TC::OnVerticalToolBar_NumSequence()
 
 void CnCS_TC::OnVerticalToolBar_ErrorCheck()
 {
-	Xmap<iString, int> testmap;
+	CnC3FileManager mngr(this->Main);
 
-	testmap.Add(L"newkey123", 123);
-	testmap.Add(L"key987", 987);
-	testmap.Add(L"key456", 456);
-
-
-	auto data = testmap.GetDataForKey(L"key987");
-	if (data)
+	auto files = mngr.Open();
+	if (files.Succeeded())
 	{
-		testmap.Remove(L"key987");
+		if (files.GetCount() > 0)
+		{
+			auto singleFile =
+				files.GetAt(0);
+
+			if (singleFile.Succeeded())
+			{
+
+			}
+		}
 	}
+
+
+	//auto ptp = this->GetActiveTabProperty();
+	//if (ptp != nullptr)
+	//{
+	//	TCHAR *buffer = nullptr;
+
+	//	CnC3File file;
+	//	file.AddProperty(CnC3File::PID_DESCRIPTION_ONE, ptp->DESC1);
+	//	file.AddProperty(CnC3File::PID_DESCRIPTION_TWO, ptp->DESC2);
+	//	file.AddProperty(CnC3File::PID_DESCRIPTION_THREE, ptp->DESC3);
+
+	//	if (ptp->Editcontrol->GetTextContent(&buffer) > 0)
+	//	{
+	//		file.SetNCContent(buffer);
+
+	//		CnC3FileManager mngr(this->Main);
+	//		mngr.SetDialogText(L"Speichern unter", L"Speichern", L"myCnC3");
+
+	//		auto savedFile = mngr.SaveAs(file);
+	//		if (savedFile.Succeeded())
+	//		{
+
+	//		}
+	//		SafeDeleteArray(&buffer);
+	//	}
+	//}
+	//Xmap<iString, int> testmap;
+
+	//testmap.Add(L"newkey123", 123);
+	//testmap.Add(L"key987", 987);
+	//testmap.Add(L"key456", 456);
+
+
+	//auto data = testmap.GetDataForKey(L"key987");
+	//if (data)
+	//{
+	//	testmap.Remove(L"key987");
+	//}
 
 	//TCHAR *folder = nullptr;
 	//CnC3FileManager fMngr;
@@ -5720,6 +5763,26 @@ bool CnCS_TC::displayFileInfos(HDC hdc, int fromPos)
 						);
 						outString += L" ";
 						outString += li.LowPart;
+						outString += L" Bytes";
+
+						TextOut(
+							hdc,
+							DPIScale(30),
+							fromPos,
+							outString.GetData(),
+							outString.GetLength()
+						);
+
+						fromPos += DPIScale(20);// next line
+
+						// display output-size
+						auto textLen = ptp->Editcontrol->GetTextLength();
+
+						outString.Replace(
+							getStringFromResource(UI_OUTPUTSIZE)
+						);
+						outString += L" ";
+						outString += textLen;
 						outString += L" Bytes";
 
 						TextOut(

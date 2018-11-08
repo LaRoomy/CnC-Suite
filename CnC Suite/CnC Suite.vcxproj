@@ -240,6 +240,7 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="ApplicationData.cpp" />
+    <ClCompile Include="Async.cpp" />
     <ClCompile Include="AutocompleteManager.cpp" />
     <ClCompile Include="autocompleteStrings.cpp" />
     <ClCompile Include="AutosyntaxManager.cpp" />

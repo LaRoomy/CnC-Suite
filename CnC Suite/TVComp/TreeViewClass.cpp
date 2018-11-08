@@ -5909,6 +5909,13 @@ HRESULT TreeViewCTRL::_executeRenameOP(LPCWSTR newName)
 								hr = pfo->RenameItem(psiRename, _newName_, (IFileOperationProgressSink*)this);
 								if (SUCCEEDED(hr))
 								{
+									SendMessage(
+										this->TVFrame,
+										WM_COMMAND,
+										MAKEWPARAM(ICOMMAND_ACTIVATE_FSW_BLOCKER, 0),
+										(LPARAM)TRUE
+									);						// prevent the file-system-watcher from launching events during the operation
+
 									hr = pfo->PerformOperations();
 									if (SUCCEEDED(hr))
 									{

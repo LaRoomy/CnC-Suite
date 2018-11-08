@@ -304,6 +304,7 @@
 #define				_UI_FILETIME_LASTACCESS				L"Last accessed:"
 #define				_UI_FILEINFO						L"File"
 #define				_UI_FILESIZE						L"Filesize:     "
+#define				_UI_OUTPUTSIZE						L"Outputsize:   "
 
 // ERROR MESSAGES >>
 

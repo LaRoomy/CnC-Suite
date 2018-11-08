@@ -73,6 +73,7 @@ public:
 	// caseSensitive - if true: case sensitive is enabled, false otherwise;
 	bool Contains(const iString& strToFind, LPCHARSCOPE scope, int startIndex, bool caseSensitive);
 	bool Contains(const TCHAR* strToFind, LPCHARSCOPE scope, int startIndex, bool caseSensitive);
+	bool Contains(const TCHAR* strToFind, LPCHARSCOPE scope, int startIndex);
 
 	iString GetSegment(LPCHARSCOPE cs);
 	bool SetSegment(const iString& segment, LPCHARSCOPE cs);

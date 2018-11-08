@@ -310,6 +310,7 @@
 #define				UI_FILETIME_LASTACCESS			632
 #define				UI_FILEINFO						633
 #define				UI_FILESIZE						634
+#define				UI_OUTPUTSIZE					635
 
 // ERROR STRINGS
 #define				UI_XML_ERR_UNEXPECTEDCLOSINGTAG		800

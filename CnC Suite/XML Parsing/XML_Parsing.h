@@ -137,7 +137,14 @@ public:
 			{
 				if (this->tagProperties.GetAt(i).isName(name))
 				{
-					return this->tagProperties.GetAt(i).getInstance();
+//#pragma warning(push)
+//#pragma warning(disable : 4172)
+
+					auto inst = this->tagProperties.GetAt(i).getInstance();
+
+					return inst;//this->tagProperties.GetAt(i).getInstance();
+
+//#pragma warning(pop)
 				}
 			}
 		}
