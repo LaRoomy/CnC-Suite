@@ -11,9 +11,10 @@
 #include"BasicFPO.h"
 #include"DPI_Helper.h"
 #include"history.h"
+#include"CnC3FileManager.h"
 
 class Application
-	:public IFileSystemModificationProtocoll, public IHistroyEventProtocoll
+	:public IFileSystemModificationProtocoll, public IHistroyEventProtocoll, public IExportFormatProtocol
 {
 
 public:			
@@ -81,6 +82,9 @@ public:
 	void OnWindowClosed(cObject sender) {
 		this->FileNavigator->Show();
 	}
+
+	// IExportFormatProtocol Base
+	void FormatForExport(const CnC3File& file, iString& buffer_out);
 
 private:
 	HINSTANCE hInstance;

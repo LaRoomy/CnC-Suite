@@ -327,6 +327,10 @@
 #define				_ERROR_MSG_ROOTFOLDERINVALIDATED	L"Der aktuelle Stammordner ist ungültig geworden. Bitte wählen Sie einen neuen Ordner."
 #define				_ERROR_MSG_ROOTFOLDERLOADINGFAILED	L"(E_UNEXPECTED) Laden des Stammordners fehlgeschlagen."
 #define				_ERROR_MSG_DRIVELOADINGNOTALLOWED	L"Ein komplettes Laufwerk kann nicht geladen werden. Bitte wählen Sie einen Unterordner."
+#define				_ERROR_MSG_EXPORT_FAILED			L"Export fehlgeschlagen. Fehlercode: "
+#define				_ERROR_MSG_OPENFILE_FAILED			L"Öffnen der Datei fehlgeschlagen. Fehlercode: "
+
+
 
 
 // WARNINGS >>

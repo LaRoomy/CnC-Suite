@@ -632,57 +632,42 @@ HRESULT CnCS_PI::_createTabCtrlPage()
 	{
 		GetClientRect(this->iParam.tabctrlPage, &rc);
 
-		auto dataContainer = reinterpret_cast<ApplicationData*>(getDefaultApplicationDataContainer());
-
-		// autosave checkbox
-		POINT pt;
-		pt.x = DPIScale(20);
-		pt.y = DPIScale(20);
-		SIZE sz;
-		sz.cx = rc.right - DPIScale(50);
-		sz.cy = DPIScale(30);
-		iString cb_text(
-			getStringFromResource(UI_PROPWND_AUTOSAVE));
-
-		auto autosaveCheckbox = new CustomCheckbox(this->hInstance, this->iParam.tabctrlPage, &pt, &sz, CTRLID_AUTOSAVECBX);
-		if (autosaveCheckbox != nullptr)
-		{
-			autosaveCheckbox->setChecked(
-				dataContainer->getBooleanData(DATAKEY_SETTINGS_AUTOSAVE, false));
-			autosaveCheckbox->setEventHandler(dynamic_cast<customCheckboxEventSink*>(this));
-			autosaveCheckbox->setText(cb_text);
-			autosaveCheckbox->setColors(this->sInfo.TabColor, this->sInfo.TextColor);
-			autosaveCheckbox->setConstraints(10, 10);
-			autosaveCheckbox->setFont(
-				CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
+		auto dataContainer =
+			reinterpret_cast<ApplicationData*>(
+				getDefaultApplicationDataContainer()
+			);
+		auto extendedDataContainer =
+			reinterpret_cast<ApplicationData*>(
+				getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
 			);
 
-			hr = autosaveCheckbox->Create();
-		}
-		else
-			hr = E_FAIL;
-
+		hr = ((dataContainer != nullptr) && (extendedDataContainer != nullptr)) ? S_OK : E_UNEXPECTED;
 		if (SUCCEEDED(hr))
 		{
-			pt.y += DPIScale(40);
-			cb_text.Replace(
-				getStringFromResource(UI_PROPWND_OPENNEWFILEINNEWTAB));
+			// autosave checkbox
+			POINT pt;
+			pt.x = DPIScale(20);
+			pt.y = DPIScale(20);
+			SIZE sz;
+			sz.cx = rc.right - DPIScale(50);
+			sz.cy = DPIScale(30);
+			iString cb_text(
+				getStringFromResource(UI_PROPWND_AUTOSAVE));
 
-			auto newtabCheckbox = new CustomCheckbox(this->hInstance, this->iParam.tabctrlPage, &pt, &sz, CTRLID_NEWTABCBX);
-			if (newtabCheckbox != nullptr)
+			auto autosaveCheckbox = new CustomCheckbox(this->hInstance, this->iParam.tabctrlPage, &pt, &sz, CTRLID_AUTOSAVECBX);
+			if (autosaveCheckbox != nullptr)
 			{
-				newtabCheckbox->setChecked(
-					dataContainer->getBooleanData(DATAKEY_SETTINGS_OPEN_IN_NEW_TAB, true)
-				);
-				newtabCheckbox->setEventHandler(dynamic_cast<customCheckboxEventSink*>(this));
-				newtabCheckbox->setText(cb_text);
-				newtabCheckbox->setColors(this->sInfo.TabColor, this->sInfo.TextColor);
-				newtabCheckbox->setConstraints(10, 10);
-				newtabCheckbox->setFont(
+				autosaveCheckbox->setChecked(
+					dataContainer->getBooleanData(DATAKEY_SETTINGS_AUTOSAVE, false));
+				autosaveCheckbox->setEventHandler(dynamic_cast<customCheckboxEventSink*>(this));
+				autosaveCheckbox->setText(cb_text);
+				autosaveCheckbox->setColors(this->sInfo.TabColor, this->sInfo.TextColor);
+				autosaveCheckbox->setConstraints(10, 10);
+				autosaveCheckbox->setFont(
 					CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
 				);
 
-				hr = newtabCheckbox->Create();
+				hr = autosaveCheckbox->Create();
 			}
 			else
 				hr = E_FAIL;
@@ -691,187 +676,212 @@ HRESULT CnCS_PI::_createTabCtrlPage()
 			{
 				pt.y += DPIScale(40);
 				cb_text.Replace(
-					getStringFromResource(UI_PROPWND_SHOWDOCPROPERTIES));
+					getStringFromResource(UI_PROPWND_OPENNEWFILEINNEWTAB));
 
-				auto dPropWndCheckbox = new CustomCheckbox(this->hInstance, this->iParam.tabctrlPage, &pt, &sz, CTRLID_SHOWPROPWNDCBX);
-				if (dPropWndCheckbox != nullptr)
+				auto newtabCheckbox = new CustomCheckbox(this->hInstance, this->iParam.tabctrlPage, &pt, &sz, CTRLID_NEWTABCBX);
+				if (newtabCheckbox != nullptr)
 				{
-					dPropWndCheckbox->setChecked(
-						dataContainer->getBooleanData(DATAKEY_SETTINGS_SHOW_DESCWND, true)
+					newtabCheckbox->setChecked(
+						dataContainer->getBooleanData(DATAKEY_SETTINGS_OPEN_IN_NEW_TAB, true)
 					);
-					dPropWndCheckbox->setEventHandler(dynamic_cast<customCheckboxEventSink*>(this));
-					dPropWndCheckbox->setText(cb_text);
-					dPropWndCheckbox->setColors(this->sInfo.TabColor, this->sInfo.TextColor);
-					dPropWndCheckbox->setConstraints(10, 10);
-					dPropWndCheckbox->setFont(
+					newtabCheckbox->setEventHandler(dynamic_cast<customCheckboxEventSink*>(this));
+					newtabCheckbox->setText(cb_text);
+					newtabCheckbox->setColors(this->sInfo.TabColor, this->sInfo.TextColor);
+					newtabCheckbox->setConstraints(10, 10);
+					newtabCheckbox->setFont(
 						CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
 					);
 
-					hr = dPropWndCheckbox->Create();
+					hr = newtabCheckbox->Create();
 				}
 				else
 					hr = E_FAIL;
 
 				if (SUCCEEDED(hr))
 				{
-					this->iParam.editChangeBlockerEnabled = true;
+					pt.y += DPIScale(40);
+					cb_text.Replace(
+						getStringFromResource(UI_PROPWND_SHOWDOCPROPERTIES));
 
-					auto descriptorEdit1 = new singleLineEdit(this->hInstance);
-
-					hr = (descriptorEdit1 != nullptr) ? S_OK : E_FAIL;
-					if (SUCCEEDED(hr))
+					auto dPropWndCheckbox = new CustomCheckbox(this->hInstance, this->iParam.tabctrlPage, &pt, &sz, CTRLID_SHOWPROPWNDCBX);
+					if (dPropWndCheckbox != nullptr)
 					{
-						iString desc(getStringFromResource(UI_PROPWND_PROPDESCRIPTOR));
-						iString counter(L" 1\0");
-						iString d1 = desc + counter;
-
-						descriptorEdit1->setEventHandler(dynamic_cast<singleLineEditEventSink*>(this));
-						descriptorEdit1->setType(
-							SLE_TYPE_WITHDESCRIPTION,
-							DPIScale(100)
+						dPropWndCheckbox->setChecked(
+							dataContainer->getBooleanData(DATAKEY_SETTINGS_SHOW_DESCWND, true)
 						);
-						descriptorEdit1->setCtrlFont(
+						dPropWndCheckbox->setEventHandler(dynamic_cast<customCheckboxEventSink*>(this));
+						dPropWndCheckbox->setText(cb_text);
+						dPropWndCheckbox->setColors(this->sInfo.TabColor, this->sInfo.TextColor);
+						dPropWndCheckbox->setConstraints(10, 10);
+						dPropWndCheckbox->setFont(
 							CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
 						);
-						descriptorEdit1->setDescriptionText(d1);
-						descriptorEdit1->setBorder(true, this->sInfo.TextColor);
-						descriptorEdit1->setAlignment(DESC_ALIGN_LEFT);
-						descriptorEdit1->setDimensions(
-							DPIScale(40),
-							DPIScale(200),
-							rc.right - DPIScale(150)
-						);
-						descriptorEdit1->setColors(this->sInfo.TabColor, this->sInfo.mainToolbarColor, this->sInfo.TextColor, this->sInfo.TextColor);
 
-						hr = descriptorEdit1->Create(this->iParam.tabctrlPage, CTRLID_DESCRIPTORONE);
+						hr = dPropWndCheckbox->Create();
+					}
+					else
+						hr = E_FAIL;
+
+					if (SUCCEEDED(hr))
+					{
+						this->iParam.editChangeBlockerEnabled = true;
+
+						auto descriptorEdit1 = new singleLineEdit(this->hInstance);
+
+						hr = (descriptorEdit1 != nullptr) ? S_OK : E_FAIL;
 						if (SUCCEEDED(hr))
 						{
-							descriptorEdit1->setContent(dInfo.desc1);
+							iString desc(getStringFromResource(UI_PROPWND_PROPDESCRIPTOR));
+							iString counter(L" 1\0");
+							iString d1 = desc + counter;
 
-							auto descriptorEdit2 = new singleLineEdit(this->hInstance);
+							descriptorEdit1->setEventHandler(dynamic_cast<singleLineEditEventSink*>(this));
+							descriptorEdit1->setType(
+								SLE_TYPE_WITHDESCRIPTION,
+								DPIScale(100)
+							);
+							descriptorEdit1->setCtrlFont(
+								CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
+							);
+							descriptorEdit1->setDescriptionText(d1);
+							descriptorEdit1->setBorder(true, this->sInfo.TextColor);
+							descriptorEdit1->setAlignment(DESC_ALIGN_LEFT);
+							descriptorEdit1->setDimensions(
+								DPIScale(40),
+								DPIScale(200),
+								rc.right - DPIScale(150)
+							);
+							descriptorEdit1->setColors(this->sInfo.TabColor, this->sInfo.mainToolbarColor, this->sInfo.TextColor, this->sInfo.TextColor);
 
-							hr = (descriptorEdit2 != nullptr) ? S_OK : E_FAIL;
+							hr = descriptorEdit1->Create(this->iParam.tabctrlPage, CTRLID_DESCRIPTORONE);
 							if (SUCCEEDED(hr))
 							{
-								counter.Replace(L" 2\0");
-								iString d2 = desc + counter;
+								descriptorEdit1->setContent(dInfo.desc1);
 
-								descriptorEdit2->setEventHandler(dynamic_cast<singleLineEditEventSink*>(this));
-								descriptorEdit2->setType(
-									SLE_TYPE_WITHDESCRIPTION,
-									DPIScale(100)
-								);
-								descriptorEdit2->setCtrlFont(
-									CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
-								);
-								descriptorEdit2->setDescriptionText(d2);
-								descriptorEdit2->setBorder(true, this->sInfo.TextColor);
-								descriptorEdit2->setAlignment(DESC_ALIGN_LEFT);
-								descriptorEdit2->setDimensions(
-									DPIScale(40),
-									DPIScale(240),
-									rc.right - DPIScale(150)
-								);
-								descriptorEdit2->setColors(this->sInfo.TabColor, this->sInfo.mainToolbarColor, this->sInfo.TextColor, this->sInfo.TextColor);
+								auto descriptorEdit2 = new singleLineEdit(this->hInstance);
 
-								hr = descriptorEdit2->Create(this->iParam.tabctrlPage, CTRLID_DESCRIPTORTWO);
+								hr = (descriptorEdit2 != nullptr) ? S_OK : E_FAIL;
 								if (SUCCEEDED(hr))
 								{
-									descriptorEdit2->setContent(dInfo.desc2);
+									counter.Replace(L" 2\0");
+									iString d2 = desc + counter;
 
-									auto descriptorEdit3 = new singleLineEdit(this->hInstance);
+									descriptorEdit2->setEventHandler(dynamic_cast<singleLineEditEventSink*>(this));
+									descriptorEdit2->setType(
+										SLE_TYPE_WITHDESCRIPTION,
+										DPIScale(100)
+									);
+									descriptorEdit2->setCtrlFont(
+										CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
+									);
+									descriptorEdit2->setDescriptionText(d2);
+									descriptorEdit2->setBorder(true, this->sInfo.TextColor);
+									descriptorEdit2->setAlignment(DESC_ALIGN_LEFT);
+									descriptorEdit2->setDimensions(
+										DPIScale(40),
+										DPIScale(240),
+										rc.right - DPIScale(150)
+									);
+									descriptorEdit2->setColors(this->sInfo.TabColor, this->sInfo.mainToolbarColor, this->sInfo.TextColor, this->sInfo.TextColor);
 
-									hr = (descriptorEdit3 != nullptr) ? S_OK : E_FAIL;
+									hr = descriptorEdit2->Create(this->iParam.tabctrlPage, CTRLID_DESCRIPTORTWO);
 									if (SUCCEEDED(hr))
 									{
-										counter.Replace(L" 3\0");
-										iString d3 = desc + counter;
+										descriptorEdit2->setContent(dInfo.desc2);
 
-										descriptorEdit3->setEventHandler(dynamic_cast<singleLineEditEventSink*>(this));
-										descriptorEdit3->setType(
-											SLE_TYPE_WITHDESCRIPTION,
-											DPIScale(100)
-										);
-										descriptorEdit3->setCtrlFont(
-											CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
-										);
-										descriptorEdit3->setDescriptionText(d3);
-										descriptorEdit3->setBorder(true, this->sInfo.TextColor);
-										descriptorEdit3->setAlignment(DESC_ALIGN_LEFT);
-										descriptorEdit3->setDimensions(
-											DPIScale(40),
-											DPIScale(280),
-											rc.right - DPIScale(150)
-										);
-										descriptorEdit3->setColors(this->sInfo.TabColor, this->sInfo.mainToolbarColor, this->sInfo.TextColor, this->sInfo.TextColor);
+										auto descriptorEdit3 = new singleLineEdit(this->hInstance);
 
-										hr = descriptorEdit3->Create(this->iParam.tabctrlPage, CTRLID_DESCRIPTORTHREE);
+										hr = (descriptorEdit3 != nullptr) ? S_OK : E_FAIL;
 										if (SUCCEEDED(hr))
 										{
-											descriptorEdit3->setContent(dInfo.desc3);
+											counter.Replace(L" 3\0");
+											iString d3 = desc + counter;
 
-											this->iParam.editChangeBlockerEnabled = false;
+											descriptorEdit3->setEventHandler(dynamic_cast<singleLineEditEventSink*>(this));
+											descriptorEdit3->setType(
+												SLE_TYPE_WITHDESCRIPTION,
+												DPIScale(100)
+											);
+											descriptorEdit3->setCtrlFont(
+												CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
+											);
+											descriptorEdit3->setDescriptionText(d3);
+											descriptorEdit3->setBorder(true, this->sInfo.TextColor);
+											descriptorEdit3->setAlignment(DESC_ALIGN_LEFT);
+											descriptorEdit3->setDimensions(
+												DPIScale(40),
+												DPIScale(280),
+												rc.right - DPIScale(150)
+											);
+											descriptorEdit3->setColors(this->sInfo.TabColor, this->sInfo.mainToolbarColor, this->sInfo.TextColor, this->sInfo.TextColor);
 
-											pt.y = DPIScale(390);
-
-											cb_text.Replace(
-												getStringFromResource(UI_PROPWND_INSERTSTANDARDTEMPLATE));
-
-											auto stdTemplateCbx = new CustomCheckbox(this->hInstance, this->iParam.tabctrlPage, &pt, &sz, CTRLID_STDTEMPLATE_CBX);
-											if (stdTemplateCbx != nullptr)
-											{
-												stdTemplateCbx->setChecked(
-													dataContainer->getBooleanData(DATAKEY_SETTINGS_INSERTDEFAULTTEXT, true)
-												);
-												stdTemplateCbx->setEventHandler(
-													dynamic_cast<customCheckboxEventSink*>(this)
-												);
-												stdTemplateCbx->setText(cb_text);
-												stdTemplateCbx->setColors(this->sInfo.TabColor, this->sInfo.TextColor);
-												stdTemplateCbx->setConstraints(10, 10);
-												stdTemplateCbx->setFont(
-													CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
-												);
-
-												hr = stdTemplateCbx->Create();
-											}
-											else
-												hr = E_FAIL;
-
+											hr = descriptorEdit3->Create(this->iParam.tabctrlPage, CTRLID_DESCRIPTORTHREE);
 											if (SUCCEEDED(hr))
 											{
-												pt.x = DPIScale(130);
-												pt.y = DPIScale(488);
-												sz.cx = DPIScale(100);
+												descriptorEdit3->setContent(dInfo.desc3);
 
-												auto lineEndCombo = new comboBox(
-													this->hInstance, this->iParam.tabctrlPage,
-													COMBOTYPE_DROPDOWNLIST, CTRLID_EXPORT_LINEENDFORMAT,
-													pt.x, pt.y, sz.cx, DPIScale(30)
-												);
-												hr = (lineEndCombo != nullptr)
-													? S_OK : E_FAIL;
+												this->iParam.editChangeBlockerEnabled = false;
+
+												pt.y = DPIScale(390);
+
+												cb_text.Replace(
+													getStringFromResource(UI_PROPWND_INSERTSTANDARDTEMPLATE));
+
+												auto stdTemplateCbx = new CustomCheckbox(this->hInstance, this->iParam.tabctrlPage, &pt, &sz, CTRLID_STDTEMPLATE_CBX);
+												if (stdTemplateCbx != nullptr)
+												{
+													stdTemplateCbx->setChecked(
+														dataContainer->getBooleanData(DATAKEY_SETTINGS_INSERTDEFAULTTEXT, true)
+													);
+													stdTemplateCbx->setEventHandler(
+														dynamic_cast<customCheckboxEventSink*>(this)
+													);
+													stdTemplateCbx->setText(cb_text);
+													stdTemplateCbx->setColors(this->sInfo.TabColor, this->sInfo.TextColor);
+													stdTemplateCbx->setConstraints(10, 10);
+													stdTemplateCbx->setFont(
+														CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
+													);
+
+													hr = stdTemplateCbx->Create();
+												}
+												else
+													hr = E_FAIL;
+
 												if (SUCCEEDED(hr))
 												{
-													if (lineEndCombo->Succeded())
+													pt.x = DPIScale(130);
+													pt.y = DPIScale(488);
+													sz.cx = DPIScale(100);
+
+													auto lineEndCombo = new comboBox(
+														this->hInstance, this->iParam.tabctrlPage,
+														COMBOTYPE_DROPDOWNLIST, CTRLID_EXPORT_LINEENDFORMAT,
+														pt.x, pt.y, sz.cx, DPIScale(30)
+													);
+													hr = (lineEndCombo != nullptr)
+														? S_OK : E_FAIL;
+													if (SUCCEEDED(hr))
 													{
-														iString item(L"CR/LF");
-														lineEndCombo->Items->AddItem(item);
-														item.Replace(L"CR");
-														lineEndCombo->Items->AddItem(item);
-														item.Replace(L"LF");
-														lineEndCombo->Items->AddItem(item);
+														if (lineEndCombo->Succeded())
+														{
+															iString item(L"CR/LF");
+															lineEndCombo->Items->AddItem(item);
+															item.Replace(L"CR");
+															lineEndCombo->Items->AddItem(item);
+															item.Replace(L"LF");
+															lineEndCombo->Items->AddItem(item);
 
-														lineEndCombo->setFont(
-															CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
-														);
+															lineEndCombo->setFont(
+																CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
+															);
 
-														lineEndCombo->setEventHandler(dynamic_cast<comboBoxEventSink*>(this));
-														lineEndCombo->setSelectedIndex(
-															dataContainer->getIntegerData(DATAKEY_EXSETTINGS_EXPORT_LINEENDFORMAT, 0)
-														);
+															lineEndCombo->setEventHandler(dynamic_cast<comboBoxEventSink*>(this));
+															lineEndCombo->setSelectedIndex(
+																extendedDataContainer->getIntegerData(DATAKEY_EXSETTINGS_EXPORT_LINEENDFORMAT, 0)
+															);
 
-
+														}
 													}
 												}
 											}

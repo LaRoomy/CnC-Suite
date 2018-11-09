@@ -210,6 +210,7 @@ public:
 
 	HRESULT CnCS_TC::Init(HWND Frame, LPTCSTARTUPINFO tc_info) { return this->_Init(Frame, tc_info); }
 	BOOL CnCS_TC::GetProperty(LPTCPROPERTY TabControlProp) { return this->_GetProp(TabControlProp); }
+	void CnCS_TC::GetCurrentCnC3File(CnC3File& file);
 	BOOL CnCS_TC::GetCurrentTabContent(TCHAR** content) {
 		return GetRichEditContent(
 			this->GetCurrentVisibleEditbox(this->TCFrame), content);
@@ -221,6 +222,9 @@ public:
 	}
 	void CnCS_TC::UserRequest_AddNewTab() { this->ADD_Tab(nullptr); }
 	void CnCS_TC::UserRequest_Open(LPTSTR path, BOOL ForceOpenInNewTab, BOOL setFocus) { this->Open(path, ForceOpenInNewTab, setFocus); }
+
+	void CnCS_TC::UserRequest_Open(const CnC3File& file, bool forceOpenInNewTab, bool setFocus);
+
 	BOOL CnCS_TC::UserRequest_SaveAs(TCHAR** path) {  return this->SaveAs(path, nullptr); }
 	BOOL CnCS_TC::UserRequest_Save(DWORD mode) { return this->Save(mode, nullptr); }
 	void CnCS_TC::UserRequest_Import(LPTSTR content) { this->Import(content); }
@@ -430,7 +434,9 @@ private:
 	void OnVerticalToolBar_Undo();
 	void OnVerticalToolBar_Redo();
 
-	BOOL ADD_Tab(LPCTSTR path);
+	BOOL ADD_Tab(LPCTSTR path);				// old!
+	BOOL AddTab(const CnC3File& file);		// new!
+
 	BOOL CLOSE_Tab(HWND Tab, BOOL performSavecheck);
 
 	void selectTab(DWORD tabNr);
@@ -504,7 +510,8 @@ private:
 	LPTABPROPERTY GetTabProperty(DWORD);
 	BOOL ConfigPropEdit(HWND edit);
 
-	BOOL OpenDisplayAndFormat(LPCTSTR, DWORD);
+	BOOL OpenDisplayAndFormat(LPCTSTR, DWORD);		// old!
+	BOOL OpenDisplayAndFormat(const CnC3File& file, DWORD flags);
 	BOOL getCurrentSelectedText(LPSELECTIONINFO);
 
 	BOOL onGetDescriptionNames(LPDESCRIPTIONINFO dInfo);
@@ -517,7 +524,10 @@ private:
 
 	void updateAutocompleteData();
 	void comboboxSelChange(comboBox* cBox, int selindex);
-	BOOL isPathAlreadyOpen(LPTSTR path);
+
+	BOOL isPathAlreadyOpen(LPTSTR path);			// old!
+	bool isAlreadyOpened(const CnC3File& file);		// new!
+
 	void setFocusOncurEdit();
 	void insertDiameterSymbol();
 	void tagsToInternalClipboard();

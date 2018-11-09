@@ -317,6 +317,8 @@
 #define				_ERROR_MSG_ROOTFOLDERINVALIDATED	L"The current Root-Folder has become invalid. Please select a new Folder."
 #define				_ERROR_MSG_ROOTFOLDERLOADINGFAILED	L"(E_UNEXPECTED) Loading Root-Folder failed."
 #define				_ERROR_MSG_DRIVELOADINGNOTALLOWED	L"A complete Drive cannot be loaded. Please select a sub-Folder."
+#define				_ERROR_MSG_EXPORT_FAILED			L"Export failed. Errorcode: "
+#define				_ERROR_MSG_OPENFILE_FAILED			L"Error opening file. Errorcode: "
 
 // WARNINGS >>
 #define				_WARNING_MSG_UPDATESEARCH_FAILED	L"Search for updates failed - no internet connection.\0"

@@ -19,6 +19,7 @@
 #include"EditControl.h"
 #include"Async.h"
 #include"FileSystem.h"
+#include"CnC3FileManager.h"
 
 typedef struct _TCSTARTUPINFO {
 	int mode;
@@ -40,11 +41,13 @@ class CnCSuite_Tabcontrol {
 public:
 	virtual HRESULT Init(HWND Frame, LPTCSTARTUPINFO tc_info) = 0;
 	virtual BOOL GetProperty(LPTCPROPERTY TabControlProp) = 0;
+	virtual void GetCurrentCnC3File(CnC3File& file) = 0;
 	virtual BOOL GetCurrentTabContent(TCHAR** content) = 0;
 	virtual BOOL GetCurrentSelectedText(LPSELECTIONINFO selInfo) = 0;
 	virtual LPCTSTR GetCurrentFilename() = 0;
 	virtual void UserRequest_AddNewTab() = 0;
 	virtual void UserRequest_Open(LPTSTR path, BOOL ForceOpenInNewTab, BOOL setFocus) = 0;
+	virtual void UserRequest_Open(const CnC3File& file, bool forceOpenInNewTab, bool setFocus) = 0;
 	virtual BOOL UserRequest_SaveAs(TCHAR** path) = 0;
 	virtual BOOL UserRequest_Save(DWORD mode) = 0;
 	virtual void UserRequest_Import(LPTSTR content) = 0;

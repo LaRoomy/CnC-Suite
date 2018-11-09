@@ -277,6 +277,47 @@ LONG_PTR Application::getCBoxComponent()
 	return reinterpret_cast<LONG_PTR>(this->CBox);
 }
 
+void Application::FormatForExport(const CnC3File & file, iString & buffer_out)
+{
+	auto dataContainer =
+		reinterpret_cast<ApplicationData*>(
+			getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
+			);
+	if (dataContainer != nullptr)
+	{
+		auto formatIndex = dataContainer->getIntegerData(DATAKEY_EXSETTINGS_EXPORT_LINEENDFORMAT, 0);
+
+		EditorContentManager em;
+		em.SetExecuteAsync(false);
+		em.SetContent(
+			file.GetNCContent()
+		);
+
+		switch (formatIndex)
+		{
+		case 0:
+			em.SetEndOfLineFormat(EditorContentManager::ENDOFLINE_FORMAT_CRLF);
+			break;
+		case 1:
+			em.SetEndOfLineFormat(EditorContentManager::ENDOFLINE_FORMAT_CR);
+			break;
+		case 2:
+			em.SetEndOfLineFormat(EditorContentManager::ENDOFLINE_FORMAT_LF);
+			break;
+		default:
+			em.SetEndOfLineFormat(EditorContentManager::ENDOFLINE_FORMAT_CRLF);
+			break;
+		}
+
+		if (em.PrepareContentForSubsequentUsage())
+		{
+			buffer_out.Replace(
+				em.GetContent()
+			);
+		}
+	}
+}
+
 HRESULT Application::Init_Mainframe()
 {
 	HRESULT hr;
@@ -1219,39 +1260,50 @@ LRESULT Application::OnRestartApp(WPARAM wParam)
 
 void Application::Open()
 {
-	Open_Save_CTRL* osc = new Open_Save_CTRL();
-	if (osc != NULL)
+	CnC3FileManager cnc3FileManager(this->MainWindow);
+
+	cnc3FileManager.SetDialogText(
+
+
+	)
+
+	//cnc3FileManager.SetTargetFolder()
+
+	auto files = cnc3FileManager.Open();
+	if (files.Succeeded())
 	{
-		// set the allowed filetype to *.cnc3 only
-		osc->SetFileTypeMode(FILETYPEMODE_ONLY_CNC3);
-		osc->setHwndOwner(this->MainWindow);
+		auto fileCount = files.GetCount();
 
-		TCHAR* path = NULL;
-
-		auto res = osc->GetFilePathFromUser(&path, MODE_OPEN, INDEX_CNC_DOC);
-		if (res)
+		for (int i = 0; i < fileCount; i++)
 		{
-			if (res != DIALOG_CANCELLED)
+			auto file = files.GetAt(i);
+
+			if (file.Succeeded())
 			{
 				auto dataCont
 					= reinterpret_cast<ApplicationData*>(
 						getDefaultApplicationDataContainer()
-					);
+						);
 				if (dataCont != nullptr)
 				{
-					auto openInNewTab = dataCont->getBooleanData(L"newtabcbx", false);
+					auto openInNewTab =
+						(i > 0)
+						? true
+						: dataCont->getBooleanData(DATAKEY_SETTINGS_OPEN_IN_NEW_TAB, false);
 
 					this->Tabcontrol->UserRequest_Open(
-						path,
-						openInNewTab ? TRUE : FALSE,
-						TRUE
+						file,
+						openInNewTab,
+						(i == (fileCount - 1)) ? true : false
 					);
 
 					// expand path
 					auto expPath = dataCont->getBooleanData(DATAKEY_SETTINGS_ALWAYS_EXPAND_PATH, true);
 					if (expPath)
 					{
-						this->FileNavigator->ExpandPathToFile(path);
+						this->FileNavigator->ExpandPathToFile(
+							file.GetPath()
+						);
 					}
 
 					// add to history
@@ -1265,29 +1317,35 @@ void Application::Open()
 						HistoryItem hiItem;
 						hiItem.SetActionType(HistoryItem::FILE_OPENED);
 						hiItem.SetLastOpenedTime();
-						hiItem.SetItemPath(path);
+						hiItem.SetItemPath(
+							file.GetPath()
+						);
 
 						this->FileHistory->AddToHistory(hiItem);
 						this->FileHistory->Save();
 					}
 				}
-				SafeDeleteArray(&path);
+			}
+			else
+			{
+				auto hr = file.GetStatus();
+
+				if (hr != HRESULT_FROM_WIN32(ERROR_CANCELLED))
+				{
+					iString errorMsg(
+						getStringFromResource(ERROR_MSG_OPENFILE_FAILED)
+					);
+					errorMsg += iString::fromHex((uintX)hr);
+
+					DispatchEWINotification(
+						EDSP_ERROR,
+						L"AC0003",
+						errorMsg.GetData(),
+						L"IFileOpenDialog"
+					);
+				}
 			}
 		}
-		else
-		{
-			// get and dispatch the error
-			iString errorCode(L"FD");
-			TCHAR* errorMessage = nullptr;
-			auto hr = osc->GetTranslated_hResultErrorCode(&errorMessage);
-			int code = (int)LOWORD(hr);
-			errorCode += code;
-
-			DispatchEWINotification(EDSP_ERROR, errorCode.GetData(), errorMessage, L"System File Dialog");
-
-			SafeDeleteArray(&errorMessage);
-		}
-		SafeRelease(&osc);
 	}
 }
 
@@ -1561,76 +1619,115 @@ void Application::Receive()
 
 void Application::Export()
 {
-	TCHAR* buffer = nullptr;
-	
-	auto res = this->Tabcontrol->GetCurrentTabContent(&buffer);
-	if (res)
+	// old routine:
+	//
+	//TCHAR* buffer = nullptr;
+	//
+	//auto res = this->Tabcontrol->GetCurrentTabContent(&buffer);
+	//if (res)
+	//{
+	//	auto dataContainer =
+	//		reinterpret_cast<ApplicationData*>(
+	//			getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
+	//			);
+	//	if (dataContainer != nullptr)
+	//	{
+	//		auto formatIndex = dataContainer->getIntegerData(DATAKEY_EXSETTINGS_EXPORT_LINEENDFORMAT, 0);
+	//
+	//		EditorContentManager em;
+	//		em.SetExecuteAsync(false);
+	//		em.SetContent(buffer);
+	//
+	//		switch (formatIndex)
+	//		{
+	//		case 0:
+	//			em.SetEndOfLineFormat(EditorContentManager::ENDOFLINE_FORMAT_CRLF);
+	//			break;
+	//		case 1:
+	//			em.SetEndOfLineFormat(EditorContentManager::ENDOFLINE_FORMAT_CR);
+	//			break;
+	//		case 2:
+	//			em.SetEndOfLineFormat(EditorContentManager::ENDOFLINE_FORMAT_LF);
+	//			break;
+	//		default:
+	//			em.SetEndOfLineFormat(EditorContentManager::ENDOFLINE_FORMAT_CRLF);
+	//			break;
+	//		}
+	//		
+	//		if (em.PrepareContentForSubsequentUsage())
+	//		{
+	//			auto osc = new Open_Save_CTRL();
+	//			if (osc != nullptr)
+	//			{
+	//				TCHAR* path = nullptr;
+	//
+	//				if (osc->OS_DialogCustomText(
+	//					L"Export", L"Export",
+	//					this->Tabcontrol->GetCurrentFilename(),
+	//					this->NavigationFolder.GetData()
+	//				))
+	//				{
+	//					res = osc->GetFilePathFromUser(&path, MODE_SAVE, INDEX_ALLFILES);
+	//					if (res)
+	//					{
+	//						auto bfpo = CreateBasicFPO();
+	//						if (bfpo != nullptr)
+	//						{
+	//							res = bfpo->SaveBufferToFileAsUtf8(
+	//								em.GetContent(),
+	//								path
+	//							);
+	//							if (res)
+	//							{
+	//								// ...
+	//							}
+	//							SafeRelease(&bfpo);
+	//						}
+	//						SafeDeleteArray(&path);
+	//					}
+	//				}
+	//				SafeRelease(&osc);
+	//			}
+	//		}
+	//	}
+	//	SafeDeleteArray(&buffer);
+	//}
+
+	CnC3File file;
+	CnC3FileManager cnc3FileManager(this->MainWindow);
+
+	cnc3FileManager.SetExportFormatHandler(
+		dynamic_cast<IExportFormatProtocol*>(this)
+	);
+
+	this->Tabcontrol->GetCurrentCnC3File(file);
+
+	if (file.Succeeded())
 	{
-		auto dataContainer =
-			reinterpret_cast<ApplicationData*>(
-				getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
-				);
-		if (dataContainer != nullptr)
+		cnc3FileManager.SetDialogText(
+			L"Export", L"Export",
+			file.GetFilename(true)
+		);
+
+		auto hr = cnc3FileManager.ExportAs(file);
+		if (FAILED(hr))
 		{
-			auto formatIndex = dataContainer->getIntegerData(DATAKEY_EXSETTINGS_EXPORT_LINEENDFORMAT, 0);
-
-			EditorContentManager em;
-			em.SetExecuteAsync(false);
-			em.SetContent(buffer);
-
-			switch (formatIndex)
+			if (hr != HRESULT_FROM_WIN32(ERROR_CANCELLED))
 			{
-			case 0:
-				em.SetEndOfLineFormat(EditorContentManager::ENDOFLINE_FORMAT_CRLF);
-				break;
-			case 1:
-				em.SetEndOfLineFormat(EditorContentManager::ENDOFLINE_FORMAT_CR);
-				break;
-			case 2:
-				em.SetEndOfLineFormat(EditorContentManager::ENDOFLINE_FORMAT_LF);
-				break;
-			default:
-				em.SetEndOfLineFormat(EditorContentManager::ENDOFLINE_FORMAT_CRLF);
-				break;
-			}
-			
-			if (em.PrepareContentForSubsequentUsage())
-			{
-				auto osc = new Open_Save_CTRL();
-				if (osc != nullptr)
-				{
-					TCHAR* path = nullptr;
+				iString errorMsg(
+					getStringFromResource(ERROR_MSG_EXPORT_FAILED)
+				);
+				errorMsg +=
+					iString::fromHex((uintX)hr);
 
-					if (osc->OS_DialogCustomText(
-						L"Export", L"Export",
-						this->Tabcontrol->GetCurrentFilename(),
-						this->NavigationFolder.GetData()
-					))
-					{
-						res = osc->GetFilePathFromUser(&path, MODE_SAVE, INDEX_ALLFILES);
-						if (res)
-						{
-							auto bfpo = CreateBasicFPO();
-							if (bfpo != nullptr)
-							{
-								res = bfpo->SaveBufferToFileAsUtf8(
-									em.GetContent(),
-									path
-								);
-								if (res)
-								{
-									// ...
-								}
-								SafeRelease(&bfpo);
-							}
-							SafeDeleteArray(&path);
-						}
-					}
-					SafeRelease(&osc);
-				}
+				DispatchEWINotification(
+					EDSP_ERROR,
+					L"AC0002",
+					errorMsg.GetData(),
+					L"IFileSaveDialog"
+				);
 			}
 		}
-		SafeDeleteArray(&buffer);
 	}
 }
 
@@ -1764,10 +1861,13 @@ void Application::OnNavigatorOpenRequest(WPARAM wParam, LPARAM lParam)
 					if ((openFlags & FORCE_OPEN_IN_NEW_TAB) && !openInNewTab)
 						openInNewTab = true;
 
+					CnC3File file;
+					file.Load(path);
+
 					this->Tabcontrol->UserRequest_Open(
-						path,
-						openInNewTab ? TRUE : FALSE,
-						(openFlags & DO_NOT_SET_FOCUS) ? FALSE : TRUE
+						file,
+						openInNewTab,
+						(openFlags & DO_NOT_SET_FOCUS) ? false : true
 					);
 
 					// add to history

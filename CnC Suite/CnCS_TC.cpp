@@ -72,6 +72,93 @@ CnCS_TC::~CnCS_TC()
 	// destroy toolbar icons ...
 }
 
+void CnCS_TC::GetCurrentCnC3File(CnC3File & file)
+{
+	// set the file definition from the tabinfostruct related to the current tab
+
+	file.Clear();
+
+	auto ptp = this->GetActiveTabProperty();
+	if (ptp != nullptr)
+	{
+		if (ptp->DESC1 != nullptr)
+			file.AddProperty(CnC3File::PID_DESCRIPTION_ONE, ptp->DESC1);
+		if (ptp->DESC2 != nullptr)
+			file.AddProperty(CnC3File::PID_DESCRIPTION_TWO, ptp->DESC2);
+		if (ptp->DESC3 != nullptr)
+			file.AddProperty(CnC3File::PID_DESCRIPTION_THREE, ptp->DESC3);
+
+		if (ptp->Path != nullptr)
+			file.SetPath(ptp->Path);
+
+		if (ptp->Editcontrol != nullptr)
+		{
+			TCHAR* content = nullptr;
+
+			if (ptp->Editcontrol->GetTextContent(&content) > 0)
+			{
+				file.SetNCContent(content);
+
+				SafeDeleteArray(&content);
+			}
+		}
+		file.SetStatus(S_OK);
+	}
+}
+
+void CnCS_TC::UserRequest_Open(const CnC3File & file, bool forceOpenInNewTab, bool setFocus)
+{
+	if (this->isAlreadyOpened(file))
+	{
+		DispatchEWINotification(
+			EDSP_INFO,
+			L"TC0004",
+			getStringFromResource(INFO_MSG_FILEISALREADYOPEN),
+			getStringFromResource(UI_TABCONTROL)
+		);
+	}
+	else
+	{
+		if (this->iParam.OpenNewPathInNewTab || forceOpenInNewTab)
+		{
+			if (this->AddTab(file))
+			{
+				if (setFocus)
+				{
+					auto _async = new Async();
+					if (_async != nullptr)
+					{
+						_async->callFunction(&focusToEdit);
+					}
+				}
+			}
+		}
+		else
+		{
+			if (this->SaveCheck_singleTab(this->GetActiveTabProperty()))
+			{
+				if (!this->OpenDisplayAndFormat(file, DO_CLEANUP | SET_DISPLAYNAME))
+				{
+					// handle error...
+				}
+				else
+				{
+					this->updateFileInfoArea();
+
+					if (setFocus)
+					{
+						auto _async = new Async();
+						if (_async != nullptr)
+						{
+							_async->callFunction(&focusToEdit);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 void CnCS_TC::GetCurrentTabDataAsStringCollection(itemCollection<iString> & data)
 {
 	auto ptp = this->GetActiveTabProperty();
@@ -2375,6 +2462,250 @@ BOOL CnCS_TC::ADD_Tab(LPCTSTR Path)
 												TRUE,
 												CARET_TO_END_OF_TEXT
 											);	
+										}
+									}
+								}
+								tabProperty->Editcontrol->UpdateFocusRect();
+							}
+						}
+					}
+				}
+			}
+			// update the internal control values
+			this->TABCount++;
+			this->iParam.previousTab = this->iParam.dwActiveTab;
+			this->iParam.dwActiveTab = tabProperty->TabIndex;
+			this->iParam.hwndActiveTab = Tab;
+
+			this->RefreshTabAlignment();
+		}
+	}
+	return result;
+}
+
+BOOL CnCS_TC::AddTab(const CnC3File & file)
+{
+	RECT rc;
+	BOOL result = TRUE;
+	POINT pt;
+	GetClientRect(this->TCFrame, &rc);
+
+	// get the absoluteRange of the new tab
+	result = this->CalculateInsertTabrange(&pt);
+	if (result)
+	{
+		// check if the maximum number of tabs is reached
+		if ((result == TAB_MAXIMUM) && (this->TABCount > 0))
+		{
+			TCHAR text[100] = { 0 };
+			StringCbPrintf(text, sizeof(text), L"Tab %i", this->TABCount + 1);
+
+			DispatchEWINotification(EDSP_INFO, L"TC0001", getStringFromResource(INFO_MSG_MAXIMUMTABCOUNTREACHED), text);
+
+			return TRUE;
+		}
+
+		// create the tab itself
+		HWND Tab =
+			CreateWindow(
+				L"CSTABCLASS",
+				NULL,
+				WS_CHILD | WS_VISIBLE,
+				pt.x,
+				DPIScale(2),
+				pt.y - pt.x,
+				DPIScale(25),
+				this->TCFrame,
+				reinterpret_cast<HMENU>(MAKECTRLID(TAB_ID_START + this->TABCount)),			//800 + ( zero based index ) 
+				this->hInstance,
+				this
+			);
+
+		if (!Tab)
+			return FALSE;
+		else
+		{
+			this->iParam.ActiveTabRange.x = pt.x;
+			this->iParam.ActiveTabRange.y = pt.y;
+
+			// allocate the tab-property and store it in the tab-window
+			LPTABPROPERTY tabProperty = new TABPROPERTY;
+			SecureZeroMemory(tabProperty, sizeof(TABPROPERTY));
+
+			tabProperty->toClass = reinterpret_cast<LONG_PTR>(this);
+			tabProperty->TabIndex = this->TABCount;						// zero based index
+			tabProperty->Content_Changed = FALSE;
+			tabProperty->mouseHover = FALSE;
+			tabProperty->Tab = Tab;
+
+			if (file.HasPath())
+			{
+				CopyStringToPtr(
+					file.GetPath(),
+					&tabProperty->Path
+				);
+				GetFilenameOutOfPath(
+					file.GetPath(),
+					&tabProperty->displayname,
+					TRUE
+				);
+			}
+			else
+			{
+				CopyStringToPtr(
+					getStringFromResource(UI_TABCTRL_NEWTAB),
+					&tabProperty->displayname
+				);
+			}
+			SetWindowLongPtr(Tab, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(tabProperty));
+
+			RECT rc_tab;
+			GetClientRect(Tab, &rc_tab);
+
+			// create the close-button
+			HWND button =
+				CreateWindow(
+					L"BUTTON",
+					nullptr,
+					WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
+					rc_tab.right - DPIScale(28),
+					rc_tab.bottom - DPIScale(21),
+					DPIScale(16),
+					DPIScale(16),
+					Tab,
+					(HMENU)ID_TABCLOSE,
+					this->hInstance,
+					nullptr
+				);
+
+			if (!button)
+				return FALSE;
+			else
+			{
+				// subclass the close-button
+				result = SetWindowSubclass(button, CnCS_TC::CloseBtnSub, NULL, reinterpret_cast<DWORD_PTR>(tabProperty));
+				if (result)
+				{
+					if (this->TABCount > 0)
+					{
+						// if another tab will be hidden make sure to save the visible data to the tab-property
+						LPTABPROPERTY ptp_old =
+							reinterpret_cast<LPTABPROPERTY>(
+								GetWindowLongPtr(this->iParam.hwndActiveTab, GWLP_USERDATA)
+								);
+
+						if (ptp_old != NULL)
+						{
+							this->SaveDescritpionsToTabProperty(ptp_old);
+							ShowWindow(ptp_old->AssocEditWnd, SW_HIDE);
+						}
+					}
+					// create the associated editwindow
+					tabProperty->AssocEditWnd =
+						CreateWindowEx(
+							0,
+							MSFTEDIT_CLASS,
+							nullptr,
+							WS_CHILD | WS_CLIPSIBLINGS | ES_MULTILINE | ES_NOHIDESEL | ES_SELECTIONBAR | WS_VSCROLL | ES_AUTOHSCROLL | ES_AUTOVSCROLL | WS_HSCROLL,
+							0, 0, 0, 0,
+							this->TCFrame,
+							IDTOHMENU(TABEDIT_ID_START + this->TABCount),//reinterpret_cast<HMENU>(MAKECTRLID(TABEDIT_ID_START + this->TABCount)),
+							this->hInstance,
+							nullptr
+						);
+
+					if (!tabProperty->AssocEditWnd)
+						return FALSE;
+					else
+					{
+						// create the editcontrol instance and connect it to the rich-edit-box
+						tabProperty->Editcontrol = CreateEditControlInstance(tabProperty->AssocEditWnd, Tab);
+
+						result = (tabProperty->Editcontrol != nullptr) ? TRUE : FALSE;
+						if (result)
+						{
+							// config the editcontrol object >>
+
+							EDITCONTROLPROPERTIES ecs;
+							this->SetEditControlProperties(&ecs);// includes the autosyntax settings...!
+
+							// this could reduce efficiency????
+							iString subprog, endprog, newline;
+							autosyntaxManager::GetTriggerStrings(subprog, endprog, newline);
+							tabProperty->Editcontrol->insertUserdefinedTriggerStrings(
+								subprog.GetData(),
+								endprog.GetData(),
+								newline.GetData()
+							);
+
+							result = tabProperty->Editcontrol->ConfigureComponent(&this->editStyleColors, &ecs, TRUE, TRUE);
+							if (result)
+							{
+								auto appProperties
+									= reinterpret_cast<CnCSuite_Property*>(
+										getApplicationPropertyComponent()
+										);
+
+								if (appProperties != nullptr)
+								{
+									int cnt = 0;
+									auto acStrings
+										= reinterpret_cast<LPAUTOCOMPLETESTRINGS>(
+											appProperties->GetAutocompleteStrings(&cnt)
+											);
+									tabProperty->Editcontrol->SetAutocompleteStrings(acStrings, cnt);
+								}
+
+								int Ewidth = rc.right - DPIScale(40);
+								if (this->iParam.descWnd_visible)	// hold free section for desc window
+									Ewidth = 2 * (Ewidth / 3);
+
+								ShowScrollBar(tabProperty->AssocEditWnd, SB_BOTH, FALSE);
+
+								SetWindowPos(
+									tabProperty->AssocEditWnd,
+									NULL,
+									DPIScale(40),
+									DPIScale(40),
+									Ewidth,
+									rc.bottom - DPIScale(40),
+									SWP_NOZORDER | SWP_SHOWWINDOW
+								);
+
+								// load a path (if exist) or default values (no path)
+								if (file.HasPath())
+								{
+									this->iParam.hwndActiveTab = Tab;
+
+									this->OpenDisplayAndFormat(file, NO_EXECUTE);
+
+									this->updateFileInfoArea();
+								}
+								else
+								{
+									// its an empty tab, so set placeholder descriptions and default text if desired
+									this->SetDescriptions(L"...", L"...", L"...");
+									this->initDescriptionBuffer(tabProperty);
+
+									this->eraseFileInfoArea(nullptr);
+
+									auto dataContainer =
+										reinterpret_cast<ApplicationData*>(
+											getDefaultApplicationDataContainer()
+											);
+									if (dataContainer != nullptr)
+									{
+										auto insertDefaultText =
+											dataContainer->getBooleanData(DATAKEY_SETTINGS_INSERTDEFAULTTEXT, true);
+
+										if (insertDefaultText)
+										{
+											this->SetTabContentFocusAndPushCaret(
+												tabProperty,
+												this->getDefaultInsertText(),
+												TRUE,
+												CARET_TO_END_OF_TEXT
+											);
 										}
 									}
 								}
@@ -5188,6 +5519,62 @@ BOOL CnCS_TC::OpenDisplayAndFormat(LPCTSTR path, DWORD flags)
 	return result;
 }
 
+BOOL CnCS_TC::OpenDisplayAndFormat(const CnC3File & file, DWORD flags)
+{
+	if (file.HasPath())
+	{
+		HWND Tab = this->iParam.hwndActiveTab;
+		if (Tab != NULL)
+		{
+			LPTABPROPERTY ptc =
+				reinterpret_cast<LPTABPROPERTY>(
+					GetWindowLongPtr(Tab, GWLP_USERDATA)
+				);
+
+			if (ptc != NULL)
+			{
+
+				if (flags & DO_CLEANUP)
+				{
+					// clean old content
+					this->CleanUpTabStructForNewContent(ptc);
+				}
+				if (flags & SET_DISPLAYNAME)
+				{
+					// set new content
+					CopyStringToPtr(
+						file.GetPath(),
+						&ptc->Path
+					);
+					GetFilenameOutOfPath(
+						file.GetPath(),
+						&ptc->displayname,
+						TRUE
+					);
+				}
+
+				ptc->Editcontrol->SetTextContent(
+					file.GetNCContent(),
+					TRUE, TRUE, FALSE
+				);
+
+				file.GetProperty(CnC3File::PID_DESCRIPTION_ONE, &ptc->DESC1);
+				file.GetProperty(CnC3File::PID_DESCRIPTION_TWO, &ptc->DESC2);
+				file.GetProperty(CnC3File::PID_DESCRIPTION_THREE, &ptc->DESC3);
+
+				this->SetDescriptions(
+					ptc->DESC1,
+					ptc->DESC2,
+					ptc->DESC3
+				);
+
+				RedrawWindow(Tab, NULL, NULL, RDW_INVALIDATE | RDW_NOERASE | RDW_ALLCHILDREN);
+			}
+		}
+	}
+	return TRUE;
+}
+
 BOOL CnCS_TC::getCurrentSelectedText(LPSELECTIONINFO selInfo)
 {
 	BOOL result;
@@ -5470,6 +5857,27 @@ BOOL CnCS_TC::isPathAlreadyOpen(LPTSTR path)
 	}
 	return FALSE;
 }
+
+bool CnCS_TC::isAlreadyOpened(const CnC3File& file)
+{
+	for (DWORD i = 0; i < this->TABCount; i++)
+	{
+		auto ptp = this->GetTabProperty(i);
+		if (ptp != nullptr)
+		{
+			auto isEqual =
+				CompareStringsB(
+					ptp->Path,
+					file.GetPath()
+				);
+
+			if (isEqual)
+				return true;
+		}
+	}
+	return false;
+}
+
 
 void CnCS_TC::setFocusOncurEdit()
 {

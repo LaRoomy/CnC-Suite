@@ -25,6 +25,8 @@ void DispatchSystemError();
 
 // APPLICATION CORE
 // AC0001	- filetype not supported				// error
+// AC0002	- export failed							// error
+// AC0003	- opening file failed					// error
 
 // TABCONTROL
 // TC0001	- maximum Tab-count reached				// info

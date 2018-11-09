@@ -125,6 +125,37 @@ void CnC3File::Clear()
 	// TODO !!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
+LPCTSTR CnC3File::GetFilename(bool hideFileExtension)
+{
+	TCHAR* fName = nullptr;
+
+	if (GetFilenameOutOfPath(this->pathToFile.GetData(), &fName, hideFileExtension ? TRUE : FALSE)
+		== TRUE)
+	{
+		this->filename.Replace(fName);
+
+		SafeDeleteArray(&fName);
+		return this->filename.GetData();
+	}
+	return nullptr;
+}
+
+void CnC3File::GetProperty(PropertyID Id, TCHAR ** data_out) const
+{
+	//auto propertyData = this->cnc3PropertyMap.GetDataForKey(Id);
+
+	CopyStringToPtr(
+		this->cnc3PropertyMap.GetDataForKey(Id)
+			.GetData(),
+		data_out
+	);
+}
+
+iString CnC3File::GetProperty(PropertyID Id) const
+{
+	return this->cnc3PropertyMap.GetDataForKey(Id);
+}
+
 void CnC3File::copy(const CnC3File & file)
 {
 	this->Clear();
@@ -877,7 +908,7 @@ HRESULT CnC3FileManager::ExportAs(const CnC3File & file)
 
 												if (this->exportFormatHandler != nullptr)
 												{
-													this->exportFormatHandler->onFormatForExport(file, bufferToSave);
+													this->exportFormatHandler->FormatForExport(file, bufferToSave);
 												}
 												else
 												{

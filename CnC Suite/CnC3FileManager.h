@@ -2,7 +2,6 @@
 #include<Windows.h>
 #include"cObject.h"
 #include<ShObjIdl.h>
-//#include<ItemCollection.h>
 #include<StringClass.h>
 #include<Xmap.h>
 
@@ -44,12 +43,18 @@ public:
 	void SetPath(LPCTSTR path) {
 		this->pathToFile = path;
 	}
+	bool HasPath() const {
+		return
+			(this->pathToFile.GetData() != nullptr)
+			? true : false;
+	}
 	LPCTSTR GetNCContent() const {
 		return this->ncContent.GetData();
 	}
 	void SetNCContent(LPCTSTR content) {
 		this->ncContent = content;
 	}
+	LPCTSTR GetFilename(bool hideFileExtension);
 
 	HRESULT GetStatus() {
 		return this->status;
@@ -91,15 +96,19 @@ public:
 	int GetPropertyCount() {
 		this->cnc3PropertyMap.GetCount();
 	}
-	void GetProperty(int index, iString& propertyKey, iString& pData) {
+	void GetProperty(int index, iString& propertyKey, iString& pData) const {
 		this->cnc3PropertyMap.GetPairAtIndex(index, propertyKey, pData);
 	}
+	void GetProperty(PropertyID Id, TCHAR** data_out) const;
+	iString GetProperty(PropertyID Id) const;
+
 private:
 	HRESULT status;
 	bool skippathsaving;
 
 	iString ncContent;
 	iString pathToFile;
+	iString filename;
 
 	Xmap<iString, iString> cnc3PropertyMap;
 
@@ -201,7 +210,7 @@ private:
 
 __interface IExportFormatProtocol {
 public:
-	void onFormatForExport(const CnC3File& file, iString& buffer_out);
+	void FormatForExport(const CnC3File& file, iString& buffer_out);
 };
 
 
@@ -230,7 +239,7 @@ public:
 	void SetTargetFolder(LPCTSTR Path);
 	void SetHwndOwner(HWND Owner);
 
-	void SetExportFormatRoutine(IExportFormatProtocol* routine) {
+	void SetExportFormatHandler(IExportFormatProtocol* routine) {
 		this->exportFormatHandler = routine;
 	}
 
