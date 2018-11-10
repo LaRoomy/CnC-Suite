@@ -22,6 +22,7 @@ public:
 	virtual void SetEventHandler(IFileSystemModificationProtocoll *FileSystemEvents_) = 0;
 	virtual void Hide() = 0;
 	virtual void Show() = 0;
+	virtual LPCTSTR GetRootFolder() const = 0;
 };
 
 CnCSuite_FileNavigator* CreateFileNavigator(HINSTANCE hInst, HWND MainWindow);

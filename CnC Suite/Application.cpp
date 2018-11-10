@@ -1,5 +1,4 @@
 #include"Application.h"
-#include"OpenSave\Open_Save_CTRL.h"
 #include"DataExchange\DataExchange.h"
 #include"Searchcontrol\SearchControl.h"
 #include"SampleManager\SampleManager.h"
@@ -1260,14 +1259,36 @@ LRESULT Application::OnRestartApp(WPARAM wParam)
 
 void Application::Open()
 {
+	CnC3File currentFile;
 	CnC3FileManager cnc3FileManager(this->MainWindow);
 
-	cnc3FileManager.SetDialogText(
+	//cnc3FileManager.SetDialogText(???)
 
+	this->Tabcontrol->GetCurrentCnC3File(currentFile);
+	if (currentFile.HasPath())
+	{
+		auto bfpo = CreateBasicFPO();
+		if (bfpo != nullptr)
+		{
+			TCHAR* path = nullptr;
 
-	)
-
-	//cnc3FileManager.SetTargetFolder()
+			if (CopyStringToPtr(currentFile.GetPath(), &path) == TRUE)
+			{
+				if (bfpo->RemoveFilenameFromPath(path))
+				{
+					cnc3FileManager.SetTargetFolder(path);
+				}
+				SafeDeleteArray(&path);
+			}
+			bfpo->Release();
+		}
+	}
+	else
+	{
+		cnc3FileManager.SetTargetFolder(
+			this->FileNavigator->GetRootFolder()
+		);
+	}
 
 	auto files = cnc3FileManager.Open();
 	if (files.Succeeded())
@@ -1423,73 +1444,78 @@ void Application::SaveAs()
 	}
 }
 
-void Application::Import(LPTSTR path)
+void Application::Import(LPCTSTR path)
 {
-	Open_Save_CTRL* osc = new Open_Save_CTRL();
-	if (osc != NULL)
+	if (path == nullptr)
 	{
-		if (path == NULL)
+		CnC3FileManager cnc3FileManager(this->MainWindow);
+
+		cnc3FileManager.SetDialogText(
+			getStringFromResource(UI_IMPORT_FILE_CONTENT),
+			getStringFromResource(UI_IMPORT_ACTION),
+			nullptr
+		);
+
+		auto importElement =
+			cnc3FileManager.Import();
+
+		if (importElement.Succeeded())
 		{
-			if (osc->OS_DialogCustomText(
-				getStringFromResource(UI_IMPORT_FILE_CONTENT),
-				getStringFromResource(UI_IMPORT_ACTION),
-				NULL, NULL))
-			{
-				TCHAR* importPath = NULL;
-
-				osc->setHwndOwner(this->MainWindow);
-
-				if (osc->GetFilePathFromUser(&importPath, MODE_OPEN, INDEX_ALLFILES))
-				{
-					BasicFPO* bfpo = CreateBasicFPO();
-					if (bfpo != NULL)
-					{
-						TCHAR* fileContent = NULL;
-
-						if (bfpo->LoadBufferFmFile(&fileContent, importPath))		//CODEPAGE		// use different codepages, selected by the user??
-						{
-							this->Tabcontrol->UserRequest_Import(fileContent);
-
-							SafeDeleteArray(&fileContent);
-						}
-						SafeRelease(&bfpo);
-					}
-					SafeDeleteArray(&importPath);
-				}
-			}
+			this->Tabcontrol->UserRequest_Import(
+				importElement.GetNCContent()
+			);
 		}
 		else
 		{
-			BasicFPO* bfpo = CreateBasicFPO();
-			if (bfpo != NULL)
+			auto hr =
+				importElement.GetStatus();
+
+			if (hr != HRESULT_FROM_WIN32(ERROR_CANCELLED))
 			{
-				TCHAR* fileContent = NULL;
+				iString errorMsg(
+					getStringFromResource(ERROR_MSG_IMPORT_FAILED)
+				);
+				errorMsg += iString::fromHex((uintX)hr);
 
-				if (bfpo->LoadBufferFmFile(&fileContent, path))			//CODEPAGE		// use different codepages, selected by the user??
-				{
-					this->Tabcontrol->UserRequest_Import(fileContent);
-
-					TCHAR* filename = NULL;
-					if (bfpo->GetFilenameOutOfPath(path, &filename, FALSE))
-					{
-						iString string(getStringFromResource(INFO_MSG_FILEWASIMPORTED));
-						string.Append(filename);
-
-						DispatchEWINotification(
-							EDSP_INFO,
-							L"FN0002\0",
-							string.getContentReference(),
-							getStringFromResource(UI_FILENAVIGATOR)
-						);
-
-						SafeDeleteArray(&filename);
-					}
-					SafeDeleteArray(&fileContent);
-				}
-				SafeRelease(&bfpo);
+				DispatchEWINotification(
+					EDSP_ERROR,
+					L"AC0004",
+					errorMsg.GetData(),
+					L"IFileOpenDialog"
+				);
 			}
 		}
-		SafeRelease(&osc);
+	}
+	else
+	{
+		BasicFPO* bfpo = CreateBasicFPO();
+		if (bfpo != NULL)
+		{
+			TCHAR* fileContent = NULL;
+
+			if (bfpo->LoadBufferFmFile(&fileContent, path))			//CODEPAGE		// use different codepages, selected by the user??
+			{
+				this->Tabcontrol->UserRequest_Import(fileContent);
+
+				TCHAR* filename = NULL;
+				if (bfpo->GetFilenameOutOfPath(path, &filename, FALSE))
+				{
+					iString string(getStringFromResource(INFO_MSG_FILEWASIMPORTED));
+					string.Append(filename);
+
+					DispatchEWINotification(
+						EDSP_INFO,
+						L"FN0002\0",
+						string.getContentReference(),
+						getStringFromResource(UI_FILENAVIGATOR)
+					);
+
+					SafeDeleteArray(&filename);
+				}
+				SafeDeleteArray(&fileContent);
+			}
+			SafeRelease(&bfpo);
+		}
 	}
 }
 
@@ -1584,34 +1610,40 @@ void Application::Receive()
 
 	if (!isAlreadyOpen)
 	{
-		SerialComm* dataTraffic = new SerialComm(this->MainWindow, this->hInstance, this->AppData.UserPath);
-		if (dataTraffic != nullptr)
+		AppPath appPath;
+		auto commsetuppath = appPath.Get(PATHID_FILE_COMSETUP);
+
+		if (commsetuppath.succeeded())
 		{
-			HWND cBox = this->UserInterface->GetFrameHandles(GFWH_CBOXFRAME);
-			if (cBox)
+			SerialComm* dataTraffic = new SerialComm(this->MainWindow, this->hInstance, commsetuppath.GetData());
+			if (dataTraffic != nullptr)
 			{
-				RECT rc;
-				GetWindowRect(cBox, &rc);
-
-				auto dataContainer =
-					reinterpret_cast<ApplicationData*>(
-						getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
-						);
-
-				if (dataContainer->getBooleanData(DATAKEY_EXSETTINGS_EXCHANGEWND_MONITORTRANSMISSION, true))
+				HWND cBox = this->UserInterface->GetFrameHandles(GFWH_CBOXFRAME);
+				if (cBox)
 				{
-					if ((rc.bottom - rc.top) < DPIScale(250))
-						rc.top = rc.top - (DPIScale(250) - (rc.bottom - rc.top));
-				}
-				else
-				{
-					rc.top = rc.bottom - DPIScale(30);
-				}
+					RECT rc;
+					GetWindowRect(cBox, &rc);
 
-				dataTraffic->enableVerboseMessaging(
-					dataContainer->getBooleanData(DATAKEY_EXSETTINGS_EXCHANGEWND_VERBOSETRANSMISSION, false)
-				);
-				dataTraffic->InitDataTransmission(RECIEVE_BUFFER, nullptr, &rc);
+					auto dataContainer =
+						reinterpret_cast<ApplicationData*>(
+							getApplicationDataContainerFromFilekey(FILEKEY_EXTENDED_SETTINGS)
+							);
+
+					if (dataContainer->getBooleanData(DATAKEY_EXSETTINGS_EXCHANGEWND_MONITORTRANSMISSION, true))
+					{
+						if ((rc.bottom - rc.top) < DPIScale(250))
+							rc.top = rc.top - (DPIScale(250) - (rc.bottom - rc.top));
+					}
+					else
+					{
+						rc.top = rc.bottom - DPIScale(30);
+					}
+
+					dataTraffic->enableVerboseMessaging(
+						dataContainer->getBooleanData(DATAKEY_EXSETTINGS_EXCHANGEWND_VERBOSETRANSMISSION, false)
+					);
+					dataTraffic->InitDataTransmission(RECIEVE_BUFFER, nullptr, &rc);
+				}
 			}
 		}
 	}

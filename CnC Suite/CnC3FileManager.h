@@ -212,6 +212,10 @@ __interface IExportFormatProtocol {
 public:
 	void FormatForExport(const CnC3File& file, iString& buffer_out);
 };
+__interface IFileDialogUserEvents {
+public:
+	void SaveAsPathWasSelected(cObject sender, LPCTSTR path);
+};
 
 
 class CnC3FileManager
@@ -225,15 +229,21 @@ public:
 	CnC3FileCollection& Open();
 	// Opens the file at the specified path direct (without showing a dialog)
 	CnC3File& Open(LPCTSTR path);
-
 	// Shows the Save-Dialog and saves the given file at a location selected by the user
 	// The returned cnc3-object is the full-defined representation of the saved file
 	CnC3File& SaveAs(const CnC3File& file);
 	// Saves the cnc3-object to file at the given location in the cnc3-object
 	HRESULT Save(CnC3File& file);
-
-	CnC3File& Import(LPCTSTR path);
+	// Shows the Open-Dialog but the returned object has no path, only the nc-content is valid (if status == S_OK)
+	// NOTE: the dialog-text for the import-style is not initally set! It must be done before calling this method (by calling SetDialogText(...))
+	CnC3File& Import();
+	// Shows the Save-Dialog but the user can choose the filetype he wants
+	// NOTE: the method calls the IExportFormatProtocol::FormatForExport method if a handler was subscribed
+	// -> so the caller could reformat the nc-content for export if neccessary
+	// NOTE: the dialog-text for the export-style is not initally set! It must be done before calling this method (by calling SetDialogText(...))
 	HRESULT ExportAs(const CnC3File& file);
+
+	BOOL ConvertToCnC3(LPCTSTR pathOfFileToConvert, CnC3File& file_out);
 
 	void SetDialogText(LPCTSTR CaptionText, LPCTSTR ButtonText, LPCTSTR FileText);
 	void SetTargetFolder(LPCTSTR Path);
@@ -241,6 +251,9 @@ public:
 
 	void SetExportFormatHandler(IExportFormatProtocol* routine) {
 		this->exportFormatHandler = routine;
+	}
+	void SetUserEventHandler(IFileDialogUserEvents* eventHandler) {
+		this->userEventHandler = eventHandler;
 	}
 
 	const wchar_t* ToString(){
@@ -257,6 +270,7 @@ private:
 	iString targetfolder;
 
 	IExportFormatProtocol* exportFormatHandler;
+	IFileDialogUserEvents* userEventHandler;
 
 	CnC3FileCollection openResult;
 	CnC3File currentFile;

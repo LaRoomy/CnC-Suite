@@ -216,7 +216,6 @@
     <ClInclude Include="iBox.h" />
     <ClInclude Include="IPath.h" />
     <ClInclude Include="LanguageDispatcher.h" />
-    <ClInclude Include="OpenSave\Open_Save_CTRL.h" />
     <ClInclude Include="ResetDialog.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SafeRelease.h" />
@@ -279,7 +278,6 @@
     </ClCompile>
     <ClCompile Include="history.cpp" />
     <ClCompile Include="IPath.cpp" />
-    <ClCompile Include="OpenSave\Open_Save_CTRL.cpp" />
     <ClCompile Include="ResetDialog.cpp" />
     <ClCompile Include="SampleManager\SampleManager.cpp" />
     <ClCompile Include="Searchcontrol\SearchControl.cpp" />

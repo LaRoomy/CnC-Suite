@@ -1,6 +1,5 @@
 #pragma once
 #include"..\external.h"
-#include"..\OpenSave\Open_Save_CTRL.h"
 
 #ifndef _SEARCHCTRL_INCLUDED_
 #define _SEARCHCTRL_INCLUDED_
@@ -135,7 +134,6 @@ typedef struct OpenResults{
 
 typedef struct ThreadStorage{
 
-	Open_Save_CTRL* osc;
 	HWND Progress;
 
 }THREADSTORAGE, *LPTHREADSTORAGE;
@@ -204,7 +202,7 @@ private:
 	LONG ConvertPixToTwips(int);
 	BOOL CheckCriteria(void);
 	int CheckFileType(LPTSTR);
-	BOOL SearchForString(LPTSTR,LPTSTR);
+	BOOL SearchForString(LPCTSTR,LPCTSTR);
 	int CreateSearchResultString(LPTSTR);
 	BOOL ExeedContainer(void);
 	void CleanUpThreadMemory(void);
@@ -213,7 +211,7 @@ private:
 	BOOL SearchInRoot(LPTSTR);
 
 
-	inline BOOL ResultDisplayAndStorage(DWORD,int&,LPTSTR,LPTSTR,LPTSTR,LPTSTR,LPTSTR,LPTSTR,LPTSTR,int);
+	inline BOOL ResultDisplayAndStorage(DWORD,int&,LPCTSTR,LPCTSTR,LPCTSTR,LPCTSTR,LPCTSTR,LPCTSTR,LPCTSTR,int);
 	inline void Interrupt(void);
 	inline BOOL ProcessNextLevel(int,int&,LPTSTR,LPTSTR,LPWIN32_FIND_DATA,HANDLE);
 	inline BOOL Analyse(LPTSTR,int&,LPTSTR,LPTSTR,LPTSTR,DWORD);

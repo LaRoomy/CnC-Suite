@@ -393,6 +393,13 @@ BOOL CnC3File::Extract(LPCTSTR buffer)
 			}
 			i++;
 		}
+
+		if ((i == 0) && (buffer[i] == L'['))
+		{
+			if (buffer[1] != L'P')
+				i++;
+		}
+
 		if (buffer[i] == L'\0')
 		{
 			break;
@@ -547,12 +554,12 @@ int CnC3File::Get_Property(int start_pos, int prop_number, LPCTSTR buffer)
 }
 
 CnC3FileManager::CnC3FileManager()
-	: owner(nullptr), exportFormatHandler(nullptr)
+	: owner(nullptr), exportFormatHandler(nullptr), userEventHandler(nullptr)
 {
 }
 
 CnC3FileManager::CnC3FileManager(HWND _owner_)
-	: owner(_owner_), exportFormatHandler(nullptr)
+	: owner(_owner_), exportFormatHandler(nullptr), userEventHandler(nullptr)
 {
 }
 
@@ -724,6 +731,14 @@ CnC3File & CnC3FileManager::SaveAs(const CnC3File & file)
 											hr = sItem->GetDisplayName(SIGDN_FILESYSPATH, &filePath);
 											if (SUCCEEDED(hr))
 											{
+												// trigger the event if the caller subscribed on the eventHandler
+												if (this->userEventHandler != nullptr)
+												{
+													this->userEventHandler->SaveAsPathWasSelected(
+														reinterpret_cast<cObject>(this),
+														filePath
+													);
+												}
 												// update the file with the new valid path and save
 												this->currentFile.SetPath(filePath);
 												this->currentFile.Save();
@@ -751,94 +766,87 @@ HRESULT CnC3FileManager::Save(CnC3File & file)
 	return file.Save();
 }
 
-CnC3File & CnC3FileManager::Import(LPCTSTR path)
+CnC3File & CnC3FileManager::Import()
 {
 	this->currentFile.Clear();
 	
-	auto hr =
-		(path != nullptr)
-		? S_OK : E_INVALIDARG;
+	IFileOpenDialog* Ifd;
 
+	auto hr =
+		CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&Ifd));
 	if (SUCCEEDED(hr))
 	{
-		IFileOpenDialog* Ifd;
+		// set options on the dialog
+		FILEOPENDIALOGOPTIONS fOptions;
 
-		hr =
-			CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&Ifd));
+		hr = Ifd->GetOptions(&fOptions);
 		if (SUCCEEDED(hr))
 		{
-			// set options on the dialog
-			FILEOPENDIALOGOPTIONS fOptions;
-
-			hr = Ifd->GetOptions(&fOptions);
+			hr = Ifd->SetOptions(fOptions | FOS_FORCEFILESYSTEM);
 			if (SUCCEEDED(hr))
 			{
-				hr = Ifd->SetOptions(fOptions | FOS_FORCEFILESYSTEM);
+				// set default file location
+				hr = this->setTargetFolder(Ifd);
 				if (SUCCEEDED(hr))
 				{
-					// set default file location
-					hr = this->setTargetFolder(Ifd);
+					// set the custom dialog text
+					hr = this->setDialogText(Ifd);
 					if (SUCCEEDED(hr))
 					{
-						// set the custom dialog text
-						hr = this->setDialogText(Ifd);
+						// set filetype(s) -> in this case all files are valid
+						hr = Ifd->SetFileTypes(ARRAYSIZE(AllFiles), AllFiles);
 						if (SUCCEEDED(hr))
 						{
-							// set filetype(s) -> in this case all files are valid
-							hr = Ifd->SetFileTypes(ARRAYSIZE(AllFiles), AllFiles);
+							hr = Ifd->SetFileTypeIndex(0);
 							if (SUCCEEDED(hr))
 							{
-								hr = Ifd->SetFileTypeIndex(0);
+								hr = Ifd->SetDefaultExtension(L".txt");
 								if (SUCCEEDED(hr))
 								{
-									hr = Ifd->SetDefaultExtension(L".txt");
+									// show the dialog
+									hr = Ifd->Show(this->owner);
 									if (SUCCEEDED(hr))
 									{
-										// show the dialog
-										hr = Ifd->Show(this->owner);
+										// obtain the result
+										IShellItem* sItem;
+
+										hr = Ifd->GetResult(&sItem);
 										if (SUCCEEDED(hr))
 										{
-											// obtain the result
-											IShellItem* sItem;
+											PTSTR itemPath = nullptr;
 
-											hr = Ifd->GetResult(&sItem);
+											hr = sItem->GetDisplayName(SIGDN_FILESYSPATH, &itemPath);
 											if (SUCCEEDED(hr))
 											{
-												PTSTR itemPath = nullptr;
+												auto bfpo = CreateBasicFPO();
 
-												hr = sItem->GetDisplayName(SIGDN_FILESYSPATH, &itemPath);
-												if (SUCCEEDED(hr))
+												hr =
+													(bfpo != nullptr)
+													? S_OK : E_OUTOFMEMORY;
+
+												if(SUCCEEDED(hr))
 												{
-													auto bfpo = CreateBasicFPO();
+													TCHAR* buffer = nullptr;
 
 													hr =
-														(bfpo != nullptr)
-														? S_OK : E_OUTOFMEMORY;
+														bfpo->LoadBufferFmFileAsUtf8(&buffer, itemPath)
+														? S_OK : E_FAIL;
 
-													if(SUCCEEDED(hr))
+													if (SUCCEEDED(hr))
 													{
-														TCHAR* buffer = nullptr;
+														this->currentFile.SetNCContent(buffer);
 
-														hr =
-															bfpo->LoadBufferFmFileAsUtf8(&buffer, itemPath)
-															? S_OK : E_FAIL;
+														this->currentFile.AddProperty(CnC3File::PID_DESCRIPTION_ONE, EMPTY_PROPERTY_STRING);
+														this->currentFile.AddProperty(CnC3File::PID_DESCRIPTION_TWO, EMPTY_PROPERTY_STRING);
+														this->currentFile.AddProperty(CnC3File::PID_DESCRIPTION_THREE, EMPTY_PROPERTY_STRING);
 
-														if (SUCCEEDED(hr))
-														{
-															this->currentFile.SetNCContent(buffer);
-
-															this->currentFile.AddProperty(CnC3File::PID_DESCRIPTION_ONE, EMPTY_PROPERTY_STRING);
-															this->currentFile.AddProperty(CnC3File::PID_DESCRIPTION_TWO, EMPTY_PROPERTY_STRING);
-															this->currentFile.AddProperty(CnC3File::PID_DESCRIPTION_THREE, EMPTY_PROPERTY_STRING);
-
-															SafeDeleteArray(&buffer);
-														}
-														SafeRelease(&bfpo);
+														SafeDeleteArray(&buffer);
 													}
-													CoTaskMemFree(itemPath);
+													SafeRelease(&bfpo);
 												}
-												SafeRelease(&sItem);
+												CoTaskMemFree(itemPath);
 											}
+											SafeRelease(&sItem);
 										}
 									}
 								}
@@ -847,8 +855,8 @@ CnC3File & CnC3FileManager::Import(LPCTSTR path)
 					}
 				}
 			}
-			SafeRelease(&Ifd);
 		}
+		SafeRelease(&Ifd);
 	}
 	this->currentFile = hr;
 	return this->currentFile;
@@ -939,6 +947,133 @@ HRESULT CnC3FileManager::ExportAs(const CnC3File & file)
 		SafeRelease(&Ifd);
 	}
 	return hr;
+}
+
+BOOL CnC3FileManager::ConvertToCnC3(LPCTSTR pathOfFileToConvert, CnC3File & file_out)
+{
+	file_out.Clear();
+
+	BOOL rAction = (BOOL)MessageBox(
+		this->owner,
+		getStringFromResource(UI_GNRL_KEEPOLDFILE),
+		getStringFromResource(UI_GNRL_CONVERTTOCNC3),
+		MB_YESNO | MB_ICONINFORMATION);
+
+	if (rAction != IDCANCEL)
+	{
+		BOOL result;
+		TCHAR* filename = nullptr;
+
+		result = (GetFilenameOutOfPath(pathOfFileToConvert, &filename, TRUE) == TRUE) ? TRUE : FALSE;
+		if (result)
+		{
+			BasicFPO* pfpo = CreateBasicFPO();
+
+			result =
+				(pfpo != nullptr) ? TRUE : FALSE;
+
+			if (result)
+			{
+				TCHAR placeholder[2] = L" ";
+				TCHAR* contentBuffer = nullptr;
+
+				result = pfpo->LoadBufferFmFileAsUtf8(&contentBuffer, pathOfFileToConvert);
+				if (result)
+				{
+					if (contentBuffer == nullptr)
+						contentBuffer = placeholder;
+
+					TCHAR* folder = nullptr;
+
+					result = (CopyStringToPtrA(pathOfFileToConvert, &folder) == TRUE) ? TRUE : FALSE;
+					if (result)
+					{
+						result = pfpo->RemoveFilenameFromPath(folder);
+						if (result)
+						{
+							TCHAR *newPath = nullptr;
+
+							if (rAction == IDNO)
+							{
+								result = DeleteFile(pathOfFileToConvert);
+								if (result)
+								{
+									result = AppendStringsWithVaList(&newPath, folder, L"\\", filename, L".cnc3", NULL);
+								}
+							}
+							else if (rAction == IDYES)
+							{
+								result = AppendStringsWithVaList(&newPath, folder, L"\\", filename, L"(conv)", L".cnc3", NULL);
+							}
+							else
+								result = FALSE;
+
+							if (result)
+							{
+								result = pfpo->IfFileExistsChangePath(&newPath);
+								if (result)
+								{
+									TCHAR* fOld = nullptr;
+									result = AppendStringsWithVaList(&fOld, L"filename.old <", filename, L">\0", nullptr);
+
+									if (result == TRUE)
+									{
+										file_out.SetPath(newPath);
+										file_out.SetNCContent(contentBuffer);
+										file_out.AddProperty(CnC3File::PID_DESCRIPTION_ONE, fOld);
+										file_out.AddProperty(CnC3File::PID_DESCRIPTION_TWO, L"---");
+										file_out.AddProperty(CnC3File::PID_DESCRIPTION_THREE, L"converted file");
+										file_out.Save();
+
+										result =
+											file_out.Succeeded()
+											? TRUE : FALSE;
+
+										if (result)
+										{
+											TCHAR* newFilename = nullptr;
+
+											result =
+												(pfpo->GetFilenameOutOfPath(newPath, &newFilename, FALSE) == TRUE)
+												? TRUE : FALSE;
+
+											if (result)
+											{
+												size_t len;
+
+												result =
+													SUCCEEDED(
+														StringCbLength(pathOfFileToConvert, sizeof(TCHAR)*STRSAFE_MAX_CCH, &len))
+													? TRUE : FALSE;
+
+												if (result)
+												{
+													SecureZeroMemory((PVOID)pathOfFileToConvert, len);
+
+													result =
+														SUCCEEDED(
+															StringCbCopy((STRSAFE_LPWSTR)pathOfFileToConvert, len, newFilename))
+														? TRUE : FALSE;
+												}
+												SafeDeleteArray(&newFilename);
+											}
+										}
+									}
+								}
+								SafeDeleteArray(&newPath);
+							}
+						}
+						SafeDeleteArray(&folder);
+					}
+				}
+				SafeRelease(&pfpo);
+			}
+			SafeDeleteArray(&filename);
+		}
+		if (!result)
+			rAction = (BOOL)IDCANCEL;
+	}
+	return rAction;// if something goes wrong return IDCANCEL !!!
 }
 
 void CnC3FileManager::SetDialogText(LPCTSTR CaptionText, LPCTSTR ButtonText, LPCTSTR FileText)

@@ -2032,3 +2032,50 @@ LARGE_INTEGER getFileSizeX(LPCTSTR path)
 	}
 	return li;
 }
+
+HRESULT OpenFolder(HWND owner, WCHAR** folderPath)
+{
+	// CoCreate the File Open Dialog object.
+	IFileDialog *pfd = NULL;
+	HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd));
+	if (SUCCEEDED(hr))
+	{
+		// Set the options on the dialog.
+		DWORD dwFlags;
+		// Before setting, always get the options first in order not to override existing options.
+		hr = pfd->GetOptions(&dwFlags);
+		if (SUCCEEDED(hr))
+		{
+			// In this case, get shell items only for folder items.
+			hr = pfd->SetOptions(dwFlags | FOS_PICKFOLDERS);
+			if (SUCCEEDED(hr))
+			{
+				// Show the dialog
+				hr = pfd->Show(owner);
+				if (SUCCEEDED(hr))
+				{
+					// Obtain the result, once the user clicks the 'Open' button.
+					// The result is an IShellItem object.
+					IShellItem *psiResult;
+					hr = pfd->GetResult(&psiResult);
+					if (SUCCEEDED(hr))
+					{
+						PWSTR pszFolderPath = NULL;
+						hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pszFolderPath);
+						if (SUCCEEDED(hr))
+						{
+							hr =
+								(CopyStringToPtr(pszFolderPath, folderPath) == TRUE)
+								? S_OK : E_UNEXPECTED;
+
+							CoTaskMemFree(pszFolderPath);
+						}
+						psiResult->Release();
+					}
+				}
+			}
+		}
+		pfd->Release();
+	}
+	return hr;
+}

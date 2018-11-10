@@ -1,10 +1,10 @@
 #include"TreeViewClass.h"
-#include"..//OpenSave/Open_Save_CTRL.h"
 #include"..//CommonControls/StringClass.h"
 #include"..//BasicFPO.h"
 #include"..//IPath.h"
 #include"..//Error dispatcher.h"
 #include"..//ApplicationData.h"
+#include"..//CnC3FileManager.h"
 
 TreeViewCTRL::TreeViewCTRL(HWND TVFrame_, HINSTANCE hInst, int language, LPTSTR Working_Directory)
 	: hInstance(hInst),
@@ -5387,16 +5387,26 @@ int TreeViewCTRL::OnGetInfoTip(LPNMTVGETINFOTIP gtip)
 				);
 			if (result)
 			{
-				Open_Save_CTRL osc;
-				TCHAR desc1[512] = { L'\0' };
-				TCHAR desc2[512] = { L'\0' };
-				TCHAR desc3[2048] = { L'\0' };
+				CnC3File file;
+				auto hr =
+					file.Load(itemPath);
 
-				if (osc.Open_For_Searching(itemPath, desc1, desc2, desc3))
+				if (SUCCEEDED(hr))
 				{
 					iString tooltip;
 
-					if (tooltip.Builder(nullptr, dInfo.desc1, L":\n", desc1, L"\n\n", dInfo.desc2, L":\n", desc2, L"\n\n", dInfo.desc3, L":\n", desc3, NULL))
+					if (tooltip.Builder(
+						nullptr, dInfo.desc1, L":\n",
+						file.GetProperty(CnC3File::PID_DESCRIPTION_ONE)
+							.GetData(),
+						L"\n\n", dInfo.desc2, L":\n",
+						file.GetProperty(CnC3File::PID_DESCRIPTION_TWO)
+							.GetData(),
+						L"\n\n", dInfo.desc3, L":\n",
+						file.GetProperty(CnC3File::PID_DESCRIPTION_THREE)
+							.GetData(),
+						nullptr)
+						)
 					{
 						StringCbCopy(gtip->pszText, sizeof(TCHAR)* (tooltip.GetLength() + 1), tooltip.GetData());
 					}
@@ -6082,43 +6092,45 @@ HRESULT TreeViewCTRL::_executeNewOP(int insertType)
 											//// if a new cnc3 file was created it must be overwritten in the cnc3 format!
 											if (insertType == A__CNC3FILE)
 											{
-												Open_Save_CTRL *osc = new Open_Save_CTRL();
-												if (osc != nullptr)
+												iString first(path);
+												iString newName(Fptr);
+												iString delimiter(L"\\\0");
+												iString fullpath = first + delimiter + newName;
+
+												iString content(L"\n ");
+
+												if (reinterpret_cast<ApplicationData*>(
+													getDefaultApplicationDataContainer()
+													)->getBooleanData(DATAKEY_SETTINGS_INSERTDEFAULTTEXT, true))
 												{
-													iString first(path);
-													iString newName(Fptr);
-													iString delimiter(L"\\\0");
-													iString fullpath = first + delimiter + newName;
-
-													iString content(L"\n ");
-
-													if (reinterpret_cast<ApplicationData*>(
-														getDefaultApplicationDataContainer()
-														)->getBooleanData(DATAKEY_SETTINGS_INSERTDEFAULTTEXT, true))
-													{
-														content.Replace(
-															reinterpret_cast<ApplicationData*>(
-																getApplicationDataContainerFromFilekey(FILEKEY_USER_STRINGS)
-																)->getStringData(DATAKEY_USERSTRINGS_DEFAULTTABINSERTTEXT)
-															);
-													}
-
-													osc->SaveBuffersDirect(
-														fullpath.getContentReference(),
-														content.getContentReference(),
-														L"...", L"...", L"..."
-													);
-													SafeRelease(&osc);
-
-													if (this->openNewFile)
-													{
-														SendMessage(this->TVFrame,
-															WM_COMMAND,
-															MAKEWPARAM(TV_CTRL_OPENPATH, DO_NOT_SET_FOCUS),
-															reinterpret_cast<LPARAM>(fullpath.GetData())
+													content.Replace(
+														reinterpret_cast<ApplicationData*>(
+															getApplicationDataContainerFromFilekey(FILEKEY_USER_STRINGS)
+															)->getStringData(DATAKEY_USERSTRINGS_DEFAULTTABINSERTTEXT)
 														);
-													}
 												}
+
+												CnC3File file;
+												file.SetPath(
+													fullpath.GetData()
+												);
+												file.SetNCContent(
+													content.GetData()
+												);
+												file.AddProperty(CnC3File::PID_DESCRIPTION_ONE, L"...");
+												file.AddProperty(CnC3File::PID_DESCRIPTION_TWO, L"...");
+												file.AddProperty(CnC3File::PID_DESCRIPTION_THREE, L"...");
+
+												file.Save();
+
+												if (this->openNewFile)
+												{
+													SendMessage(this->TVFrame,
+														WM_COMMAND,
+														MAKEWPARAM(TV_CTRL_OPENPATH, DO_NOT_SET_FOCUS),
+														reinterpret_cast<LPARAM>(fullpath.GetData())
+													);
+												}												
 											}
 
 											int _type_ = this->CheckItemType(item);

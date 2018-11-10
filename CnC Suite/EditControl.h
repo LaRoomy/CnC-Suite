@@ -489,6 +489,7 @@ private:
 	DWORD inputCounter;
 	BOOL N_open;
 	BOOL N_inside; // localize ???
+	BOOL isTextSelected;
 	TCHAR inputBuffer[1024];
 	TCHAR* editboxContent;
 	TCHAR backspaceChar;

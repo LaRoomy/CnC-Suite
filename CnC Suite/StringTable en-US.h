@@ -319,6 +319,9 @@
 #define				_ERROR_MSG_DRIVELOADINGNOTALLOWED	L"A complete Drive cannot be loaded. Please select a sub-Folder."
 #define				_ERROR_MSG_EXPORT_FAILED			L"Export failed. Errorcode: "
 #define				_ERROR_MSG_OPENFILE_FAILED			L"Error opening file. Errorcode: "
+#define				_ERROR_MSG_IMPORT_FAILED			L"Error importing file. Errorcode "
+#define				_ERROR_MSG_CNC3FILEOBJECT_ERROR		L"CnC3FileObject error. Errorcode "
+#define				_ERROR_MSG_OPENFOLDER_FAILED		L"Error opening folder. Errorcode "
 
 // WARNINGS >>
 #define				_WARNING_MSG_UPDATESEARCH_FAILED	L"Search for updates failed - no internet connection.\0"

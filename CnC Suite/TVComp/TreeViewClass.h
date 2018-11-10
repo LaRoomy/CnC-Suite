@@ -193,7 +193,11 @@ public:					TreeViewCTRL( HWND, HINSTANCE, int, LPTSTR );
 						IFACEMETHODIMP UpdateProgress(UINT, UINT) { return S_OK; }
 						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-						TCHAR* Root_Folder;
+						TCHAR* Root_Folder;	// must be private!
+
+						TCHAR* GetRootFolder() {
+							return this->Root_Folder;
+						}
 
 						HRESULT InitTreeView( COLORREF, HFONT, COLORREF, LPRECT, DWORD );// Create the treeview control
 						BOOL InitTreeViewItems( LPCTSTR, int );// load a new root folder

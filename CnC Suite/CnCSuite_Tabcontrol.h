@@ -50,7 +50,7 @@ public:
 	virtual void UserRequest_Open(const CnC3File& file, bool forceOpenInNewTab, bool setFocus) = 0;
 	virtual BOOL UserRequest_SaveAs(TCHAR** path) = 0;
 	virtual BOOL UserRequest_Save(DWORD mode) = 0;
-	virtual void UserRequest_Import(LPTSTR content) = 0;
+	virtual void UserRequest_Import(LPCTSTR content) = 0;
 	virtual BOOL UserRequest_CloseApp() = 0;
 	virtual void UserRequest_InsertText(LPTSTR text) = 0;
 	virtual void UserRequest_SetNewColorScheme(BOOL setUserdefinedColor) = 0;

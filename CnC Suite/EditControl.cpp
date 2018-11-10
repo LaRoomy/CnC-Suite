@@ -30,7 +30,8 @@ EditControl::EditControl(HWND Editwnd, HWND Connector)
 	annotationMarkWasRemoved(FALSE),
 	blockLinenumberRemoval(FALSE),
 	backspaceChar(L'\0'),
-	editboxContent(nullptr)
+	editboxContent(nullptr),
+	isTextSelected(FALSE)
 {
 	SecureZeroMemory(&this->inputBuffer, sizeof(this->inputBuffer));
 	SecureZeroMemory(&this->editStyleColors, sizeof(EDITSTYLECOLORS));
@@ -651,7 +652,15 @@ int EditControl::OnEditNotify(HWND Parent, WPARAM wParam, LPARAM lParam)
 						_MSG_TO_MAIN(WM_UPDATESTATUSBAR, 0, reinterpret_cast<LPARAM>(&sbUp));
 					}
 
-					this->UpdateFocusRect();
+					if (this->isTextSelected)
+					{
+						this->setFocusRect();
+						this->isTextSelected = FALSE;
+					}
+					else
+					{
+						this->UpdateFocusRect();
+					}
 				}
 			}
 			else
@@ -671,7 +680,12 @@ int EditControl::OnEditNotify(HWND Parent, WPARAM wParam, LPARAM lParam)
 						_MSG_TO_MAIN(WM_UPDATESTATUSBAR, 0, reinterpret_cast<LPARAM>(&sbUp));
 					}
 
-					this->UpdateFocusRect();
+					//this->UpdateFocusRect();
+					if (!this->isTextSelected)
+					{
+						this->eraseFocusRect();
+						this->isTextSelected = TRUE;
+					}
 				}
 				//if (pSel->seltyp & SEL_MULTICHAR)
 				//{

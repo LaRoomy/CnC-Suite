@@ -1,6 +1,9 @@
 #include"SearchControl.h"
 #include<StringClass.h>
 #include"..//DPI_Helper.h"
+#include"..//HelperF.h"
+#include"..//BasicFPO.h"
+#include"..//CnC3FileManager.h"
 
 Searchcontrol::Searchcontrol(	HINSTANCE hInst,
 								HWND Main,
@@ -1503,7 +1506,7 @@ BOOL Searchcontrol::CheckCriteria( void )
 	return TRUE;
 }
 
-BOOL Searchcontrol::SearchForString( LPTSTR Searchstring, LPTSTR buffer )
+BOOL Searchcontrol::SearchForString( LPCTSTR Searchstring, LPCTSTR buffer )
 {
 	if( ( Searchstring == NULL ) || ( buffer == NULL ) )
 		return FALSE;
@@ -1560,10 +1563,11 @@ BOOL Searchcontrol::SearchInRoot( LPTSTR Searchstring )
 
 	if( this->lps != nullptr )
 	{
-		this->lps->osc = new Open_Save_CTRL();
 		this->lps->Progress
 			= GetDlgItem(
-				FindWindow(L"SEARCHCLASS", NULL), ID_SEARCHPROGRESS);
+				FindWindow(L"SEARCHCLASS", NULL),
+				ID_SEARCHPROGRESS
+			);
 	}
 	else
 		return FALSE;
@@ -1717,7 +1721,7 @@ BOOL Searchcontrol::SearchInRoot( LPTSTR Searchstring )
 	return immediateExit;
 }
 
-BOOL Searchcontrol::ResultDisplayAndStorage( DWORD dwFlags, int& Index, LPTSTR filename, LPTSTR filepath, LPTSTR projectname, LPTSTR projectpath, LPTSTR desc1, LPTSTR desc2, LPTSTR desc3, int image )
+BOOL Searchcontrol::ResultDisplayAndStorage( DWORD dwFlags, int& Index, LPCTSTR filename, LPCTSTR filepath, LPCTSTR projectname, LPCTSTR projectpath, LPCTSTR desc1, LPCTSTR desc2, LPCTSTR desc3, int image )
 {
 	HRESULT hr;
 
@@ -2379,16 +2383,7 @@ void Searchcontrol::CleanUpThreadMemory( void )
 {
 	this->FinalizeProgress();
 
-	if( this->lps != NULL )
-	{
-		if( this->lps->osc != NULL )
-		{
-			delete this->lps->osc;
-			this->lps->osc = NULL;
-		}
-		delete this->lps;
-		this->lps = NULL;
-	}
+	SafeDelete(&this->lps);
 }
 
 BOOL Searchcontrol::ProcessNextLevel( int level, int& index, LPTSTR Searchstring, LPTSTR subPath, LPWIN32_FIND_DATA subData, HANDLE hFindSub )
@@ -2561,82 +2556,80 @@ BOOL Searchcontrol::Analyse( LPTSTR Searchstring, int& index, LPTSTR filename, L
 							hr = StringCbPrintf( filepath, ( file_len + fpath_len + ( sizeof( TCHAR ) * 5 )), L"%s\\%s", folderpath, filename );
 							if( SUCCEEDED( hr ))
 							{
-								Open_Save_CTRL* osc = new Open_Save_CTRL( );
+								DWORD resultFlags = RSLT_TYPE_FILE;
+								BOOL success = FALSE;
 
-								if( osc != NULL )
+								CnC3File file;
+								hr =
+									file.Load(filepath);
+
+								auto description_one = file.GetProperty(CnC3File::PID_DESCRIPTION_ONE);
+								auto description_two = file.GetProperty(CnC3File::PID_DESCRIPTION_TWO);
+								auto description_three = file.GetProperty(CnC3File::PID_DESCRIPTION_THREE);
+
+								if (SUCCEEDED(hr))
 								{
-									TCHAR desc1[ 512 ]	= { 0 };
-									TCHAR desc2[ 512 ]	= { 0 };
-									TCHAR desc3[ 2048 ]	= { 0 };
-
-									DWORD resultFlags = RSLT_TYPE_FILE;
-									BOOL success = FALSE;
-
-									if( osc->Open_For_Searching( filepath, desc1, desc2, desc3 ))
+									if (this->SC_info->settings.SF_Description1 != 0)
 									{
-										if( this->SC_info->settings.SF_Description1 != 0 )
+										if (this->SearchForString(Searchstring, description_one.GetData()))
 										{
-											if( this->SearchForString( Searchstring, desc1 ))
-											{
-												resultFlags = ( resultFlags | DESC_1_MATCH );
-												success = TRUE;
-											}
-										}
-										if( this->SC_info->settings.SF_Description2 != 0 )
-										{
-											if( this->SearchForString( Searchstring, desc2 ))
-											{
-												resultFlags = ( resultFlags | DESC_2_MATCH );
-												success = TRUE;
-											}
-										}
-										if( this->SC_info->settings.SF_Description3 != 0 )
-										{
-											if( this->SearchForString( Searchstring, desc3 ))
-											{
-												resultFlags = ( resultFlags | DESC_3_MATCH );
-												success = TRUE;
-											}
-										}
-									}
-									if( this->SC_info->settings.SF_Filename != 0 )
-									{
-										if( this->SearchForString( Searchstring, filename ))
-										{
-											resultFlags = ( resultFlags | FILENAME_MATCH );
+											resultFlags = (resultFlags | DESC_1_MATCH);
 											success = TRUE;
 										}
 									}
-									if( this->SC_info->settings.SF_Projectname != 0 )
+									if (this->SC_info->settings.SF_Description2 != 0)
 									{
-										if( this->SearchForString( Searchstring, _foldername_ ))
+										if (this->SearchForString(Searchstring, description_two.GetData()))
 										{
-											resultFlags = ( resultFlags | PROJECT_MATCH );
+											resultFlags = (resultFlags | DESC_2_MATCH);
 											success = TRUE;
 										}
 									}
-									if( success )
+									if (this->SC_info->settings.SF_Description3 != 0)
 									{
-										this->ConvertMultilineDescription( desc3 );
-
-										if( !this->ResultDisplayAndStorage(		resultFlags,
-																				index,
-																				filename,
-																				filepath,
-																				_foldername_,
-																				folderpath,
-																				desc1,
-																				desc2,
-																				desc3,
-																				imageindex	))
+										if (this->SearchForString(Searchstring, description_three.GetData()))
 										{
-											result = FALSE;
+											resultFlags = (resultFlags | DESC_3_MATCH);
+											success = TRUE;
 										}
 									}
-									delete osc;
+									if (this->SC_info->settings.SF_Filename != 0)
+									{
+										if (this->SearchForString(Searchstring, filename))
+										{
+											resultFlags = (resultFlags | FILENAME_MATCH);
+											success = TRUE;
+										}
+									}
+									if (this->SC_info->settings.SF_Projectname != 0)
+									{
+										if (this->SearchForString(Searchstring, _foldername_))
+										{
+											resultFlags = (resultFlags | PROJECT_MATCH);
+											success = TRUE;
+										}
+									}
 								}
-								else
-									result = FALSE;
+								if( success )
+								{
+									//this->ConvertMultilineDescription( description_three.GetData() );
+
+									if( !this->ResultDisplayAndStorage(		resultFlags,
+																			index,
+																			filename,
+																			filepath,
+																			_foldername_,
+																			folderpath,
+																			description_one.GetData(),
+																			description_two.GetData(),
+																			description_three.GetData(),
+																			imageindex	))
+									{
+										result = FALSE;
+									}									
+								}
+								//else
+								//	result = FALSE;
 							}
 							else
 								result = FALSE;

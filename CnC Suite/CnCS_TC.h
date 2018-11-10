@@ -202,7 +202,8 @@ class CnCS_TC
 	public customButtonEventSink,
 	public trackBarEventSink,
 	public customCheckboxEventSink,
-	public customPopUpMenuEventSink
+	public customPopUpMenuEventSink,
+	public IFileDialogUserEvents
 {
 public:
 	CnCS_TC(HINSTANCE, HWND);
@@ -227,7 +228,7 @@ public:
 
 	BOOL CnCS_TC::UserRequest_SaveAs(TCHAR** path) {  return this->SaveAs(path, nullptr); }
 	BOOL CnCS_TC::UserRequest_Save(DWORD mode) { return this->Save(mode, nullptr); }
-	void CnCS_TC::UserRequest_Import(LPTSTR content) { this->Import(content); }
+	void CnCS_TC::UserRequest_Import(LPCTSTR content) { this->Import(content); }
 	void CnCS_TC::UserRequest_InsertText(LPTSTR text) { this->Insert(text); }
 	BOOL CnCS_TC::UserRequest_CloseApp() { return this->onClose(); }
 	void CnCS_TC::UserRequest_SetNewColorScheme(BOOL setUserdefinedColor) {
@@ -364,6 +365,9 @@ public:
 		}
 	}
 
+	// IFileDialogUserEvent Base
+	void SaveAsPathWasSelected(cObject sender, LPCTSTR path);
+
 private:
 	HINSTANCE hInstance;
 	HWND TCFrame;
@@ -446,8 +450,8 @@ private:
 	void Open(LPTSTR path, BOOL openInNewTab, BOOL setFocus);
 	BOOL SaveAs(TCHAR** path, LPTABPROPERTY);
 	BOOL Save(DWORD, LPTABPROPERTY);
-	void Import(LPTSTR);
-	void Insert(LPTSTR);
+	void Import(LPCTSTR);
+	void Insert(LPCTSTR);
 	void OnFileDeleted(LPCTSTR path);
 	void OnFolderDeleted(LPCTSTR path);
 	void OnFileRenamed(LPCTSTR path_new, LPCTSTR path_old);
@@ -510,7 +514,7 @@ private:
 	LPTABPROPERTY GetTabProperty(DWORD);
 	BOOL ConfigPropEdit(HWND edit);
 
-	BOOL OpenDisplayAndFormat(LPCTSTR, DWORD);		// old!
+	//BOOL OpenDisplayAndFormat(LPCTSTR, DWORD);		// old!
 	BOOL OpenDisplayAndFormat(const CnC3File& file, DWORD flags);
 	BOOL getCurrentSelectedText(LPSELECTIONINFO);
 

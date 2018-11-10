@@ -329,6 +329,9 @@
 #define				_ERROR_MSG_DRIVELOADINGNOTALLOWED	L"Ein komplettes Laufwerk kann nicht geladen werden. Bitte wählen Sie einen Unterordner."
 #define				_ERROR_MSG_EXPORT_FAILED			L"Export fehlgeschlagen. Fehlercode: "
 #define				_ERROR_MSG_OPENFILE_FAILED			L"Öffnen der Datei fehlgeschlagen. Fehlercode: "
+#define				_ERROR_MSG_IMPORT_FAILED			L"Importieren der Datei fehlgeschlagen. Fehlercode "
+#define				_ERROR_MSG_CNC3FILEOBJECT_ERROR		L"CnC3FileObject error. Errorcode "
+#define				_ERROR_MSG_OPENFOLDER_FAILED		L"Order konnte nicht geöffnet werden. Fehlercode "
 
 
 

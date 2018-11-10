@@ -146,7 +146,7 @@ private:
 	void Save();
 	void SaveAll();
 	void SaveAs();
-	void Import(LPTSTR);
+	void Import(LPCTSTR);
 	void OnFileConverted(LPTSTR);
 	//void OnCut();
 	void Send();

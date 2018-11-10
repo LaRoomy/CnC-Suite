@@ -27,12 +27,14 @@ void DispatchSystemError();
 // AC0001	- filetype not supported				// error
 // AC0002	- export failed							// error
 // AC0003	- opening file failed					// error
+// AC0004	- importing file failed					// error
 
 // TABCONTROL
 // TC0001	- maximum Tab-count reached				// info
 // TC0002	- last Tab cannot be closed				// info
 // TC0003	- not all tabs got a valid target-path	// warning
 // TC0004	- file is already open					// info
+// TC0005	- cnc3file object error					// error
 
 // USERINTERFACE
 // UI0001	- ??
@@ -44,6 +46,7 @@ void DispatchSystemError();
 // FN0004	- Rootfolder invalidated at runtime // error
 // FN0005	- Rootfolder loading failed			// error
 // FN0006	- Driveloading not permitted		// error
+// FN0007	- Error opening root folder			// error
 
 // UPDATEAGENT
 // UA0001	- An update is available			// info

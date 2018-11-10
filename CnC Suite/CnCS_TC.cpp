@@ -1,6 +1,5 @@
 #include "CnCS_TC.h"
 #include "CnCSuite_Property.h"
-#include "OpenSave\Open_Save_CTRL.h"
 #include "Error dispatcher.h"
 #include"ApplicationData.h"
 #include"ColorSchemeManager.h"
@@ -206,6 +205,18 @@ void CnCS_TC::GetCurrentTabDataAsStringCollection(itemCollection<iString> & data
 	}
 	else
 		data.AddItem(L"error - no tab info found");
+}
+
+void CnCS_TC::SaveAsPathWasSelected(cObject sender, LPCTSTR path)
+{
+	// check if the file will be overwritten
+	BOOL fOverwritten = CheckForFileExist(path);
+	if (fOverwritten)
+	{
+		// check if the file is opened in another tab and if so
+		// -> close the other tab to prevent that one file is opened in multiple tabs
+		this->closeTabIfPathIsEqual(path);
+	}
 }
 
 HRESULT CnCS_TC::_Init(HWND Frame, LPTCSTARTUPINFO tc_info)
@@ -2431,11 +2442,32 @@ BOOL CnCS_TC::ADD_Tab(LPCTSTR Path)
 								// load a path (if exist) or default values (no path)
 								if (Path != nullptr)
 								{
-									this->iParam.hwndActiveTab = Tab;
+									CnC3File file;
+									auto hr =
+										file.Load(Path);
 
-									this->OpenDisplayAndFormat(Path, NO_EXECUTE);
+									if (SUCCEEDED(hr))
+									{
+										this->iParam.hwndActiveTab = Tab;
 
-									this->updateFileInfoArea();
+										this->OpenDisplayAndFormat(file, NO_EXECUTE);
+
+										this->updateFileInfoArea();
+									}
+									else
+									{
+										iString errorMsg(
+											getStringFromResource(ERROR_MSG_CNC3FILEOBJECT_ERROR)
+										);
+										errorMsg += iString::fromHex((uintX)hr);
+
+										DispatchEWINotification(
+											EDSP_ERROR,
+											L"TC0005",
+											errorMsg.GetData(),
+											L"Method::ADD_Tab"
+										);
+									}
 								}
 								else
 								{
@@ -2968,23 +3000,46 @@ void CnCS_TC::Open(LPTSTR path, BOOL openInNewTab, BOOL setFocus)
 		{
 			if (this->SaveCheck_singleTab(this->GetActiveTabProperty()))
 			{
-				if (!this->OpenDisplayAndFormat(path, DO_CLEANUP | SET_DISPLAYNAME))
+				CnC3File file;
+				file.Load(path);
+
+				if (file.Succeeded())
 				{
-					// handle error...
+					if (!this->OpenDisplayAndFormat(file, DO_CLEANUP | SET_DISPLAYNAME))
+					{
+						// handle error...
+					}
+					else
+					{
+						this->updateFileInfoArea();
+
+						if (setFocus)
+						{
+							auto _async = new Async();
+							if (_async != nullptr)
+							{
+								//async_smpl fct = (async_smpl)&focusToEdit;
+								_async->callFunction(&focusToEdit);
+							}
+						}
+					}
 				}
 				else
 				{
-					this->updateFileInfoArea();
+					auto hr = file.GetStatus();
 
-					if (setFocus)
-					{
-						auto _async = new Async();
-						if (_async != nullptr)
-						{
-							//async_smpl fct = (async_smpl)&focusToEdit;
-							_async->callFunction(&focusToEdit);
-						}
-					}
+					iString errorMsg(
+						getStringFromResource(ERROR_MSG_CNC3FILEOBJECT_ERROR)
+					);
+					errorMsg += iString::fromHex((uintX)hr);
+
+					DispatchEWINotification(
+						EDSP_ERROR,
+						L"TC0005",
+						errorMsg.GetData(),
+						L"Method::Open"
+					);
+
 				}
 			}
 		}
@@ -2994,10 +3049,97 @@ void CnCS_TC::Open(LPTSTR path, BOOL openInNewTab, BOOL setFocus)
 BOOL CnCS_TC::SaveAs(TCHAR ** path_out, LPTABPROPERTY _ptp)
 {
 	BOOL result = FALSE;
-	BOOL fOverwritten = FALSE;
 
-	Open_Save_CTRL* osc = new Open_Save_CTRL();
-	if (osc != nullptr)
+	LPTABPROPERTY ptp = nullptr;
+
+	if (_ptp == nullptr)
+		ptp = this->GetActiveTabProperty();
+	else
+		ptp = _ptp;
+
+	if (ptp != nullptr)
+	{
+		CnC3FileManager cnc3FileManager(this->Main);
+
+		cnc3FileManager.SetUserEventHandler(
+			dynamic_cast<IFileDialogUserEvents*>(this)
+		);
+
+		// set the current directory and filename to make to process more conveniant for the user
+		if (ptp->Path != nullptr)
+		{
+			auto bfpo = CreateBasicFPO();
+			if (bfpo != nullptr)
+			{
+				TCHAR* folder = nullptr;
+
+				if (bfpo->RemoveFilenameFromPath(ptp->Path, &folder))
+				{
+					cnc3FileManager.SetTargetFolder(folder);
+					cnc3FileManager.SetDialogText(nullptr, nullptr, ptp->displayname);
+				}
+				SafeDeleteArray(&folder);
+				SafeRelease(&bfpo);
+			}
+		}
+		else
+		{
+			// TODO: get the last navigated folder and set as target folder
+		}
+
+		this->iParam.SkipNextFilesystemAction = TRUE;// prevent the filesystem-watcher from closing the tab
+
+		TCHAR* editText = nullptr;
+
+		if (GetRichEditContent(ptp->AssocEditWnd, &editText) == TRUE)
+		{
+			CnC3File file;
+			file.SetNCContent(editText);
+			file.AddProperty(CnC3File::PID_DESCRIPTION_ONE, ptp->DESC1);
+			file.AddProperty(CnC3File::PID_DESCRIPTION_TWO, ptp->DESC2);
+			file.AddProperty(CnC3File::PID_DESCRIPTION_THREE, ptp->DESC3);
+
+			auto savedFile = cnc3FileManager.SaveAs(file);
+			if (savedFile.Succeeded())
+			{
+				ptp->Content_Changed = FALSE;
+
+				SafeDeleteArray(&ptp->Path);
+				SafeDeleteArray(&ptp->displayname);
+
+				if (CopyStringToPtr(
+					savedFile.GetPath(),
+					&ptp->Path)
+					== TRUE)
+				{
+					if (GetFilenameOutOfPath(ptp->Path, &ptp->displayname, TRUE) == TRUE)
+					{
+						this->RedrawTab_s(REDRAW_CURRENT);
+						this->updateFileInfoArea();
+
+						result =
+							(CopyStringToPtr(savedFile.GetPath(), path_out) == TRUE)
+							? TRUE : FALSE;
+					}
+				}
+			}
+			else
+			{
+				// error saving the file -> Dispatch notification!!!!!!!!
+
+
+			}
+			SafeDeleteArray(&editText);	
+		}
+	}
+	return result;
+}
+
+BOOL CnCS_TC::Save(DWORD mode, LPTABPROPERTY _ptp)
+{
+	BOOL result = TRUE;
+
+	if (mode == TOS_SAVE)
 	{
 		LPTABPROPERTY ptp = nullptr;
 
@@ -3008,119 +3150,75 @@ BOOL CnCS_TC::SaveAs(TCHAR ** path_out, LPTABPROPERTY _ptp)
 
 		if (ptp != nullptr)
 		{
-			// set allowed filetypes to *.cnc3 only
-			osc->SetFileTypeMode(FILETYPEMODE_ONLY_CNC3);
-			osc->setHwndOwner(this->Main);
-
-			// set the current directory and filename to make the navigation easier for the user
-			auto bfpo = CreateBasicFPO();
-			if (bfpo != nullptr)
+			if (ptp->Content_Changed)
 			{
-				TCHAR* folder = nullptr;
-
-				if (bfpo->RemoveFilenameFromPath(ptp->Path, &folder))
-				{
-					osc->OS_DialogCustomText(nullptr, nullptr, ptp->displayname, folder);
-				}
-				SafeDeleteArray(&folder);
-				SafeRelease(&bfpo);
-			}
-
-			auto res = osc->GetFilePathFromUser(path_out, MODE_SAVE, 0);
-			if (res == TRUE)
-			{
-				this->iParam.SkipNextFilesystemAction = TRUE;// prevent the filesystem-watcher from closing the tab
-
-				// check if the file will be overwritten
-				fOverwritten = CheckForFileExist(*path_out);
-
-				if (fOverwritten)
-				{
-					// check if the file is opened in another tab and if so -> close the other tab to prevent that one file is opened in multiple tabs
-					this->closeTabIfPathIsEqual(*path_out);
-				}
-
-				TCHAR* editText = nullptr;
+				TCHAR *editText = nullptr;
 
 				if (GetRichEditContent(ptp->AssocEditWnd, &editText) == TRUE)
 				{
-					if (osc->SaveBuffersDirect(*path_out, editText, ptp->DESC1, ptp->DESC2, ptp->DESC3))
+					this->SaveDescritpionsToTabProperty(ptp);
+
+					if (ptp->Path != nullptr)
 					{
-						ptp->Content_Changed = FALSE;
+						CnC3File file;
+						file.SetPath(ptp->Path);
+						file.SetNCContent(editText);
+						file.AddProperty(CnC3File::PID_DESCRIPTION_ONE, ptp->DESC1);
+						file.AddProperty(CnC3File::PID_DESCRIPTION_TWO, ptp->DESC2);
+						file.AddProperty(CnC3File::PID_DESCRIPTION_THREE, ptp->DESC3);
 
-						SafeDeleteArray(&ptp->Path);
-						SafeDeleteArray(&ptp->displayname);
-
-						if (CopyStringToPtr(*path_out, &ptp->Path) == TRUE)
+						auto hr = file.Save();
+						if (SUCCEEDED(hr))
 						{
-							if (GetFilenameOutOfPath(*path_out, &ptp->displayname, TRUE) == TRUE)
-							{
-								this->RedrawTab_s(REDRAW_CURRENT);
-								this->updateFileInfoArea();
-
-								result = fOverwritten ? FILE_OVERWRITTEN : TRUE;
-							}
-						}						
+							ptp->Content_Changed = FALSE;
+							this->RedrawTab_s(REDRAW_CURRENT);
+							this->updateFileInfoArea();
+						}
+					}
+					else
+					{
+						result = FALSE;
 					}
 					SafeDeleteArray(&editText);
 				}
 			}
-			else
-			{
-				if (res != DIALOG_CANCELLED)
-				{
-					// get and dispatch the error
-					iString errorCode(L"FD");
-					TCHAR* errorMessage = nullptr;
-					auto hr = osc->GetTranslated_hResultErrorCode(&errorMessage);
-
-					int code = (int)LOWORD(hr);
-					errorCode += code;
-
-					DispatchEWINotification(EDSP_ERROR, errorCode.GetData(), errorMessage, L"System File Dialog");
-
-					SafeDeleteArray(&errorMessage);
-				}
-			}
 		}
-		SafeRelease(&osc);		
 	}
-	return result;
-}
-
-BOOL CnCS_TC::Save(DWORD mode, LPTABPROPERTY _ptp)
-{
-	BOOL result = TRUE;
-
-	Open_Save_CTRL* osc = new Open_Save_CTRL();
-	if (osc != nullptr)
+	else if (mode == TOS_SAVEALL)
 	{
-		if (mode == TOS_SAVE)
+		this->SaveDescritpionsToTabProperty(
+			this->GetActiveTabProperty()
+		);
+
+		LPTABPROPERTY ptp = NULL;
+		TCHAR* editText = NULL;
+
+		for (DWORD i = 0; i < this->TABCount; i++)
 		{
-			LPTABPROPERTY ptp = nullptr;
+			ptp = reinterpret_cast<LPTABPROPERTY>(
+				GetWindowLongPtr(
+					GetDlgItem(this->TCFrame, TAB_ID_START + i), GWLP_USERDATA)
+				);
 
-			if (_ptp == nullptr)
-				ptp = this->GetActiveTabProperty();
-			else
-				ptp = _ptp;
-
-			if (ptp != nullptr)
+			if (ptp != NULL)
 			{
 				if (ptp->Content_Changed)
 				{
-					TCHAR *editText = nullptr;
-
 					if (GetRichEditContent(ptp->AssocEditWnd, &editText) == TRUE)
 					{
-						this->SaveDescritpionsToTabProperty(ptp);
-
-						if (ptp->Path != nullptr)
+						if (ptp->Path != NULL)
 						{
-							if (osc->SaveBuffersDirect(ptp->Path, editText, ptp->DESC1, ptp->DESC2, ptp->DESC3))
+							CnC3File file;
+							file.SetPath(ptp->Path);
+							file.SetNCContent(editText);
+							file.AddProperty(CnC3File::PID_DESCRIPTION_ONE, ptp->DESC1);
+							file.AddProperty(CnC3File::PID_DESCRIPTION_TWO, ptp->DESC2);
+							file.AddProperty(CnC3File::PID_DESCRIPTION_THREE, ptp->DESC3);
+
+							auto hr = file.Save();
+							if (SUCCEEDED(hr))
 							{
 								ptp->Content_Changed = FALSE;
-								this->RedrawTab_s(REDRAW_CURRENT);
-								this->updateFileInfoArea();
 							}
 						}
 						else
@@ -3132,50 +3230,12 @@ BOOL CnCS_TC::Save(DWORD mode, LPTABPROPERTY _ptp)
 				}
 			}
 		}
-		else if (mode == TOS_SAVEALL)
-		{
-			this->SaveDescritpionsToTabProperty(
-				this->GetActiveTabProperty()
-			);
-
-			LPTABPROPERTY ptp = NULL;
-			TCHAR* editText = NULL;
-
-			for (DWORD i = 0; i < this->TABCount; i++)
-			{
-				ptp = reinterpret_cast<LPTABPROPERTY>(
-					GetWindowLongPtr(
-						GetDlgItem(this->TCFrame, TAB_ID_START + i), GWLP_USERDATA));
-				if (ptp != NULL)
-				{
-					if (ptp->Content_Changed)
-					{
-						if (GetRichEditContent(ptp->AssocEditWnd, &editText) == TRUE)
-						{
-							if (ptp->Path != NULL)
-							{
-								if (osc->SaveBuffersDirect(ptp->Path, editText, ptp->DESC1, ptp->DESC2, ptp->DESC3))
-								{
-									ptp->Content_Changed = FALSE;
-								}
-							}
-							else
-							{
-								result = FALSE;
-							}
-							SafeDeleteArray(&editText);
-						}
-					}
-				}
-			}
-			this->RedrawTab_s(REDRAW_ALL);
-		}
-		SafeRelease(&osc);
+		this->RedrawTab_s(REDRAW_ALL);
 	}
 	return result;
 }
 
-void CnCS_TC::Import(LPTSTR content)
+void CnCS_TC::Import(LPCTSTR content)
 {
 	auto ctp = this->GetActiveTabProperty();
 	if (ctp != NULL)
@@ -3186,7 +3246,7 @@ void CnCS_TC::Import(LPTSTR content)
 	}
 }
 
-void CnCS_TC::Insert(LPTSTR text)
+void CnCS_TC::Insert(LPCTSTR text)
 {
 	auto ptp = this->GetTabProperty(this->iParam.dwActiveTab);
 	if (ptp != nullptr)
@@ -4153,7 +4213,15 @@ void CnCS_TC::restoreCondition()
 					}
 					else
 					{
-						this->ADD_Tab(pathtofile.GetData());
+						CnC3File file;
+						file.SetPath(
+							pathtofile.GetData()
+						);
+						auto hr = file.Load();
+						if (SUCCEEDED(hr))
+						{
+							this->AddTab(file);
+						}
 					}
 					// look for the tab with the selection mark-property
 					if (tag.hasSpecificProperty(L"isActive"))
@@ -5467,57 +5535,57 @@ BOOL CnCS_TC::ConfigPropEdit(HWND edit)
 	);
 }
 
-BOOL CnCS_TC::OpenDisplayAndFormat(LPCTSTR path, DWORD flags)
-{
-	BOOL result = FALSE;
-
-	if (path != NULL)
-	{
-		Open_Save_CTRL *osc = new Open_Save_CTRL();
-
-		result = (osc == NULL) ? FALSE : TRUE;
-		if (result)
-		{
-			HWND Tab = this->iParam.hwndActiveTab;
-			if (Tab != NULL)
-			{
-				LPTABPROPERTY ptc = reinterpret_cast<LPTABPROPERTY>(GetWindowLongPtr(Tab, GWLP_USERDATA));
-				if (ptc != NULL)
-				{
-					TCHAR* text = NULL;
-
-					if (flags & DO_CLEANUP)
-					{
-						// clean old content
-						this->CleanUpTabStructForNewContent(ptc);
-					}
-					if (flags & SET_DISPLAYNAME)
-					{
-						// set new content
-						CopyStringToPtr(path, &ptc->Path);
-						GetFilenameOutOfPath(path, &ptc->displayname, TRUE);
-					}
-
-					osc->OpenWithoutLoading(
-						path,
-						&text,
-						&ptc->DESC1,
-						&ptc->DESC2,
-						&ptc->DESC3);
-
-					ptc->Editcontrol->SetTextContent(text, TRUE, TRUE, FALSE);
-					SafeDeleteArray(&text);
-
-					this->SetDescriptions(ptc->DESC1, ptc->DESC2, ptc->DESC3);
-
-					RedrawWindow(Tab, NULL, NULL, RDW_INVALIDATE | RDW_NOERASE | RDW_ALLCHILDREN);
-				}
-			}
-			SafeRelease(&osc);
-		}
-	}
-	return result;
-}
+//BOOL CnCS_TC::OpenDisplayAndFormat(LPCTSTR path, DWORD flags)
+//{
+//	BOOL result = FALSE;
+//
+//	if (path != NULL)
+//	{
+//		Open_Save_CTRL *osc = new Open_Save_CTRL();
+//
+//		result = (osc == NULL) ? FALSE : TRUE;
+//		if (result)
+//		{
+//			HWND Tab = this->iParam.hwndActiveTab;
+//			if (Tab != NULL)
+//			{
+//				LPTABPROPERTY ptc = reinterpret_cast<LPTABPROPERTY>(GetWindowLongPtr(Tab, GWLP_USERDATA));
+//				if (ptc != NULL)
+//				{
+//					TCHAR* text = NULL;
+//
+//					if (flags & DO_CLEANUP)
+//					{
+//						// clean old content
+//						this->CleanUpTabStructForNewContent(ptc);
+//					}
+//					if (flags & SET_DISPLAYNAME)
+//					{
+//						// set new content
+//						CopyStringToPtr(path, &ptc->Path);
+//						GetFilenameOutOfPath(path, &ptc->displayname, TRUE);
+//					}
+//
+//					osc->OpenWithoutLoading(
+//						path,
+//						&text,
+//						&ptc->DESC1,
+//						&ptc->DESC2,
+//						&ptc->DESC3);
+//
+//					ptc->Editcontrol->SetTextContent(text, TRUE, TRUE, FALSE);
+//					SafeDeleteArray(&text);
+//
+//					this->SetDescriptions(ptc->DESC1, ptc->DESC2, ptc->DESC3);
+//
+//					RedrawWindow(Tab, NULL, NULL, RDW_INVALIDATE | RDW_NOERASE | RDW_ALLCHILDREN);
+//				}
+//			}
+//			SafeRelease(&osc);
+//		}
+//	}
+//	return result;
+//}
 
 BOOL CnCS_TC::OpenDisplayAndFormat(const CnC3File & file, DWORD flags)
 {

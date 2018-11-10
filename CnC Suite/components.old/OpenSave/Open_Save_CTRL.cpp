@@ -863,18 +863,26 @@ BOOL Open_Save_CTRL::Extract( WCHAR* buffer )
 		{
 			i+=1;
 		}
-		while( buffer[ i ] != '[' )
+		while( buffer[ i ] != L'[' )
 		{
-			if( buffer[ i ] == '\0' )
+			if( buffer[ i ] == L'\0' )
 			{
 				break;
 			}
 			i++;
 		}
-		if( buffer[ i ] == '\0' )
+
+		if ((i == 0) && (buffer[i] == L'['))
+		{
+			if (buffer[1] != L'P')
+				i++;
+		}
+
+		if( buffer[ i ] == L'\0' )
 		{
 			break;
 		}
+
 	}while( ( property_start = this->SearchFor_Property_begin( i, buffer, 9, L"[PROPERTY]" ) ) == NO_PROPERTY );
 
 	if( i == 0 )

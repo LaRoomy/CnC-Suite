@@ -87,9 +87,6 @@
     <ClInclude Include="CnCSuite_Userinterface.h">
       <Filter>Headerdateien\Interface-Header</Filter>
     </ClInclude>
-    <ClInclude Include="OpenSave\Open_Save_CTRL.h">
-      <Filter>Importierte Komponentenheader</Filter>
-    </ClInclude>
     <ClInclude Include="Searchcontrol\SearchControl.h">
       <Filter>Importierte Komponentenheader</Filter>
     </ClInclude>
@@ -305,9 +302,6 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="TVComp\TreeViewClass.cpp">
-      <Filter>Importierte Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenSave\Open_Save_CTRL.cpp">
       <Filter>Importierte Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Searchcontrol\SearchControl.cpp">

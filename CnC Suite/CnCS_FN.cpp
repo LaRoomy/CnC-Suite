@@ -3,6 +3,7 @@
 #include "ApplicationData.h"
 #include "ProgressDialog.h"
 #include "Async.h"
+#include "CnC3FileManager.h"
 
 CnCS_FN::CnCS_FN(HINSTANCE hInst, HWND MainWindow)
 	: hInstance(hInst),
@@ -419,15 +420,15 @@ LRESULT CnCS_FN::OnConvert(LPARAM lParam)
 {
 	BOOL rAction = IDCANCEL;
 
-	Open_Save_CTRL* osc = new Open_Save_CTRL();
-	if (osc != NULL)
+	CnC3File file;
+	CnC3FileManager cnc3FileManager(this->fnParam.Main);
+
+	rAction =
+		cnc3FileManager.ConvertToCnC3(reinterpret_cast<LPCTSTR>(lParam), file);
+
+	if (rAction != IDCANCEL)
 	{
-		rAction = osc->ConvertFileToCnc3(this->fnParam.Main, reinterpret_cast<LPTSTR>(lParam));
-		if (rAction != IDCANCEL)
-		{
-			_FWD_MSG_TO_MAIN(MAKEWPARAM(NAVIGATOR_FILEWASCONVERTED, 0), lParam);
-		}
-		delete osc;
+		_FWD_MSG_TO_MAIN(MAKEWPARAM(NAVIGATOR_FILEWASCONVERTED, 0), lParam);
 	}
 	return static_cast<LRESULT>(rAction);
 }
@@ -1270,60 +1271,56 @@ void CnCS_FN::startFileSystemWatcher(LPCTSTR root)
 
 void CnCS_FN::SelectNewRootFolder()
 {
-	Open_Save_CTRL* osc = new Open_Save_CTRL();
-	if (osc != NULL)
+	WCHAR* path = NULL;
+
+	HRESULT hr = OpenFolder(this->fnParam.Frame, &path);
+	if (SUCCEEDED(hr))
 	{
-		WCHAR* path = NULL;
+		// Validate new root folder!
+		auto exec = isDrive(path);
 
-		HRESULT hr = osc->OpenFolder(this->fnParam.Frame, &path);
-		if (SUCCEEDED(hr))
+		if (!(reinterpret_cast<ApplicationData*>(
+			getApplicationDataContainerFromFilekey(FILEKEY_INTERNAL_SETTINGS)
+			)->getBooleanData(DATAKEY_INTSET_BLOCKDRIVELOADING, true)))
 		{
-			// Validate new root folder!
-			auto exec = isDrive(path);
-
-			if (!(reinterpret_cast<ApplicationData*>(
-				getApplicationDataContainerFromFilekey(FILEKEY_INTERNAL_SETTINGS)
-				)->getBooleanData(DATAKEY_INTSET_BLOCKDRIVELOADING, true)))
-			{
-				if (exec == TRUE)
-					exec = FALSE;
-			}
+			if (exec == TRUE)
+				exec = FALSE;
+		}
 			
-			if (!exec)
-			{
-				this->ClearCondition();
-				this->fnParam.interruptFileSystemWatcher = (UINT32)TRUE;
+		if (!exec)
+		{
+			this->ClearCondition();
+			this->fnParam.interruptFileSystemWatcher = (UINT32)TRUE;
 
-				this->pTV->setEventListener(
-					dynamic_cast<ITreeViewItemLoadingProgress*>(this)
-				);
-				this->pTV->InitTreeViewItemsAsync(path);
-			}
-			else
-			{
-				DispatchEWINotification(
-					EDSP_ERROR,
-					L"FN0006",
-					getStringFromResource(ERROR_MSG_DRIVELOADINGNOTALLOWED),
-					getStringFromResource(UI_FILENAVIGATOR)
-				);
-			}
-			SafeDeleteArray(&path);
+			this->pTV->setEventListener(
+				dynamic_cast<ITreeViewItemLoadingProgress*>(this)
+			);
+			this->pTV->InitTreeViewItemsAsync(path);
 		}
 		else
 		{
-			// get and dispatch the error
-			iString errorCode(L"FD");
-			TCHAR* errorMessage = nullptr;
-			auto _hr = osc->GetTranslated_hResultErrorCode(&errorMessage);
-			int code = (int)LOWORD(_hr);
-			errorCode += code;
-
-			DispatchEWINotification(EDSP_ERROR, errorCode.GetData(), errorMessage, L"System File Dialog");
-
-			SafeDeleteArray(&errorMessage);
+			DispatchEWINotification(
+				EDSP_ERROR,
+				L"FN0006",
+				getStringFromResource(ERROR_MSG_DRIVELOADINGNOTALLOWED),
+				getStringFromResource(UI_FILENAVIGATOR)
+			);
 		}
-		delete osc;
+		SafeDeleteArray(&path);
+	}
+	else
+	{
+		iString errorMsg(
+			getStringFromResource(ERROR_MSG_OPENFOLDER_FAILED)
+		);
+		errorMsg += iString::fromHex((uintX)hr);
+
+		DispatchEWINotification(
+			EDSP_ERROR,
+			L"FN0007",
+			errorMsg.GetData(),
+			L"Method::SelectNewRootFolder"
+		);
 	}
 }
 

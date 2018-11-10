@@ -1,7 +1,6 @@
 #pragma once
 #include"CnCSuite_FileNavigator.h"
 #include"TVComp\TreeViewClass.h"
-#include"OpenSave\Open_Save_CTRL.h"
 #include"Searchcontrol\SearchControl.h"
 #include"BasicFPO.h"
 #include"AppPath.h"
@@ -128,6 +127,9 @@ public:
 	}
 	void CnCS_FN::Show() {
 		ShowWindow(this->fnParam.Frame, SW_SHOW);
+	}
+	LPCTSTR CnCS_FN::GetRootFolder() const {
+		return this->pTV->GetRootFolder();
 	}
 
 	void CnCS_FN::Reload() {
