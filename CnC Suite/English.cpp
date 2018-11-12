@@ -573,6 +573,8 @@ TCHAR* LanguageDispatcher::getEnglishString(int ID)
 		return _UI_GNRL_LINEENDFORMAT;
 	case UI_GNRL_HISTORY:
 		return _UI_GNRL_HISTORY;
+	case UI_GNRL_STARTUPTEXTPLACEHOLDER:
+		return _UI_GNRL_STARTUPTEXTPLACEHOLDER;
 
 	case UI_FILETIME_CREATED:
 		return _UI_FILETIME_CREATED;
@@ -615,6 +617,7 @@ TCHAR* LanguageDispatcher::getEnglishString(int ID)
 		return _ERROR_MSG_CNC3FILEOBJECT_ERROR;
 	case ERROR_MSG_OPENFOLDER_FAILED:
 		return _ERROR_MSG_OPENFOLDER_FAILED;
+		
 
 		// warning messages
 	case WARNING_MSG_UPDATESEARCH_FAILED:

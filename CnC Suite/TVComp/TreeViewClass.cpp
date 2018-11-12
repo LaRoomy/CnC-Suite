@@ -6106,22 +6106,25 @@ HRESULT TreeViewCTRL::_executeNewOP(int insertType)
 													content.Replace(
 														reinterpret_cast<ApplicationData*>(
 															getApplicationDataContainerFromFilekey(FILEKEY_USER_STRINGS)
-															)->getStringData(DATAKEY_USERSTRINGS_DEFAULTTABINSERTTEXT)
-														);
+															)->getStringData(
+																DATAKEY_USERSTRINGS_DEFAULTTABINSERTTEXT,
+																getStringFromResource(UI_GNRL_STARTUPTEXTPLACEHOLDER)
+														)
+													);
 												}
 
-												CnC3File file;
-												file.SetPath(
+												CnC3File cncFile;
+												cncFile.SetPath(
 													fullpath.GetData()
 												);
-												file.SetNCContent(
+												cncFile.SetNCContent(
 													content.GetData()
 												);
-												file.AddProperty(CnC3File::PID_DESCRIPTION_ONE, L"...");
-												file.AddProperty(CnC3File::PID_DESCRIPTION_TWO, L"...");
-												file.AddProperty(CnC3File::PID_DESCRIPTION_THREE, L"...");
+												cncFile.AddProperty(CnC3File::PID_DESCRIPTION_ONE, L"...");
+												cncFile.AddProperty(CnC3File::PID_DESCRIPTION_TWO, L"...");
+												cncFile.AddProperty(CnC3File::PID_DESCRIPTION_THREE, L"...");
 
-												file.Save();
+												cncFile.Save();
 
 												if (this->openNewFile)
 												{

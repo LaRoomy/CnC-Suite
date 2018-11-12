@@ -306,6 +306,7 @@
 #define				_UI_GNRL_NEWSUBFOLDER				L"Neuer Unterordner"
 #define				_UI_GNRL_LINEENDFORMAT				L"Zeilenende:"
 #define				_UI_GNRL_HISTORY					L"Chronik"
+#define				_UI_GNRL_STARTUPTEXTPLACEHOLDER		L"  %5555\n\nN   1 "
 
 #define				_UI_FILETIME_CREATED				L"Erstellt:        "
 #define				_UI_FILETIME_LASTWRITE				L"Zuletzt geändert:"

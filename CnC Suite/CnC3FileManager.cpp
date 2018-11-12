@@ -367,6 +367,10 @@ HRESULT CnC3File::ReadContentSection(LPCTSTR buffer)
 			this->ncContent.Replace(ncCont);
 		}
 	}
+	if(FAILED(hr))
+	{
+		this->ncContent.Replace(L"error: content section missing");
+	}
 	return hr;
 }
 
