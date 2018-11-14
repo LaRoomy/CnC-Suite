@@ -1,5 +1,4 @@
 #pragma once
-
 #ifndef _CNCSUITE_HEADER_
 #define _CNCSUITE_HEADER_
 
@@ -29,12 +28,6 @@
 #else
 #define Assert(b)
 #endif //( DEBUG ) || ( _DEBUG )
-#endif
-
-// Global instance variable
-#ifndef HINST_THISCOMPONENT
-EXTERN_C IMAGE_DOS_HEADER __ImageBase;
-#define HINST_THISCOMPONENT (HINSTANCE)&__ImageBase)
 #endif
 
 #include"Global.h"
