@@ -31,7 +31,9 @@ EditControl::EditControl(HWND Editwnd, HWND Connector)
 	blockLinenumberRemoval(FALSE),
 	backspaceChar(L'\0'),
 	editboxContent(nullptr),
-	isTextSelected(FALSE)
+	isTextSelected(FALSE),
+	currentSelectedLine(-1),
+	previousSelectedLine(-1)
 {
 	SecureZeroMemory(&this->inputBuffer, sizeof(this->inputBuffer));
 	SecureZeroMemory(&this->editStyleColors, sizeof(EDITSTYLECOLORS));
@@ -630,6 +632,9 @@ int EditControl::OnEditNotify(HWND Parent, WPARAM wParam, LPARAM lParam)
 				auto line = SendMessage(this->EditWnd, EM_EXLINEFROMCHAR, 0, (LPARAM)index);
 				auto lineindex = index - SendMessage(this->EditWnd, EM_LINEINDEX, (WPARAM)-1, 0);
 
+				this->previousSelectedLine = this->currentSelectedLine;
+				this->currentSelectedLine = line;
+
 				if ((line >= 0) && (lineindex >= 0))
 				{
 					HRESULT hr;
@@ -659,7 +664,17 @@ int EditControl::OnEditNotify(HWND Parent, WPARAM wParam, LPARAM lParam)
 					}
 					else
 					{
-						this->UpdateFocusRect();
+						if (this->previousSelectedLine != -1)
+						{
+							if (this->previousSelectedLine != this->currentSelectedLine)
+							{
+								this->UpdateFocusRect();
+							}
+						}
+						else
+						{
+							this->UpdateFocusRect();
+						}
 					}
 				}
 			}
@@ -4736,8 +4751,6 @@ void EditControl::eraseFocusRect()
 		// make sure the last rect-area is clean
 		if (fRect.bottom != 0 || fRect.left != 0 || fRect.right != 0 || fRect.top != 0)
 		{
-			//RECT updateRect = { fRect.left, fRect.top + 1 , fRect.right, fRect.bottom }; // old
-
 			RECT updateRect =
 			{
 				fRect.left,
@@ -4745,7 +4758,6 @@ void EditControl::eraseFocusRect()
 				fRect.right,
 				fRect.bottom + ConvertTwipsToPix(this->editControlProperties.lineOffset)
 			};
-
 
 			InvalidateRect(this->EditWnd, &updateRect, TRUE);
 			UpdateWindow(this->EditWnd);

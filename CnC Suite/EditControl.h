@@ -495,6 +495,8 @@ private:
 	TCHAR backspaceChar;
 	int numOfAutocompleteStrings;
 	//int scrollPosition;
+	int currentSelectedLine;
+	int previousSelectedLine;
 
 	BOOL Success;
 	BOOL ContentChanged;

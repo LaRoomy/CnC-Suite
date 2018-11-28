@@ -49,7 +49,7 @@
 #define		IDSEX_APPLICATIONCLASS			L"CNCSUITECLASS"
 #define		APPLICATION_DISPLAY_NAME		L"CnC Suite"
 #define		APPLICATION_FULLVERSION_NAME	L"CnC Suite 1. 3. 8"
-#define		APPLICATION_VERSION				L"Version 1.3.83"
+#define		APPLICATION_VERSION				L"Version 1.3.84"
 
 #define		EXECUTABLE_NAME					L"CnC Suite.exe"
 
