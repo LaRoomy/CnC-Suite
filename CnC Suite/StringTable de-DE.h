@@ -332,7 +332,7 @@
 #define				_ERROR_MSG_OPENFILE_FAILED			L"Öffnen der Datei fehlgeschlagen. Fehlercode: "
 #define				_ERROR_MSG_IMPORT_FAILED			L"Importieren der Datei fehlgeschlagen. Fehlercode "
 #define				_ERROR_MSG_CNC3FILEOBJECT_ERROR		L"CnC3FileObject error. Errorcode "
-#define				_ERROR_MSG_OPENFOLDER_FAILED		L"Order konnte nicht geöffnet werden. Fehlercode "
+#define				_ERROR_MSG_OPENFOLDER_FAILED		L"Ordner konnte nicht geöffnet werden. Fehlercode "
 
 
 
