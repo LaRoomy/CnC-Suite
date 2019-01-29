@@ -119,6 +119,7 @@ typedef int intX;
 #define			COMP_ID_TAB_CONTROL			22884
 #define			COMP_ID_ERROR_BOX			22885
 #define			COMP_ID_PROPERTIES			22886
+#define			COMP_ID_HISTORY				22887
 
 #define			NO_RESTART				0
 #define			RESTART_WITH_CMDLINE	1

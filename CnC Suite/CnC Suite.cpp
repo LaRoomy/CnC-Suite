@@ -231,6 +231,8 @@ LONG_PTR getComponentHandle(DWORD component_ID)
 		return pApplication->getPropertyComponent();
 	case COMP_ID_TAB_CONTROL:
 		return pApplication->getTabControlComponent();
+	case COMP_ID_HISTORY:
+		return pApplication->getHistoryComponent();
 	default:
 		return LONG_PTR(NULL);		
 	}

@@ -36,6 +36,7 @@ public:
 	LONG_PTR getFileExplorerComponent();
 	LONG_PTR getTabControlComponent();
 	LONG_PTR getCBoxComponent();
+	LONG_PTR getHistoryComponent();
 
 	HWND GetMainWindowHandle() {
 		return this->MainWindow;

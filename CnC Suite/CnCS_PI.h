@@ -346,6 +346,7 @@ private:
 	void displayUpdateSearchResult(int type);
 	void resetUpdateSearchIndication();
 	void setInitialControlParameter();
+	void deleteHistory();
 
 	void drawGeneralPage(HDC, LPRECT);
 	void drawTabCtrlPage(HDC, LPRECT);

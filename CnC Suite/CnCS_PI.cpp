@@ -11,6 +11,7 @@
 #include"CommonControls\textField.h"
 #include"ResetDialog.h"
 #include"splashScreen.h"
+#include"history.h"
 
 CnCS_PI::CnCS_PI()
 	: Success(TRUE), propWnd(nullptr), hInstance(nullptr), wki(nullptr)
@@ -3584,6 +3585,9 @@ void CnCS_PI::onButtonClick(CustomButton* sender, CTRLID ctrlID)
 	case CTRLID_DELETECURRENTSCHEME:
 		this->deleteSelectedScheme();
 		break;
+	case CTRLID_DELETEHISTORYNOW:
+		this->deleteHistory();
+		break;
 	case CTRLID_MANAGECOLORSCHEMES:
 	{
 		auto cmanager = new colorSchemeManager(this->hInstance);
@@ -4842,6 +4846,30 @@ void CnCS_PI::setInitialControlParameter()
 {
 	this->iParam.canClose = TRUE;
 	this->iParam.inputCaptured = FALSE;
+}
+
+void CnCS_PI::deleteHistory()
+{
+	auto fileHistory =
+		reinterpret_cast<UIHistory*>(
+			getComponentHandle(COMP_ID_HISTORY)
+		);
+	if (fileHistory != nullptr)
+	{
+		AppPath path;
+
+		auto historyPath =
+			path.Get(PATHID_FILE_HISTORY);
+
+		if (historyPath.succeeded())
+		{
+			// delete the file and clear the UI
+			DeleteFile(
+				historyPath.GetData()
+			);
+			fileHistory->ClearCompleteHistory();
+		}
+	}
 }
 
 void CnCS_PI::drawGeneralPage(HDC hdc, LPRECT rc)

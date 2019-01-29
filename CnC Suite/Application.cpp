@@ -276,6 +276,11 @@ LONG_PTR Application::getCBoxComponent()
 	return reinterpret_cast<LONG_PTR>(this->CBox);
 }
 
+LONG_PTR Application::getHistoryComponent()
+{
+	return reinterpret_cast<LONG_PTR>(this->FileHistory);
+}
+
 void Application::FormatForExport(const CnC3File & file, iString & buffer_out)
 {
 	auto dataContainer =

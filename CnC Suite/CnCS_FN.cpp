@@ -1180,48 +1180,48 @@ HRESULT CnCS_FN::CreateTBButtons()
 
 BOOL CnCS_FN::StartSearch()
 {
-	TCHAR* userPath = NULL;
+	//TCHAR* userPath = NULL;
+
+	
 
 	BasicFPO* pbf = CreateBasicFPO();
 	if (pbf != NULL)
 	{
-		if (pbf->GetKnownFolderPath(&userPath, FOLDERID_Documents))
+		AppPath appPath;
+
+		auto appDataPath = appPath.Get(PATHID_FOLDER_CNCSUITE_APPDATA);
+
+		if (appDataPath.succeeded())
 		{
-			TCHAR* Wdir = NULL;
+			this->pSRCH = new Searchcontrol(
+				this->hInstance,
+				this->fnParam.Main,
+				this->fnParam.Frame,
+				appDataPath.GetData(),
+				this->pTV->Root_Folder,
+				getCurrentAppLanguage()	);
 
-			if (AppendStringToString(userPath, L"\\CnC Suite\\AppData\0", &Wdir))
+			if (this->pSRCH != NULL)
 			{
-				this->pSRCH = new Searchcontrol(
-					this->hInstance,
-					this->fnParam.Main,
-					this->fnParam.Frame, Wdir,
-					this->pTV->Root_Folder,
-					getCurrentAppLanguage()	);
+				DESCRIPTIONINFO dInfo;
+				SecureZeroMemory(&dInfo, sizeof(DESCRIPTIONINFO));
 
-				if (this->pSRCH != NULL)
+				auto result = (BOOL)SendMessage(this->fnParam.Main, WM_GETDESCRIPTIONS, 0, reinterpret_cast<LPARAM>(&dInfo));
+				if (result)
 				{
-					DESCRIPTIONINFO dInfo;
-					SecureZeroMemory(&dInfo, sizeof(DESCRIPTIONINFO));
+					pSRCH->SetDescriptions(dInfo.desc1, dInfo.desc2, dInfo.desc3);
 
-					auto result = (BOOL)SendMessage(this->fnParam.Main, WM_GETDESCRIPTIONS, 0, reinterpret_cast<LPARAM>(&dInfo));
-					if (result)
-					{
-						pSRCH->SetDescriptions(dInfo.desc1, dInfo.desc2, dInfo.desc3);
-
-						SafeDeleteArray(&dInfo.desc1);
-						SafeDeleteArray(&dInfo.desc2);
-						SafeDeleteArray(&dInfo.desc3);
-					}
-
-					HRESULT hr = this->pSRCH->InitSearchWindow();
-					if (SUCCEEDED(hr))
-					{
-						EnableWindow(this->fnParam.Main, FALSE);
-					}
+					SafeDeleteArray(&dInfo.desc1);
+					SafeDeleteArray(&dInfo.desc2);
+					SafeDeleteArray(&dInfo.desc3);
 				}
-				SafeDeleteArray(&Wdir);
+
+				HRESULT hr = this->pSRCH->InitSearchWindow();
+				if (SUCCEEDED(hr))
+				{
+					EnableWindow(this->fnParam.Main, FALSE);
+				}
 			}
-			SafeDeleteArray(&userPath);
 		}
 		SafeRelease(&pbf);
 	}

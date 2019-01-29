@@ -218,6 +218,11 @@ public:
 		this->historyData.AddHistoryItem(item);
 		this->UpdateScrollbar();
 	}
+	void ClearCompleteHistory() {
+		this->historyData.Clear();
+		if (this->isWndOpen)
+			this->Update();
+	}
 	void Save();
 	void Update() {
 		RedrawWindow(this->historyWindow, nullptr, nullptr, RDW_NOCHILDREN | RDW_NOERASE | RDW_INVALIDATE | RDW_UPDATENOW);
