@@ -1,6 +1,7 @@
 #pragma once
-#ifndef _SAFE_RELEASE_H_
 
+#ifndef _SAFE_RELEASE_H_
+#define _SAFE_RELEASE_H_
 
 // Safe release for class-interfaces
 template <class A> inline void SafeRelease(A **ppInterface)
@@ -11,44 +12,25 @@ template <class A> inline void SafeRelease(A **ppInterface)
 		*ppInterface = nullptr;
 	}
 }
+
 // Safe deletition for pointer allocated with 'new'
 template <class B> inline void SafeDelete(B **ppToDelete)
 {
-	//__try
-	//{
-		if (*ppToDelete != nullptr)
-		{
-			delete (*ppToDelete);
-			(*ppToDelete) = nullptr;
-		}
-	//}
-	//__except (
-	//	GetExceptionCode() == EXCEPTION_BREAKPOINT
-	//	? EXCEPTION_EXECUTE_HANDLER
-	//	: EXCEPTION_CONTINUE_SEARCH)
-	//{
-	//	return;
-	//}
+	if (*ppToDelete != nullptr)
+	{
+		delete (*ppToDelete);
+		(*ppToDelete) = nullptr;
+	}
 }
 
 // Safe deletition for pointer allocated with 'new[  ]'
 template <class C> inline void SafeDeleteArray(C **ppToDelete)
 {
-	//__try
-	//{
-		if (*ppToDelete != nullptr)
-		{
-			delete[](*ppToDelete);
-			(*ppToDelete) = nullptr;
-		}
-	//}
-	//__except (
-	//	GetExceptionCode() == EXCEPTION_BREAKPOINT
-	//	? EXCEPTION_EXECUTE_HANDLER
-	//	: EXCEPTION_CONTINUE_SEARCH)
-	//{
-	//	return;
-	//}
+	if (*ppToDelete != nullptr)
+	{
+		delete[](*ppToDelete);
+		(*ppToDelete) = nullptr;
+	}
 }
 
 #endif // !_SAFE_RELEASE_H_
