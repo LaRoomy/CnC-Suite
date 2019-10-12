@@ -128,7 +128,7 @@ public:
 private:
 	SYSTEMTIME time_now;
 	SYSTEMTIME time_to;
-	SYSTEMTIME timespan;
+	SYSTEMTIME timespan = { 0 };
 
 	iString representation;
 

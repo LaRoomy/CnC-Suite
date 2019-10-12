@@ -75,6 +75,8 @@ extern int APIENTRY _tWinMain(
 
 TCHAR * getStringFromResource(int ID)
 {
+	// TODO: This method would be very faster if the LanguageDispatcher would be static and not created every invokation of this method
+
 	if (pApplication != nullptr)
 	{
 		int lang = pApplication->getLanguage();

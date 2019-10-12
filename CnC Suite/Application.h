@@ -17,7 +17,7 @@ class Application
 	:public IFileSystemModificationProtocoll, public IHistroyEventProtocoll, public IExportFormatProtocol
 {
 
-public:			
+public:
 	Application(HINSTANCE);
 	~Application();
 

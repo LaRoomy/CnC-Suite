@@ -280,7 +280,14 @@ private:
 		auto bufSize = GetEnvironmentVariable(L"LOCALAPPDATA", nullptr, 0);
 		if (bufSize > 0)
 		{
+#if defined(_WIN64)
+			__int64 tmp_val = bufSize;
+			tmp_val++;
+			path = new TCHAR[tmp_val];
+#else
 			path = new TCHAR[bufSize + 1];
+#endif
+
 			if (path != nullptr)
 			{
 				GetEnvironmentVariable(L"LOCALAPPDATA", path, bufSize + 1);

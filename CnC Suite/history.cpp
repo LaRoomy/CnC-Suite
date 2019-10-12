@@ -345,7 +345,9 @@ UIHistory::UIHistory()
 	selectedItemBrush(nullptr),
 	outlineColor(RGB(255,255,255)),
 	verticalScrollbar(nullptr),
-	redrawScrollbar(false)
+	redrawScrollbar(false),
+	mousePosY(0),
+	styleInfo({ 0 })
 {
 	//                    ||
 	//                   _||_
