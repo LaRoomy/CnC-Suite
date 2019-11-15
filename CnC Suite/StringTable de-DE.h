@@ -354,6 +354,7 @@
 #define				_INFO_MSG_FILEISALREADYOPEN			L"Datei ist bereits geöffnet."
 #define				_INFO_MSG_CHANGESNEEDRESTART		L"Die angeforderten Änderungen erfordern einen Programmneustart."
 #define				_INFO_MSG_NOTARGETSELECTED			L"Kein Ziel ausgewählt"
+#define				_INFO_MSG_NOHISTORYCONTENT			L"Keine Chronik-Einträge gefunden."
 
 
 

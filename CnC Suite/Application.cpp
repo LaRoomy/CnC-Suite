@@ -2050,35 +2050,47 @@ void Application::LaunchCommandlineTool()
 
 void Application::ShowHistoryWnd()
 {
-	RECT rc;
-	SPECIALCOLORSTRUCT scs;
+	if (this->FileHistory->GetEntryCount() > 0)
+	{
+		RECT rc;
+		SPECIALCOLORSTRUCT scs;
 
-	this->SpecialColorForID(this->StyleInfo.StyleID, &scs);
+		this->SpecialColorForID(this->StyleInfo.StyleID, &scs);
 
-	auto fNav = this->UserInterface->GetFrameHandles(GFWH_TVFRAME);
-	GetClientRect(fNav, &rc);
+		auto fNav = this->UserInterface->GetFrameHandles(GFWH_TVFRAME);
+		GetClientRect(fNav, &rc);
 
-	CTRLCREATIONSTRUCT ccs;
-	ccs.ctrlID = 0;
-	ccs.hInst = this->hInstance;
-	ccs.parent = this->MainWindow;
-	ccs.pos = { 0,
-		DPIScale(25) };
-	ccs.size = {
-		rc.right,
-		rc.bottom };
+		CTRLCREATIONSTRUCT ccs;
+		ccs.ctrlID = 0;
+		ccs.hInst = this->hInstance;
+		ccs.parent = this->MainWindow;
+		ccs.pos = { 0,
+			DPIScale(25) };
+		ccs.size = {
+			rc.right,
+			rc.bottom };
 
-	this->FileHistory->SetColors(
-		this->StyleInfo.Background,
-		scs.normal,
-		scs.highlighted,
-		scs.text,
-		scs.accent_text,
-		scs.outline
-	);
+		this->FileHistory->SetColors(
+			this->StyleInfo.Background,
+			scs.normal,
+			scs.highlighted,
+			scs.text,
+			scs.accent_text,
+			scs.outline
+		);
 
-	this->FileNavigator->Hide();
-	this->FileHistory->ShowHistoryWindow(&ccs);
+		this->FileNavigator->Hide();
+		this->FileHistory->ShowHistoryWindow(&ccs);
+	}
+	else
+	{
+		DispatchEWINotification(
+			EDSP_INFO,
+			L"HST0001",
+			getStringFromResource(INFO_MSG_NOHISTORYCONTENT),
+			L"Mainframe"
+		);
+	}
 }
 
 BOOL Application::LoadUserData()

@@ -63,3 +63,6 @@ void DispatchSystemError();
 
 // Editcontol
 // EDC0001	- Format Error (exception) in method  'FormatAll'	// error
+
+// History Component
+// HST0001	- No history content to display

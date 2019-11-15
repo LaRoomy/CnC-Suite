@@ -338,6 +338,7 @@
 #define				_INFO_MSG_FILEISALREADYOPEN			L"File is already open."
 #define				_INFO_MSG_CHANGESNEEDRESTART		L"An application-restart is required to apply the requested changes."
 #define				_INFO_MSG_NOTARGETSELECTED			L"No Target selected"
+#define				_INFO_MSG_NOHISTORYCONTENT			L"No history content found"
 
 // DIALOG STRINGS >>
 #define				_DLG_MSG_FILENOTSAVEDSAVENOW		L" is not saved. Save now?\0"

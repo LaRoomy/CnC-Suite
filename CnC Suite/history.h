@@ -227,6 +227,9 @@ public:
 	void Update() {
 		RedrawWindow(this->historyWindow, nullptr, nullptr, RDW_NOCHILDREN | RDW_NOERASE | RDW_INVALIDATE | RDW_UPDATENOW);
 	}
+	int GetEntryCount() {
+		return this->historyData.GetItemCount();
+	}
 
 	void SetColors(COLORREF BackgroundColor,COLORREF ItemColor, COLORREF SelectedItemColor, COLORREF TextColor, COLORREF AccentTextColor, COLORREF OutlineColor);
 

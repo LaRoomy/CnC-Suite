@@ -646,6 +646,9 @@ TCHAR* LanguageDispatcher::getGermanString(int ID)
 		return _INFO_MSG_CHANGESNEEDRESTART;
 	case INFO_MSG_NOTARGETSELECTED:
 		return _INFO_MSG_NOTARGETSELECTED;
+	case INFO_MSG_NOHISTORYCONTENT:
+		return _INFO_MSG_NOHISTORYCONTENT;
+
 
 
 		// dialog messages
