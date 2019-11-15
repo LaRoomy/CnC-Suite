@@ -20,9 +20,10 @@
 #define		ID_RENAME				58
 #define		ID_OPEN					59
 #define		ID_OPEN_IN_NEW_TAB		60
+#define		ID_SUBSEARCH			61
 
-#define		ID_EXPLORER				61
-#define		ID_TEMPLATE				62
+#define		ID_EXPLORER				62
+#define		ID_TEMPLATE				63
 
 #define		ID_DATACOLLECTIONSTARTED	71
 //#define		ID_DATACOLLECTIONFINISHED	62
@@ -35,7 +36,7 @@
 #define ID_TOOLWINDOW	99
 #define	TOOLWNDCLASS	L"CTVTOOLWND_CLASS"
 
-#define		MAX_TBBUTTON		9
+#define		MAX_TBBUTTON		9// delimiter for the toolbar button creation routine / ID_SLNEWROOTFOLDER + MAX_TBBUTTON is the last button !
 
 #define		Button_SetFont(hButton,hFont)		SNDMSG((HWND)hButton,WM_SETFONT,(WPARAM)(HFONT)hFont,MAKELPARAM(TRUE,0))
 
@@ -290,7 +291,7 @@ private:
 	LRESULT OnTimer(WPARAM);
 
 	void OnCreatePopupMenu(int);
-	BOOL StartSearch();
+	BOOL StartSearch(LPCTSTR path);
 	void addNewFileToView(LPTSTR,BOOL);
 	void startFileSystemWatcher(LPCTSTR root);
 
@@ -305,6 +306,7 @@ private:
 	void OnDeleteItem();
 	void OnOpenItem(bool openInNewTab);
 	void OnDpiChanged();
+	void OnSubSearch();
 
 	void onEnableInfoTip(BOOL);
 	void onEnableNewFileOpening(BOOL);

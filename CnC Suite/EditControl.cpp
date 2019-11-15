@@ -738,6 +738,9 @@ int EditControl::OnEditNotify(HWND Parent, WPARAM wParam, LPARAM lParam)
 				auto ctrlKeyState = GetKeyState(VK_CONTROL);
 				auto ctrlKeyIsPressed = (ctrlKeyState & 0x8000) ? true : false;
 
+				auto shiftKeyState = GetKeyState(VK_SHIFT);
+				auto shiftKeyIsPressed = (shiftKeyState & 0x8000) ? true : false;
+
 				if (ctrlKeyIsPressed)
 				{
 					switch (msgFilter->wParam)
@@ -766,8 +769,11 @@ int EditControl::OnEditNotify(HWND Parent, WPARAM wParam, LPARAM lParam)
 				{
 					if (msgFilter->wParam == VK_DELETE)	// del was pressed
 					{
-						this->onDeleteKeyWasPressed();
-						this->EditChangeCTRL();
+						if (!shiftKeyIsPressed)
+						{
+							this->onDeleteKeyWasPressed();
+							this->EditChangeCTRL();
+						}
 					}
 				}
 			}

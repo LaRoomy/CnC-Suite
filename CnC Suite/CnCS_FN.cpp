@@ -488,7 +488,10 @@ LRESULT CnCS_FN::OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		this->OnRenameItem();
 		break;
 	case ID_SEARCH:
-		this->StartSearch();
+		this->StartSearch(nullptr);
+		break;
+	case ID_SUBSEARCH:
+		this->OnSubSearch();
 		break;
 	case ID_OPEN:
 		this->OnOpenItem(false);
@@ -791,6 +794,16 @@ void CnCS_FN::OnCreatePopupMenu(int type)
 				getStringFromResource(UI_GNRL_RENAME)
 			);
 			menu->addMenuEntry(&entry);
+
+			this->_defineMenuEntry(
+				entry,
+				ID_SUBSEARCH,
+				IDI_SEARCH,
+				DPIScale(18),
+				getStringFromResource(UI_GNRL_SEARCHINFOLDER)
+			);
+			menu->addMenuEntry(&entry);
+
 
 			this->_defineMenuEntry(
 				entry,
@@ -1178,12 +1191,8 @@ HRESULT CnCS_FN::CreateTBButtons()
 	return hr;
 }
 
-BOOL CnCS_FN::StartSearch()
+BOOL CnCS_FN::StartSearch(LPCTSTR path)
 {
-	//TCHAR* userPath = NULL;
-
-	
-
 	BasicFPO* pbf = CreateBasicFPO();
 	if (pbf != NULL)
 	{
@@ -1198,7 +1207,7 @@ BOOL CnCS_FN::StartSearch()
 				this->fnParam.Main,
 				this->fnParam.Frame,
 				appDataPath.GetData(),
-				this->pTV->Root_Folder,
+				(path != nullptr) ? path : this->pTV->Root_Folder,
 				getCurrentAppLanguage()	);
 
 			if (this->pSRCH != NULL)
@@ -1416,6 +1425,18 @@ void CnCS_FN::OnDpiChanged()
 		tmpButton->setFont(
 			CreateScaledFont(18, FW_BOLD, APPLICATION_SECONDARY_FONT)
 		);
+	}
+}
+
+void CnCS_FN::OnSubSearch()
+{
+	TCHAR* path = nullptr;
+
+	if (this->pTV->GetSelectedItemPath(&path))
+	{
+		this->StartSearch(path);
+
+		SafeDeleteArray(&path);
 	}
 }
 

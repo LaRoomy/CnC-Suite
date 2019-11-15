@@ -299,6 +299,7 @@
 #define				_UI_GNRL_LINEENDFORMAT				L"End of Line:"
 #define				_UI_GNRL_HISTORY					L"Chronicle"
 #define				_UI_GNRL_STARTUPTEXTPLACEHOLDER		L"  %5555\n\nN   1 "
+#define				_UI_GNRL_SEARCHINFOLDER				L"Search through..."
 
 #define				_UI_FILETIME_CREATED				L"Created:      "
 #define				_UI_FILETIME_LASTWRITE				L"Last modified:"

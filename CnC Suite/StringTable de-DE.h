@@ -289,7 +289,7 @@
 #define				_UI_RESETWND_COMPARAMETER			L"COM Schnittstellenparameter"
 #define				_UI_RESETWND_COMMONSETTINGS			L"CnC Suite Einstellungen"
 #define				_UI_RESETWND_AUTOSYNTAXSETUP		L"Autosyntax Einstellungen"
-#define				_UI_RESETWND_USERTEXT				L"Benutzerdefinerter Text"
+#define				_UI_RESETWND_USERTEXT				L"Benutzerdefinierter Text"
 #define				_UI_RESETWND_INTERNALSETUP			L"Interne Einstellungen"
 #define				_UI_RESETWND_AUTOCOMPLETESETUP		L"Autocomplete Daten"
 #define				_UI_RESETWND_APPDATA				L"Anwendungsdaten"
@@ -307,6 +307,8 @@
 #define				_UI_GNRL_LINEENDFORMAT				L"Zeilenende:"
 #define				_UI_GNRL_HISTORY					L"Chronik"
 #define				_UI_GNRL_STARTUPTEXTPLACEHOLDER		L"  %5555\n\nN   1 "
+#define				_UI_GNRL_SEARCHINFOLDER				L"Durchsuchen..."
+
 
 #define				_UI_FILETIME_CREATED				L"Erstellt:        "
 #define				_UI_FILETIME_LASTWRITE				L"Zuletzt geändert:"
