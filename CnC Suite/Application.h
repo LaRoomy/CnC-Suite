@@ -71,15 +71,8 @@ public:
 	}
 
 	// IHistroyEventProtocoll Base
-	void OnEntryClicked(cObject sender, HistoryItem* item) {
+	void OnEntryClicked(cObject sender, HistoryItem* item);
 	
-		MessageBox(
-			this->MainWindow,			
-			item->GetItemPath().GetData(),
-			item->GetDisplayName().GetData(),
-			MB_OK
-		);
-	}
 	void OnWindowClosed(cObject sender) {
 		this->FileNavigator->Show();
 	}

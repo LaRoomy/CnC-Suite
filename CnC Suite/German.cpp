@@ -593,6 +593,9 @@ TCHAR* LanguageDispatcher::getGermanString(int ID)
 		return _UI_FILESIZE;
 	case UI_OUTPUTSIZE:
 		return _UI_OUTPUTSIZE;
+	case UI_PATH:
+		return _UI_PATH;
+
 
 		// error messages
 	case UI_XML_ERR_DOCUMENTFORMAT_INVALID:

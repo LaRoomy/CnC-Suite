@@ -316,6 +316,7 @@
 #define				_UI_FILEINFO						L"Datei"
 #define				_UI_FILESIZE						L"Dateigröße:      "
 #define				_UI_OUTPUTSIZE						L"Ausgabegröße:    "
+#define				_UI_PATH							L"Pfad"
 
 
 

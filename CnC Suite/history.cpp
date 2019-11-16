@@ -459,6 +459,8 @@ HRESULT UIHistory::ShowHistoryWindow(LPCTRLCREATIONSTRUCT pccs)
 		this->windowID = pccs->ctrlID;
 		this->parent = pccs->parent;
 
+		this->currentIndexPos = this->historyData.GetItemCount() - 1;
+
 		GetApplicationStyleInformation(&this->styleInfo);
 
 		hr = this->registerClass();
@@ -468,7 +470,7 @@ HRESULT UIHistory::ShowHistoryWindow(LPCTRLCREATIONSTRUCT pccs)
 				CreateWindow(
 					UIHistory::HISTORY_WINDOW_CLASS,
 					nullptr,
-					WS_CHILD | WS_BORDER | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+					WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 					pccs->pos.x,
 					pccs->pos.y,
 					pccs->size.cx,
@@ -653,11 +655,11 @@ HRESULT UIHistory::createControls()
 	GetClientRect(this->historyWindow, &rc);
 
 	POINT pt;
-	pt.x = rc.right - DPIScale(25);
+	pt.x = rc.right - DPIScale(24);
 	pt.y = 0;
 	SIZE sz;
-	sz.cx = DPIScale(25);
-	sz.cy = DPIScale(25);
+	sz.cx = DPIScale(24);
+	sz.cy = DPIScale(24);
 
 	auto closeButton =
 		new CustomButton(this->historyWindow, BUTTONMODE_ICON, &pt, &sz, BID_QUIT, this->hInstance);
@@ -794,7 +796,6 @@ LRESULT UIHistory::onPaint(HWND hWnd)
 		if (offScreenDC)
 		{
 			GetClientRect(this->historyWindow, &rc);
-			//rc.right -= DPIScale(16);
 
 			HBITMAP offScreenBmp = CreateCompatibleBitmap(hdc, rc.right, rc.bottom);
 			if (offScreenBmp)
@@ -817,7 +818,7 @@ LRESULT UIHistory::onPaint(HWND hWnd)
 				FillRect(offScreenDC, &rc, this->backgroundBrush);
 
 				// draw items
-				while (curHeight < rcListArea.bottom)// - itemHeight)) // only rc.bottom
+				while (curHeight < rcListArea.bottom)
 				{
 					itemRect.top = curHeight;
 					itemRect.bottom = curHeight + itemHeight;
@@ -1115,17 +1116,17 @@ bool UIHistory::drawHistoryItem(HDC hdc, int itemIndex, LPRECT itemRect)
 		FillRect(hdc, itemRect, this->itemBrush);
 	}
 
-	// draw the frame
-	auto originPen =
-		SelectObject(hdc, this->outlinePen);
+	//// draw the frame
+	//auto originPen =
+	//	SelectObject(hdc, this->outlinePen);
 
-	MoveToEx(hdc, 0, 0, nullptr);
-	LineTo(hdc, itemRect->right - 1, 0);
-	LineTo(hdc, itemRect->right - 1, itemRect->bottom - 1);
-	LineTo(hdc, 0, itemRect->bottom - 1);
-	LineTo(hdc, 0, 0);
+	//MoveToEx(hdc, 0, itemRect->top, nullptr);
+	//LineTo(hdc, itemRect->right - 1, itemRect->top);
+	//LineTo(hdc, itemRect->right - 1, itemRect->bottom - 1);
+	//LineTo(hdc, 0, itemRect->bottom - 1);
+	//LineTo(hdc, 0, itemRect->top);
 
-	SelectObject(hdc, originPen);
+	//SelectObject(hdc, originPen);
 
 	// draw the item info
 	auto originFont =
@@ -1194,6 +1195,18 @@ bool UIHistory::drawHistoryItem(HDC hdc, int itemIndex, LPRECT itemRect)
 	);
 
 	SelectObject(hdc, originFont);
+
+	// draw the frame
+	auto originPen =
+		SelectObject(hdc, this->outlinePen);
+
+	MoveToEx(hdc, 0, itemRect->top, nullptr);
+	LineTo(hdc, itemRect->right - 1, itemRect->top);
+	LineTo(hdc, itemRect->right - 1, itemRect->bottom - 1);
+	LineTo(hdc, 0, itemRect->bottom - 1);
+	LineTo(hdc, 0, itemRect->top);
+
+	SelectObject(hdc, originPen);
 
 	return true;
 }

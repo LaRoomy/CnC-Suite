@@ -281,6 +281,48 @@ LONG_PTR Application::getHistoryComponent()
 	return reinterpret_cast<LONG_PTR>(this->FileHistory);
 }
 
+void Application::OnEntryClicked(cObject sender, HistoryItem* item)
+{
+	iString message(
+		getStringFromResource(UI_FILEINFO)
+	);
+	message += L": ";
+	message += item->GetDisplayName();
+	message += L"\n\n";
+	message += getStringFromResource(UI_PATH);
+	message += L": ";
+	message += item->GetItemPath();
+	message += L"\n\n";
+	message += getStringFromResource(UI_FILETIME_LASTACCESS);
+	message += L"  ";
+	message += item->GetLastOpenedTime().SimpleDateAsString();
+	message += L" ";
+	message += item->GetLastOpenedTime().SimpleTimeAsString();
+	message += L"\n\n";
+	message += getStringFromResource(UI_GNRL_OPENFILE);
+	message += L"?";
+
+	auto res =
+		MessageBox(
+			this->MainWindow,
+			message.GetData(),
+			item->GetDisplayName().GetData(),
+			MB_YESNO | MB_DEFBUTTON1 | MB_ICONINFORMATION
+		);
+
+	if (res == IDYES)
+	{
+		// open file
+		this->OnNavigatorOpenRequest(
+			MAKEWPARAM(0, FORCE_OPEN_IN_NEW_TAB),
+			reinterpret_cast<LPARAM>(
+				item->GetItemPath()
+				.GetData()
+				)
+		);
+	}
+}
+
 void Application::FormatForExport(const CnC3File & file, iString & buffer_out)
 {
 	auto dataContainer =

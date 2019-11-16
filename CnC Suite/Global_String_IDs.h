@@ -313,6 +313,7 @@
 #define				UI_FILEINFO						633
 #define				UI_FILESIZE						634
 #define				UI_OUTPUTSIZE					635
+#define				UI_PATH							636
 
 // ERROR STRINGS
 #define				UI_XML_ERR_UNEXPECTEDCLOSINGTAG		800
