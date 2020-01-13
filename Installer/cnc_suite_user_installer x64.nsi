@@ -13,13 +13,17 @@ Name "CnC Suite ${VERSION}"
 OutFile "installer_output\CnC Suite USRINST x64 ${VERSION}.exe"             ;MARK: x86/x64
 
 InstallDir "$LOCALAPPDATA\CnC Suite"                                        ;MARK: x86/x64 ($PROGRAMFILES64 for x64)
+; NOTE: The program directory should be for the user: C:\Users\hans-\AppData\Local\CnC Suite\... or
+    ;   C:\Users\hans-\AppData\Local\Programs\CnC Suite\...
 
-VIProductVersion 1.0.3.0
+
+
+VIProductVersion 1.3.8.0
 VIAddVersionKey /LANG=0 "ProductName" "CnC Suite Installer x64"
 VIAddVersionKey /LANG=0 "Comments" "Windows 10/8/7"
-VIAddVersionKey /LANG=0 "CompanyName" "Laroomy Designs"
+VIAddVersionKey /LANG=0 "CompanyName" "LaroomySoft"
 VIAddVersionKey /LANG=0 "FileDescription" "This file installs CnC Suite on your Computer"
-VIAddVersionKey /LANG=0 "LegalCopyright" "(C) Laroomy Designs"
+VIAddVersionKey /LANG=0 "LegalCopyright" "(C) LaroomySoft"
 VIAddVersionKey /LANG=0 "ProductVersion" "1.3.8"
 VIAddVersionKey /LANG=0 "FileVersion" "1.3.8"
 
@@ -98,6 +102,12 @@ Section "Installer Section"
     File "redist_files\vccorlib140.dll"
     File "redist_files\vcruntime140.dll"
 
+    ; TODO: Write the dependency dll's direct in the installation directory!!!!
+    ; ************************************************************************************** ;
+    ; NOTE: The directory(s) which contains the redist dll's:
+    ;           C:\Program Files (x86)\Windows Kits\10\Redist\10.0.18362.0\ucrt\DLLs\x64
+    ;       &   C:\Program Files (x86)\Windows Kits\10\Redist\10.0.18362.0\ucrt\DLLs\x86
+
     SetOutPath "$INSTDIR\assets"
 
     File "logo_sq70.png"
@@ -128,7 +138,7 @@ Section "Installer Section"
     ;Create desktop shortcut
     CreateShortCut "$DESKTOP\CnC Suite.lnk" "$INSTDIR\CnC Suite.exe"
 
-    ;Write registry
+    ;Write registry (Admin level required - only necessary for Admin Installation (deprecated))
     ;------------------------------------------------------------------------------------------->
     ;Filetype association
     ;WriteRegStr HKCR ".cnc3" "" "cnc.file"
@@ -144,6 +154,7 @@ Section "Installer Section"
        SetRegView 64
     ${EndIf}
 
+    ;Write registry (Only for current user (user-installation))
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "DisplayName" "CnC Suite"
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "DisplayIcon" "$INSTDIR\image\Cnc_Suite_mIcon.ico"   
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "UninstallString" "$INSTDIR\Uninstall.exe"
@@ -151,7 +162,7 @@ Section "Installer Section"
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "Publisher" "Laroomy Designs"
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "URLInfoAbout" "http://www.cnc-suite.de"    
     
-    ;Set Application Registry entry
+    ;Set Application Registry entry (not necessary - only for use by installer and cnc-suite.exe)
     WriteRegStr HKCU "SOFTWARE\CnC_Suite\CurrentVersion" "" "1.0.3"
 
     SetRegView 32
