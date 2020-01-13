@@ -15,7 +15,7 @@ OutFile "installer_output\CnC Suite USRINST x64 ${VERSION}.exe"             ;MAR
 InstallDir "$LOCALAPPDATA\CnC Suite"                                        ;MARK: x86/x64 ($PROGRAMFILES64 for x64)
 
 VIProductVersion 1.0.3.0
-VIAddVersionKey /LANG=0 "ProductName" "CnC Suite Installer"
+VIAddVersionKey /LANG=0 "ProductName" "CnC Suite Installer x64"
 VIAddVersionKey /LANG=0 "Comments" "Windows 10/8/7"
 VIAddVersionKey /LANG=0 "CompanyName" "Laroomy Designs"
 VIAddVersionKey /LANG=0 "FileDescription" "This file installs CnC Suite on your Computer"
