@@ -3,6 +3,7 @@ Unicode true
 !include "LogicLib.nsh"
 !include "MUI2.nsh"
 !include "x64.nsh"
+!include "FileFunc.nsh"
 ; end include_region----------------------------------------------;
 ; ----------------------------------------------------------------;
 ; ----------------------------------------------------------------;
@@ -53,6 +54,9 @@ BrandingText "Laroomy Designs"
 
 ; TODO: define the ui-strings for the pages and make it language-dependent !!
 
+
+;!insertmacro ${GetTime} "" "L" $day $month $year $weekday $hours $minute $seconds
+
 ; Installer:
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "license.rtf"
@@ -77,7 +81,13 @@ BrandingText "Laroomy Designs"
 ; ----------------------------------------------------------------;
 ; variable region ------------------------------------------------;
 
-    ;no variables yet!
+    Var day
+    Var month
+    Var year
+    Var weekday
+    Var hours
+    Var minute
+    Var seconds
 
 ; end variable region --------------------------------------------;
 
@@ -93,50 +103,102 @@ Section "Installer Section"
 
     ;Create files and directories
     SetOutPath "$INSTDIR"
+    SetOutPath "$INSTDIR\bin"
 
-    File "exe_user_x64\CnC Suite.exe"                        ;MARK: x86/x64
+    ;    Program files
     File "CnC Suite.VisualElementsManifest.xml"
+    File "exe_user_x64\CnC Suite.exe"                        ;MARK: x64 only !
+    
 
-    File "redist_files\concrt140.dll"
-    File "redist_files\msvcp140.dll"
-    File "redist_files\vccorlib140.dll"
-    File "redist_files\vcruntime140.dll"
-
-    ; TODO: Write the dependency dll's direct in the installation directory!!!!
+    ; NOTE: Write the dependency dll's direct in the installation directory
     ; ************************************************************************************** ;
-    ; NOTE: The directory(s) which contains the redist dll's:
-    ;           C:\Program Files (x86)\Windows Kits\10\Redist\10.0.18362.0\ucrt\DLLs\x64
-    ;       &   C:\Program Files (x86)\Windows Kits\10\Redist\10.0.18362.0\ucrt\DLLs\x86
 
-    SetOutPath "$INSTDIR\assets"
+    ;    Visual Studio distributed dll's - Path: C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.24.28127\x64
+    File "DLLs\Microsoft.VC142.CRT\concrt140.dll"
+    File "DLLs\Microsoft.VC142.CRT\msvcp140.dll"
+    File "DLLs\Microsoft.VC142.CRT\msvcp140_1.dll"
+    File "DLLs\Microsoft.VC142.CRT\msvcp140_2.dll"
+    File "DLLs\Microsoft.VC142.CRT\msvcp140_codecvt_ids.dll"
+    File "DLLs\Microsoft.VC142.CRT\vccorlib140.dll"
+    File "DLLs\Microsoft.VC142.CRT\vcruntime140.dll"
+    File "DLLs\Microsoft.VC142.CRT\vcruntime140_1.dll"
 
+
+    ;    Other dependency files - not all are necessary but it's easier to copy the hole folder
+    ;    Path: C:\Program Files (x86)\Windows Kits\10\Redist\10.0.18362.0\ucrt\DLLs\...
+    File "DLLs\x64\api-ms-win-core-console-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-console-l1-2-0.dll"
+    File "DLLs\x64\api-ms-win-core-datetime-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-debug-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-errorhandling-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-file-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-file-l1-2-0.dll"
+    File "DLLs\x64\api-ms-win-core-file-l2-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-handle-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-heap-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-interlocked-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-libraryloader-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-localization-l1-2-0.dll"
+    File "DLLs\x64\api-ms-win-core-memory-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-namedpipe-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-processenvironment-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-processthreads-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-processthreads-l1-1-1.dll"
+    File "DLLs\x64\api-ms-win-core-profile-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-rtlsupport-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-string-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-synch-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-synch-l1-2-0.dll"
+    File "DLLs\x64\api-ms-win-core-sysinfo-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-timezone-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-core-util-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-conio-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-convert-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-environment-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-filesystem-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-heap-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-locale-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-math-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-multibyte-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-private-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-process-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-runtime-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-stdio-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-string-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-time-l1-1-0.dll"
+    File "DLLs\x64\api-ms-win-crt-utility-l1-1-0.dll"
+    File "DLLs\x64\ucrtbase.dll"
+
+
+    ;   Write the assets-folder
+    SetOutPath "$INSTDIR\bin\assets"
     File "logo_sq70.png"
     File "logo_sq150.png"
 
-    SetOutPath "$INSTDIR\fonts"
+    ;   Write the fonts-folder (deprecated - this is not used anymore - the application uses the systemfont consolas!)
+    ;SetOutPath "$INSTDIR\fonts"
+    ;File "Code New Roman.otf"
+    ;File "Courier Prime Code.ttf"
+    ;File "Courier Prime Sans.ttf"
+    ;File "Inconsolata-Bold.ttf"
+    ;File "ProFontWindowsEdit.ttf"
+    ;File "PTM55FT.ttf"
+    ;File "SVBasicManual.ttf"
+    ;File "VeraMono.ttf"
 
-    File "Code New Roman.otf"
-    File "Courier Prime Code.ttf"
-    File "Courier Prime Sans.ttf"
-    File "Inconsolata-Bold.ttf"
-    File "ProFontWindowsEdit.ttf"
-    File "PTM55FT.ttf"
-    File "SVBasicManual.ttf"
-    File "VeraMono.ttf"
-
+    ;   Write the image folder
     SetOutPath "$INSTDIR\image"
-
     File "Cnc_Suite_mIcon.ico"
     File "cnc3_file_ico.ico"
 
     ;Create uninstaller
-    WriteUninstaller "$INSTDIR\Uninstall.exe"
+    WriteUninstaller "$INSTDIR\bin\Uninstall.exe"
 
     ;Create startmenu-entry
-    CreateShortCut "$APPDATA\Roaming\Microsoft\Windows\Start Menu\Programs\CnC Suite.lnk" "$INSTDIR\CnC Suite.exe"
+    CreateShortCut "$APPDATA\Roaming\Microsoft\Windows\Start Menu\Programs\CnC Suite.lnk" "$INSTDIR\bin\CnC Suite.exe"
   
     ;Create desktop shortcut
-    CreateShortCut "$DESKTOP\CnC Suite.lnk" "$INSTDIR\CnC Suite.exe"
+    CreateShortCut "$DESKTOP\CnC Suite.lnk" "$INSTDIR\bin\CnC Suite.exe"
 
     ;Write registry (Admin level required - only necessary for Admin Installation (deprecated))
     ;------------------------------------------------------------------------------------------->
@@ -149,6 +211,9 @@ Section "Installer Section"
     ;WriteRegStr HKCR "cnc.file\shell\edit\command" "" "$\"$INSTDIR\CnC Suite.exe$\" $\"%1$\""
     ;WriteRegStr HKCR "cnc.file\shell\open\command" "" "$\"$INSTDIR\CnC Suite.exe$\" $\"%1$\""
     ;------------------------------------------------------------------------------------------->
+    ${GetTime} "" "L" $day $month $year $weekday $hours $minute $seconds
+
+
     ;Register Uninstaller:
     ${If} ${RunningX64}
        SetRegView 64
@@ -157,11 +222,30 @@ Section "Installer Section"
     ;Write registry (Only for current user (user-installation))
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "DisplayName" "CnC Suite"
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "DisplayIcon" "$INSTDIR\image\Cnc_Suite_mIcon.ico"   
-    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "UninstallString" "$INSTDIR\Uninstall.exe"
+    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "UninstallString" "$INSTDIR\bin\Uninstall.exe"
+    ;WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "QuietUninstallString" "'$INSTDIR\bin\Uninstall.exe' /SILENT"
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "DisplayVersion" "${VERSION}"
-    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "Publisher" "Laroomy Designs"
-    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "URLInfoAbout" "http://www.cnc-suite.de"    
+    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "Publisher" "LaroomySoft"
+    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "URLInfoAbout" "https://www.cnc-suite.de"    
+    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "URLUpdateInfo" "https://www.cnc-suite.de"    
+    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "InstallLocation" "$INSTDIR"
+    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite" "InstallDate" "$hours:$minute - $day/$month/$year"
+
+    ;File-type association for the current user
+    ;ProgID:
+    WriteRegStr HKCU "Software\Classes\cnc3file" "" "CnC Suite File"
+    WriteRegStr HKCU "Software\Classes\cnc3file\DefaultIcon" "" "$\"$INSTDIR\image\cnc3_file_ico.ico$\""
+    WriteRegStr HKCU "Software\Classes\cnc3file\shell\open\command" "" "$\"$INSTDIR\bin\CnC Suite.exe$\" $\"%1$\""
+    WriteRegStr HKCU "Software\Classes\cnc3file\shell\edit\command" "" "$\"$INSTDIR\bin\CnC Suite.exe$\" $\"%1$\""
+    ;FileType:
+    WriteRegStr HKCU "Software\Classes\.cnc3" "" "cnc3file"
+    WriteRegStr HKCU "Software\Classes\.cnc3" "Content Type" "Application/CnC Suite"
+    WriteRegNone HKCU "Software\Classes\.cnc3\OpenWithProgids" "cnc3file" 0
+
     
+
+    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Extensions" "cnc3" "$\"$INSTDIR\bin\CnC Suite.exe$\"";TODO: delete in uninstaller
+
     ;Set Application Registry entry (not necessary - only for use by installer and cnc-suite.exe)
     WriteRegStr HKCU "SOFTWARE\CnC_Suite\CurrentVersion" "" "1.0.3"
 
@@ -175,36 +259,14 @@ Section "un.Application" uninst_app
 
     ;Delete files and folders
     ;----------------------------------------------------------------------->
-    Delete "$INSTDIR\image\Cnc_Suite_mIcon.ico"
-    Delete "$INSTDIR\image\cnc3_file_ico.ico"
 
-    RMDir "$INSTDIR\image"
-
-    Delete "$INSTDIR\fonts\Code New Roman.otf"
-    Delete "$INSTDIR\fonts\Courier Prime Code.ttf"
-    Delete "$INSTDIR\fonts\Courier Prime Sans.ttf"
-    Delete "$INSTDIR\fonts\Inconsolata-Bold.ttf"
-    Delete "$INSTDIR\fonts\ProFontWindowsEdit.ttf"
-    Delete "$INSTDIR\fonts\PTM55FT.ttf"
-    Delete "$INSTDIR\fonts\SVBasicManual.ttf"
-    Delete "$INSTDIR\fonts\VeraMono.ttf"
-
-    RMDir "$INSTDIR\fonts"
-
-    Delete "$INSTDIR\assets\logo_sq70.png"
-    Delete "$INSTDIR\assets\logo_sq150.png"
-
-    RMDir "$INSTDIR\assets"
-
-    Delete "$INSTDIR\Uninstall.exe"
-    Delete "$INSTDIR\CnC Suite.exe"
-    Delete "$INSTDIR\CnC Suite.VisualElementsManifest.xml"
-
-    Delete "$INSTDIR\concrt140.dll"
-    Delete "$INSTDIR\msvcp140.dll"
-    Delete "$INSTDIR\vccorlib140.dll"
-    Delete "$INSTDIR\vcruntime140.dll"
-
+    ; Remove image-folder (and content):
+    RMDir /r /REBOOTOK "$INSTDIR\image"
+    ; Remove fonts-folder (and content):
+    RMDir /r /REBOOTOK "$INSTDIR\fonts"
+    ; Remove bin-folder (and content)
+    RMDir /r /REBOOTOK "$INSTDIR\bin"
+    ; Remove the Installation-Directory (DO NOT USE \r !!! - See: https://nsis.sourceforge.io/Reference/RMDir for more info)
     RMDir "$INSTDIR"
 
     ;Delete startmenu-entry
@@ -215,14 +277,14 @@ Section "un.Application" uninst_app
 
     ;Remove Registry Entries
     ;------------------------------------------------------------------------->
-    ;Delete Filetype associations
-    ;DeleteRegKey HKCR ".cnc3"
-    ;DeleteRegKey HKCR "cnc.file"
 
     ${If} ${RunningX64}
        SetRegView 64
     ${EndIf}
 
+    ;Remove file Association
+    DeleteRegKey HKCU "Software\Classes\cnc3file"
+    DeleteRegKey HKCU "Software\Classes\.cnc3"
     ;Delete uninstaller key
     DeleteRegKey HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite"
     DeleteRegKey HKCU "SOFTWARE\CnC_Suite"
@@ -244,7 +306,6 @@ Section "un.User Data" uninst_userdata
     ;new!
     RMDir /r "$LOCALAPPDATA\CnC Suite\UserStyles"
     RMDir /r "$LOCALAPPDATA\CnC Suite\Samples"
-
 SectionEnd
 
 ;Remove section for the projects ---------------------------------------------------------------------------->
