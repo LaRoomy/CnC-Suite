@@ -44,7 +44,7 @@
 #define		APPTYPE_STOREAPP		1
 #define		APPTYPE_FREEAPP			2
 
-//#define			CNCSUITE_USERINSTALLATION		// disable this to create the executable for the classic installation
+#define			CNCSUITE_USERINSTALLATION		// disable this to create the executable for the classic installation
 
 #define		IDSEX_APPLICATIONCLASS			L"CNCSUITECLASS"
 #define		APPLICATION_DISPLAY_NAME		L"CnC Suite"

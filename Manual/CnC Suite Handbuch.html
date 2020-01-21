@@ -5,6 +5,7 @@
         <meta name="description" content="Dieses Handbuch beschreibt die Verwendung der Anwendung CnC Suite">
         <meta name="keywords" content="CnC Suite, Handbuch, Verwendung, NC Editor, PAL">
         <meta name="Author" content="Hans Philipp Zimmermann">
+        <meta charset="utf-8">
         <style type="text/css">
             body, html {
                 background-color: #333333;
@@ -23,20 +24,15 @@
                 min-height: 60px;
                 display: table;
                 float: left;
-                vertical-align: middle;                
             }
             #subHeaderDiv{
                 float: left;                
                 margin-left: 5pt;
-                margin-top: 0pt;
+                margin-top: 5pt;
                 margin-bottom: 0pt;
                 margin-right: 0pt;
-                /*text-align: center;*/
                 height: 100%;
                 display: table-cell;
-                vertical-align: middle;
-                /*height: 70px;*/
-                transform: translate(0%, 24%);
             }
             #cncSuiteMainIcon {
                 width: 44px;
@@ -47,20 +43,14 @@
                 padding: 0pt;
                 float: left;
                 display: table-cell;
-                /*transform: translate(0pt, 3pt);*/
             }
             #headerText {
                 font-size: 20pt;
                 color: #ffffff;
-                /*display: table-cell;*/
-                /*vertical-align: middle;*/
-                /*float: left;*/
                 padding: 0pt;
                 margin: 0pt;
                 margin-top: 2pt;
                 font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-                /*top: 50%;
-                transform: translate(0, 50%);*/
             }
 
             #pHeader {
@@ -87,6 +77,13 @@
                 background-color: aquamarine;
             }
 
+            .divAsButtonStyle {
+                background-color: #666666;
+                padding: 5pt;
+                font-size: 16pt;
+                color: white;
+            }
+
             h2 {
                 font-size: 22pt;
                 color: #ffffff;
@@ -94,7 +91,34 @@
             }
         </style>
         <script type="text/javascript">
-        
+            var buttonCount = 3;// amount of buttons
+            var selectorIndexes = [1,0,0];//appropriate fields to the amount of buttons - button 1 is initally selected
+
+            function mouseoverbutton(index, markColor){
+                if(selectorIndexes[index] != 1){
+                    document.getElementsByClassName('divAsButtonStyle')[index].style.backgroundColor = markColor;
+                }
+            }
+
+            function mouseoutofbutton(index){
+                if(selectorIndexes[index] != 1){
+                    document.getElementsByClassName('divAsButtonStyle')[index].style.backgroundColor = '#666666';
+                }
+            }
+
+            function mousebuttonclicked(index){
+                if(selectorIndexes[index] == 0){                
+                    for(i = 0; i < buttonCount; i++){                    
+                        if(i != index)
+                        {
+                            document.getElementsByClassName('divAsButtonStyle')[i].style.backgroundColor = '#666666';
+                        }
+                        selectorIndexes[i] = 0;
+                    }
+                    document.getElementsByClassName('divAsButtonStyle')[index].style.backgroundColor = '#AAAAAA';
+                    selectorIndexes[index] = 1;
+                }
+            }
         </script>
     </head>
     <body>
@@ -109,8 +133,23 @@
         </div>
         
         <div id="indexDiv">
-
-
+            <!--The first button is initally selected-->
+            <div
+                class="divAsButtonStyle"
+                style="background-color: #AAAAAA;"
+                onmouseover="mouseoverbutton(0, '#888888')"
+                onmouseout="mouseoutofbutton(0)"
+                onclick="mousebuttonclicked(0)">First Button</div>
+            <div
+                class="divAsButtonStyle" 
+                onmouseover="mouseoverbutton(1, '#888888')" 
+                onmouseout="mouseoutofbutton(1)" 
+                onclick="mousebuttonclicked(1)">Second Button</div>
+            <div 
+                class="divAsButtonStyle" 
+                onmouseover="mouseoverbutton(2, '#888888')" 
+                onmouseout="mouseoutofbutton(2)" 
+                onclick="mousebuttonclicked(2)">Third Button</div>
         </div>
         <div id="subPageDiv">
 
