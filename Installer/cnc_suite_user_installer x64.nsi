@@ -109,11 +109,10 @@ Section "Installer Section"
     File "CnC Suite.VisualElementsManifest.xml"
     File "exe_user_x64\CnC Suite.exe"                        ;MARK: x64 only !
     
-
     ; NOTE: Write the dependency dll's direct in the installation directory
     ; ************************************************************************************** ;
 
-    ;    Visual Studio distributed dll's - Path: C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.24.28127\x64
+    ;Visual Studio distributed dll's - Path: C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.24.28127\x64
     File "DLLs\Microsoft.VC142.CRT\concrt140.dll"
     File "DLLs\Microsoft.VC142.CRT\msvcp140.dll"
     File "DLLs\Microsoft.VC142.CRT\msvcp140_1.dll"
@@ -124,8 +123,8 @@ Section "Installer Section"
     File "DLLs\Microsoft.VC142.CRT\vcruntime140_1.dll"
 
 
-    ;    Other dependency files - not all are necessary but it's easier to copy the hole folder
-    ;    Path: C:\Program Files (x86)\Windows Kits\10\Redist\10.0.18362.0\ucrt\DLLs\...
+    ;Other dependency files - not all are necessary but it's easier to copy the hole folder
+    ;Path: C:\Program Files (x86)\Windows Kits\10\Redist\10.0.18362.0\ucrt\DLLs\...
     File "DLLs\x64\api-ms-win-core-console-l1-1-0.dll"
     File "DLLs\x64\api-ms-win-core-console-l1-2-0.dll"
     File "DLLs\x64\api-ms-win-core-datetime-l1-1-0.dll"
@@ -170,7 +169,7 @@ Section "Installer Section"
     File "DLLs\x64\ucrtbase.dll"
 
 
-    ;   Write the assets-folder
+    ;Write the assets-folder
     SetOutPath "$INSTDIR\bin\assets"
     File "logo_sq70.png"
     File "logo_sq150.png"
@@ -186,16 +185,18 @@ Section "Installer Section"
     ;File "SVBasicManual.ttf"
     ;File "VeraMono.ttf"
 
-    ;   Write the image folder
+    ;Write the image folder
     SetOutPath "$INSTDIR\image"
     File "Cnc_Suite_mIcon.ico"
     File "cnc3_file_ico.ico"
+
+    ;TODO: write the manual to the application folder!!!! (if it is ready)
 
     ;Create uninstaller
     WriteUninstaller "$INSTDIR\bin\Uninstall.exe"
 
     ;Create startmenu-entry
-    CreateShortCut "$APPDATA\Roaming\Microsoft\Windows\Start Menu\Programs\CnC Suite.lnk" "$INSTDIR\bin\CnC Suite.exe"
+    CreateShortCut "$STARTMENU\CnC Suite.lnk" "$INSTDIR\bin\CnC Suite.exe" ;NOTE: The $STARTMENU variable depends on the SetShellVarContext setting
   
     ;Create desktop shortcut
     CreateShortCut "$DESKTOP\CnC Suite.lnk" "$INSTDIR\bin\CnC Suite.exe"
@@ -242,8 +243,6 @@ Section "Installer Section"
     WriteRegStr HKCU "Software\Classes\.cnc3" "Content Type" "Application/CnC Suite"
     WriteRegNone HKCU "Software\Classes\.cnc3\OpenWithProgids" "cnc3file" 0
 
-    
-
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Extensions" "cnc3" "$\"$INSTDIR\bin\CnC Suite.exe$\"";TODO: delete in uninstaller
 
     ;Set Application Registry entry (not necessary - only for use by installer and cnc-suite.exe)
@@ -257,20 +256,27 @@ SectionEnd
 ; UNINSTALLER SECTION **********************************************;
 Section "un.Application" uninst_app
 
+    ;select the current user
+    SetShellVarContext current
+
     ;Delete files and folders
     ;----------------------------------------------------------------------->
 
     ; Remove image-folder (and content):
-    RMDir /r /REBOOTOK "$INSTDIR\image"
+    RMDir /r /REBOOTOK "$LOCALAPPDATA\CnC Suite\image"
     ; Remove fonts-folder (and content):
-    RMDir /r /REBOOTOK "$INSTDIR\fonts"
+    RMDir /r /REBOOTOK "$LOCALAPPDATA\CnC Suite\fonts"
     ; Remove bin-folder (and content)
-    RMDir /r /REBOOTOK "$INSTDIR\bin"
+    RMDir /r /REBOOTOK "$LOCALAPPDATA\CnC Suite\bin"
+    ; Remove manual
+    RMDir /r /REBOOTOK "$LOCALAPPDATA\Manual"
+
     ; Remove the Installation-Directory (DO NOT USE \r !!! - See: https://nsis.sourceforge.io/Reference/RMDir for more info)
-    RMDir "$INSTDIR"
+    ; This is done later, because the could have selected the choice to keep some data...
+    ;RMDir "$INSTDIR"
 
     ;Delete startmenu-entry
-    Delete "$APPDATA\Roaming\Microsoft\Windows\Start Menu\Programs\CnC Suite.lnk"
+    Delete "$STARTMENU\CnC Suite.lnk"
 
     ;Delete desktop-shortcut
     Delete "$DESKTOP\CnC Suite.lnk"
@@ -285,6 +291,7 @@ Section "un.Application" uninst_app
     ;Remove file Association
     DeleteRegKey HKCU "Software\Classes\cnc3file"
     DeleteRegKey HKCU "Software\Classes\.cnc3"
+    DeleteRegKey HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Extensions\cnc3"
     ;Delete uninstaller key
     DeleteRegKey HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CnC_Suite"
     DeleteRegKey HKCU "SOFTWARE\CnC_Suite"
@@ -294,37 +301,51 @@ SectionEnd
 
 ;Remove section for the application data -------------------------------------->
 Section "un.Application Data" uninst_appdata
+    ;select the current user:
+    SetShellVarContext current
+
+    ;remove:
     RMDir /r "$DOCUMENTS\CnC Suite\AppData"         ;in case of old-installation
     RMDir /r "$LOCALAPPDATA\CnC Suite\AppData"      ;in case of new-installation
+
+    RMDir /r "$LOCALAPPDATA\CnC Suite\CtrlData"     ;remove ctrl-data folder
+    RMDir /r "$LOCALAPPDATA\CnC Suite\control"      ; -||-
 SectionEnd
 
 ;Remove section for the user data ---------------------------------------------------------->
 Section "un.User Data" uninst_userdata
+    ;select the current user:
+    SetShellVarContext current
+
     ;old!
     RMDir /r "$DOCUMENTS\CnC Suite\UserStyles"
-    RMDir /r "$DOCUMENTS\CnC Suite\Samples"
+    RMDir /r "$DOCUMENTS\CnC Suite\Templates"
     ;new!
     RMDir /r "$LOCALAPPDATA\CnC Suite\UserStyles"
-    RMDir /r "$LOCALAPPDATA\CnC Suite\Samples"
+    RMDir /r "$LOCALAPPDATA\CnC Suite\Templates"; this folder remains in the documents/CnC Suite folder
+
+    ;if the previous sections are completely executed, the folder must be empty, if so, delete it
+    RMDir   "$LOCALAPPDATA\CnC Suite"
 SectionEnd
 
 ;Remove section for the projects ---------------------------------------------------------------------------->
-Section "un.Projects" uninst_projects
+Section /o "un.Projects and Templates" uninst_projects    ; /o == unselected
+    ;select the current user:
+    SetShellVarContext current
+
     RMDir /r "$DOCUMENTS\CnC Suite\Projects"
 
-    ;${If} ${SectionIsSelected} ${uninst_appdata}
-        ${If} ${SectionIsSelected} ${uninst_userdata}
-            ${If} ${SectionIsSelected} ${uninst_projects}
-                RMDir "$DOCUMENTS\CnC Suite"
-            ${EndIf}
+    ${If} ${SectionIsSelected} ${uninst_userdata}
+        ${If} ${SectionIsSelected} ${uninst_projects}
+            RMDir "$DOCUMENTS\CnC Suite"                ; Remove the containing folder only if not data is in it!
         ${EndIf}
-    ;${EndIf}
+    ${EndIf}
 SectionEnd
 
 LangString UNINSTAPP_DESC ${LANG_ENGLISH} "Removes the Application and all it's Subfiles from the System."
 LangString UNINSTAPPDATA_DESC ${LANG_ENGLISH} "Removes the Application Data and Settings from the User-Directory."
 LangString UNINSTUSERDATA_DESC ${LANG_ENGLISH} "Removes the user-defined App-Data from the User-Directory."
-LangString UNINSTPROJ_DESC ${LANG_ENGLISH} "Removes the Projects Folder and all it's Content from the User-Directory."
+LangString UNINSTPROJ_DESC ${LANG_ENGLISH} "Removes the Projects- and Templates-Folder and all Content from the User-Directory."
 
 
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_BEGIN
