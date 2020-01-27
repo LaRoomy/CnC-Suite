@@ -103,7 +103,11 @@ class iXML_Tag
 	: public iCollectable<iXML_Tag>
 {
 public:
-	iXML_Tag() : hasProperties(false) {}
+	iXML_Tag()
+		: hasProperties(false),
+		initallyClosed(true)
+	{}
+
 	iXML_Tag(const iXML_Tag& xmlTag)
 	{
 		this->tagName.Replace(xmlTag.tagName.GetData());
