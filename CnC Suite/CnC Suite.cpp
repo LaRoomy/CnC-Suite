@@ -21,7 +21,9 @@ extern int APIENTRY _tWinMain(
 	UNREFERENCED_PARAMETER(nCmdShow);
 
 	SetUnhandledExceptionFilter(lpTopLevelExceptionFilter);
-	InitializeCriticalSectionAndSpinCount(&CriticalSection, 0x00000400);
+
+	auto notused = InitializeCriticalSectionAndSpinCount(&CriticalSection, 0x00000400);
+	_NOT_USED(notused);
 
 	int result = I_ERROR_DPI_FAILED;
 	DWORD restart = NO_RESTART;

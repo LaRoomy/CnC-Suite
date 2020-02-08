@@ -2943,7 +2943,9 @@ void CnCS_TC::selectTab(DWORD tabNr)
 			this->SetDescriptions(ptp_new->DESC1, ptp_new->DESC2, ptp_new->DESC3);
 		}
 		this->RefreshTabAlignment();
-		ptp_new->Editcontrol->UpdateFocusRect();
+
+		if(ptp_new != nullptr)
+			ptp_new->Editcontrol->UpdateFocusRect();
 
 		this->updateFileInfoArea();
 	}
