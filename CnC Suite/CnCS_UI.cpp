@@ -960,8 +960,24 @@ LRESULT CnCS_UI::OnNormalize(HWND hWnd, WPARAM wParam)
 	//if (propWnd != nullptr)
 	//	return 0;
 
+	// this is a temporary fix, because the settings-button loses his tooltip, so reset it on normalization
+	//if (wParam == IDM_APPSETTINGS) {
+
+	//	auto button = GetDlgItem(hWnd, IDM_APPSETTINGS);
+	//	if (button != nullptr)
+	//	{
+	//		this->MakeTooltip(
+	//			button,
+	//			IDM_APPSETTINGS
+	//		);
+	//	}
+	//}
+
 	if (this->iParam->blockSettingsButtonNormalization)
+	{
+		this->SwitchButtonActivationStatus(IDM_APPSETTINGS, BDRAW_NORMAL);
 		return result;
+	}
 
 	HWND wndToNorm = this->GetButtonHandle((int)wParam);
 	if (wndToNorm)

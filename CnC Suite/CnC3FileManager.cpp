@@ -112,6 +112,7 @@ HRESULT CnC3File::Save(LPCTSTR path)
 			}
 		}
 	}
+	this->SetStatus(hr);
 	return hr;
 }
 

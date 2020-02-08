@@ -366,7 +366,26 @@ HRESULT CnCS_TC::InitComponents(LPTCSTARTUPINFO tcInfo)
 															}
 															if (tcInfo->mode == TCI_OPENREQUEST)
 															{
-																this->ADD_Tab(tcInfo->PathToFile);
+																// check if this file is already open!
+																auto isOpen = false;
+																
+																for (DWORD i = 0; i < this->TABCount; i++)
+																{
+																	auto ptp = this->GetTabProperty(i);
+																	if (ptp != nullptr)
+																	{
+																		auto isEqual = CompareStringsB(ptp->Path, tcInfo->PathToFile);
+																		if (isEqual)
+																		{
+																			this->selectTab(i);
+																			isOpen = true;
+																		}
+																	}
+																}
+																if (!isOpen)
+																{
+																	this->ADD_Tab(tcInfo->PathToFile);
+																}
 															}
 														}
 													}
@@ -649,11 +668,29 @@ LRESULT CnCS_TC::DescEditSub(HWND edit, UINT message, WPARAM wParam, LPARAM lPar
 			}
 			else
 			{
-				auto ptp = Tabcontrol->GetActiveTabProperty();
-				if (ptp != NULL)
+				// if the user selects something (ctrl + A) or copies something (ctrl + C) -> do not set content-changed to true!
+				auto ctrlKeyIsPressed =
+					(GetKeyState(VK_CONTROL) & 0x8000)
+					? true : false;
+
+				auto aKeyIsPressed =
+					(GetKeyState(0x41) & 0x8000)
+					? true : false;
+
+				auto cKeyIsPressed =
+					(GetKeyState(0x43) & 0x8000)
+					? true : false;
+
+				auto exec = !((ctrlKeyIsPressed && aKeyIsPressed) || (ctrlKeyIsPressed && cKeyIsPressed));
+
+				if (exec)
 				{
-					ptp->Content_Changed = TRUE;
-					Tabcontrol->RedrawTab_s(REDRAW_CURRENT);
+					auto ptp = Tabcontrol->GetActiveTabProperty();
+					if (ptp != NULL)
+					{
+						ptp->Content_Changed = TRUE;
+						Tabcontrol->RedrawTab_s(REDRAW_CURRENT);
+					}
 				}
 			}
 		}
@@ -3226,6 +3263,10 @@ BOOL CnCS_TC::Save(DWORD mode, LPTABPROPERTY _ptp)
 							result = FALSE;
 						}
 						SafeDeleteArray(&editText);
+					}
+					if (i == this->iParam.dwActiveTab)
+					{
+						this->updateFileInfoArea();
 					}
 				}
 			}
