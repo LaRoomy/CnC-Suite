@@ -629,7 +629,7 @@ int EditControl::OnEditNotify(HWND Parent, WPARAM wParam, LPARAM lParam)
 			if(pSel->seltyp == SEL_EMPTY)
 			{
 				auto index = pSel->chrg.cpMax;
-				auto line = SendMessage(this->EditWnd, EM_EXLINEFROMCHAR, 0, (LPARAM)index);
+				auto line = static_cast<int>(SendMessage(this->EditWnd, EM_EXLINEFROMCHAR, 0, (LPARAM)index));
 				auto lineindex = index - SendMessage(this->EditWnd, EM_LINEINDEX, (WPARAM)-1, 0);
 
 				this->previousSelectedLine = this->currentSelectedLine;

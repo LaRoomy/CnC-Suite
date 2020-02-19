@@ -104,12 +104,12 @@ public:
 	int getAsInt() {
 		return (this->content != nullptr)
 			? _wtoi(this->content)
-			: throw DataAccessViolationException(EXCEPTION_ACCESS_VIOLATION, "Converting value to integer failed: value was nullptr");
+			: throw DataAccessViolationException("Converting value to integer failed: value was nullptr");
 	}
 	unsigned int getAsUInt() {
 		return (this->content != nullptr)
 			? static_cast<unsigned int>(wcstoul(this->content, nullptr, 0))
-			: throw DataAccessViolationException(EXCEPTION_ACCESS_VIOLATION, "Converting value to unsigned integer failed: value was nullptr");
+			: throw DataAccessViolationException("Converting value to unsigned integer failed: value was nullptr");
 	}
 
 	static iString* FromInt(int i);

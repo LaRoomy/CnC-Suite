@@ -3,27 +3,21 @@
 #ifndef _COBJECT_H_
 #define	_COBJECT_H_
 
-//#include<stdlib.h>
-//#include<vector>
-//#include<iostream>
-//#include<limits>
-//#include<string>
 #include<stdexcept>
-//
 using namespace std;
-
 
 class DataAccessViolationException
 	: public runtime_error {
 private:
-	DWORD dwError;
+	DWORD dwError = EXCEPTION_ACCESS_VIOLATION;
 public:
-	DataAccessViolationException(DWORD exceptionCode, const char* errorMessage)
-	: runtime_error(errorMessage), dwError(exceptionCode){}
+	DataAccessViolationException(const char* errorMessage)
+	: runtime_error(errorMessage) {}
 
 	DWORD GetExceptionCode() const { return this->dwError; }
 };
 
+// TODO: add more exception classes
 
 typedef LONG_PTR cObject;
 
