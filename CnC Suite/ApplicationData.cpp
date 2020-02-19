@@ -283,39 +283,48 @@ cObject ApplicationData::lookUp(_In_ DATAKEY key)
 				{
 					if (keyname.Equals(key))
 					{
-						auto dataType = setting.getPropertyContentFromName(L"type");
+						auto dataType =
+							setting.getPropertyContentFromName(L"type");
 
-						if (dataType.Equals(L"boolean"))
+						try
 						{
-							auto box = new iBox<bool>();
+							if (dataType.Equals(L"boolean"))
+							{
+								auto box = new iBox<bool>();
 
-							if (setting.tagContent.Equals(L"true"))
-								box->set(true);
-							else
-								box->set(false);
+								if (setting.tagContent.Equals(L"true"))
+									box->set(true);
+								else
+									box->set(false);
 
-							return reinterpret_cast<cObject>(box);
+								return reinterpret_cast<cObject>(box);
+							}
+							else if (dataType.Equals(L"string"))
+							{
+								iString str(setting.tagContent);
+								auto box = new iBox<iString>(str);
+
+								return reinterpret_cast<cObject>(box);
+							}
+							else if (dataType.Equals(L"integer"))
+							{
+								auto box = new iBox<int>(
+									setting.tagContent.getAsInt()
+									);
+								return reinterpret_cast<cObject>(box);
+							}
+							else if (dataType.Equals(L"unsigned_integer"))
+							{
+								auto box = new iBox<unsigned int>(
+									setting.tagContent.getAsUInt()
+									);
+								return reinterpret_cast<cObject>(box);
+							}
 						}
-						else if (dataType.Equals(L"string"))
+						catch (DataAccessViolationException dave)
 						{
-							iString str(setting.tagContent);
-							auto box = new iBox<iString>(str);
-
-							return reinterpret_cast<cObject>(box);
-						}
-						else if (dataType.Equals(L"integer"))
-						{
-							auto box = new iBox<int>(
-								setting.tagContent.getAsInt()
-								);
-							return reinterpret_cast<cObject>(box);
-						}
-						else if (dataType.Equals(L"unsigned_integer"))
-						{
-							auto box = new iBox<unsigned int>(
-								setting.tagContent.getAsUInt()
-							);
-							return reinterpret_cast<cObject>(box);
+							this->deleteValue(key);
+							return reinterpret_cast<cObject>(nullptr);
 						}
 					}
 				}

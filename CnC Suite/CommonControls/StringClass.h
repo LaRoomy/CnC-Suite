@@ -2,6 +2,8 @@
 #include"..//external.h"
 #include"ItemCollection.h"
 
+using namespace std;
+
 constexpr auto STRINGLIMIT = 50000;
 constexpr auto ISTRING_FAIL_INDICATOR = L"{ 0xf5a051e0, 0xde80, 0x19d6, 0xcc, 0x4e, 0xa8, 0x01, 0x4a, 0xb3, 0x1f, 0xff }";
 
@@ -100,12 +102,14 @@ public:
 	void insertCharAt(int index, TCHAR _Char);
 
 	int getAsInt() {
-		return _wtoi(this->content);
+		return (this->content != nullptr)
+			? _wtoi(this->content)
+			: throw DataAccessViolationException(EXCEPTION_ACCESS_VIOLATION, "Converting value to integer failed: value was nullptr");
 	}
 	unsigned int getAsUInt() {
-		return static_cast<unsigned int>(
-			wcstoul(this->content, nullptr, 0)
-		);
+		return (this->content != nullptr)
+			? static_cast<unsigned int>(wcstoul(this->content, nullptr, 0))
+			: throw DataAccessViolationException(EXCEPTION_ACCESS_VIOLATION, "Converting value to unsigned integer failed: value was nullptr");
 	}
 
 	static iString* FromInt(int i);

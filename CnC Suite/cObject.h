@@ -3,6 +3,28 @@
 #ifndef _COBJECT_H_
 #define	_COBJECT_H_
 
+//#include<stdlib.h>
+//#include<vector>
+//#include<iostream>
+//#include<limits>
+//#include<string>
+#include<stdexcept>
+//
+using namespace std;
+
+
+class DataAccessViolationException
+	: public runtime_error {
+private:
+	DWORD dwError;
+public:
+	DataAccessViolationException(DWORD exceptionCode, const char* errorMessage)
+	: runtime_error(errorMessage), dwError(exceptionCode){}
+
+	DWORD GetExceptionCode() const { return this->dwError; }
+};
+
+
 typedef LONG_PTR cObject;
 
 template<class C> class ClsObject
