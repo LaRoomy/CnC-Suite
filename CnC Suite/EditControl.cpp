@@ -650,7 +650,7 @@ int EditControl::OnEditNotify(HWND Parent, WPARAM wParam, LPARAM lParam)
 						getStringFromResource(UI_EDITCONTROL_LINE),
 						line + 1,
 						getStringFromResource(UI_EDITCONTROL_COLUMN),
-						lineindex + 1);
+						(int)(lineindex + 1));
 
 					if (SUCCEEDED(hr))
 					{

@@ -261,7 +261,7 @@ DWORD CnCS_FN::fileSystemWatcher(LPVOID lParam)
 				{
 					while (1)
 					{
-						waitResult = WaitForSingleObject(ovl.hEvent, 500);
+						waitResult = (ovl.hEvent != nullptr) ? WaitForSingleObject(ovl.hEvent, 500) : WAIT_FAILED;
 
 						if (waitResult == WAIT_OBJECT_0)
 						{
@@ -307,6 +307,7 @@ DWORD CnCS_FN::fileSystemWatcher(LPVOID lParam)
 									FILE_FLAG_BACKUP_SEMANTICS,
 									nullptr
 								);
+
 							if (hCheck == INVALID_HANDLE_VALUE)
 							{
 								fileNavigator->onRootFolderInvalidated();
@@ -315,8 +316,13 @@ DWORD CnCS_FN::fileSystemWatcher(LPVOID lParam)
 							}
 							else
 							{
-								CloseHandle(hCheck);
+								if(hCheck != nullptr)
+									CloseHandle(hCheck);
 							}
+						}
+						else if (waitResult == WAIT_FAILED)
+						{
+							break;
 						}
 
 						// check for interrupt condition...

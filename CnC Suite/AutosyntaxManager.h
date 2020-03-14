@@ -89,7 +89,7 @@ private:
 
 	int currentScrollPosition;
 
-	APPSTYLEINFO styleInfo;
+	APPSTYLEINFO styleInfo;// = { 0,0,0,0,0,0,0,0,0,0,0,0 };
 
 	HRESULT _registerASClass();
 	HRESULT _createControls();

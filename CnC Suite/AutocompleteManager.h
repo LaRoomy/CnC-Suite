@@ -5,7 +5,7 @@
 #include<cListView.h>
 #include"autocompleteStrings.h"
 
-#define			AUTOCOMPLETEMANAGERCLASS		L"AUTOCMPLMNGRCLASS"
+constexpr auto AUTOCOMPLETEMANAGERCLASS = L"AUTOCMPLMNGRCLASS";
 
 #define			CTRLID_EXITBUTTON			20
 #define			CTRLID_ADDBUTTON			21
@@ -71,12 +71,12 @@ public:
 	}
 
 private:
-	HWND acmWnd;
+	HWND acmWnd = nullptr;
 	HWND MainWnd;
-	HWND parent;
+	HWND parent = nullptr;
 	HINSTANCE hInstance;
 	HFONT ctrlFont;
-	DWORD opMode;
+	DWORD opMode = 0;
 
 	//int selectedRow;
 
@@ -84,10 +84,10 @@ private:
 	singleLineEdit* appendixEdit;
 	singleLineEdit* previewEdit;
 
-	autocompleteStrings* pAcStrings;
+	autocompleteStrings* pAcStrings = nullptr;
 
 	APPSTYLEINFO sInfo;
-	cListView* acListView;
+	cListView* acListView = nullptr;
 
 	HRESULT createControls();
 	HRESULT registerClass();

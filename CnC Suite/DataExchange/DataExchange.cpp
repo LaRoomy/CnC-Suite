@@ -495,7 +495,7 @@ int SerialComm::PrepareBufferForTransmission(LPPTSTR buffer, bool removeBracketA
 					idx = 0;
 					blocker = false;
 					bracketType = L'\0';
-					int transferIndex = 0;
+					DWORD transferIndex = 0;
 
 					// store the converted text in the new buffer
 					while (idx < oldBufferSize)
