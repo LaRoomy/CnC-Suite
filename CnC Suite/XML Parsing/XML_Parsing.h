@@ -129,7 +129,7 @@ public:
 		this->subTAG_Structure.Clear();
 		this->tagProperties.Clear();
 		this->hasProperties = false;
-		this->initallyClosed = false;
+		this->initallyClosed = false;// the default is true, so this is wrong, but i won't change it, because it could impact the usage TODO: correct this and all the related usages
 	}
 
 	XML_TAG_Property* getPropertyFromName(iString& name)
