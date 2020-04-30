@@ -4184,6 +4184,12 @@ void CnCS_TC::saveCondition()
 				if (GetRichEditContent(ptp->AssocEditWnd, &tBuffer))
 				{
 					tag.tagContent.Replace(tBuffer);
+
+					// the initiallyClosed property must be set manually. TODO: upgrade the xml tag class
+					if (tag.tagContent.GetLength() > 0)
+						tag.initallyClosed = false;
+
+
 					SafeDeleteArray(&tBuffer);
 				}
 				else
