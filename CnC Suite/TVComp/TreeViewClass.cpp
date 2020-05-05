@@ -876,10 +876,10 @@ DWORD TreeViewCTRL::FOP_Proc(LPVOID lParam)
 	__try
 	{
 		LPTVTHREADDATA ptd = reinterpret_cast<LPTVTHREADDATA>(lParam);
-		if (ptd != NULL)
+		if (ptd != nullptr)
 		{
 			TreeViewCTRL* tvC = reinterpret_cast<TreeViewCTRL*>(ptd->toClass);
-			if (tvC != NULL)
+			if (tvC != nullptr)
 			{
 				int mode = ptd->mode;
 
@@ -5299,36 +5299,41 @@ int TreeViewCTRL::OnBeginDrag(LPNMTREEVIEW ptv)
 
 int TreeViewCTRL::OnEndLabelEdit(LPNMTVDISPINFO pdtv)
 {
-	if (pdtv->item.pszText != NULL)
+	if (pdtv->item.pszText != nullptr)
 	{
-		// make sure the name for the filesystem-object is valid
-		auto bfpo = CreateBasicFPO();
-		if (bfpo != nullptr)
+		if (pdtv->item.pszText[0] != L'\0')
 		{
-			if (!bfpo->VerifyFilename(pdtv->item.pszText))
+			// make sure the name for the filesystem-object is valid
+			auto bfpo = CreateBasicFPO();
+			if (bfpo != nullptr)
 			{
-				DispatchEWINotification(
-					EDSP_ERROR,
-					L"FN0003",
-					getStringFromResource(UI_GNRL_NAMEINVALID),
-					getStringFromResource(UI_FILENAVIGATOR)
-				);
-				return FALSE;
+				if (!bfpo->VerifyFilename(pdtv->item.pszText))
+				{
+					DispatchEWINotification(
+						EDSP_ERROR,
+						L"FN0003",
+						getStringFromResource(UI_GNRL_NAMEINVALID),
+						getStringFromResource(UI_FILENAVIGATOR)
+					);
+					return FALSE;
+				}
 			}
-		}
-		if (CopyStringToPtrW(pdtv->item.pszText, &this->FOPInfo.preOperationBuffer))
-		{
-			this->FOPInfo.preOperationBuffer_valid = TRUE;
-
-			HRESULT hr = this->CreateFOP_Thread(FOP_RENAME);
-			if (SUCCEEDED(hr))
+			if (CopyStringToPtrW(pdtv->item.pszText, &this->FOPInfo.preOperationBuffer))
 			{
-				// ...
+				this->FOPInfo.preOperationBuffer_valid = TRUE;
 
-				return TRUE; // TRUE -> set new label
+				HRESULT hr = this->CreateFOP_Thread(FOP_RENAME);
+				if (SUCCEEDED(hr))
+				{
+					// ...
+
+					return TRUE; // TRUE -> set new label
+				}
+				else
+					return FALSE; // FALSE -> reject changes		
 			}
 			else
-				return FALSE; // FALSE -> reject changes		
+				return FALSE;
 		}
 		else
 			return FALSE;
