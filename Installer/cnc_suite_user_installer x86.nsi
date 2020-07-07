@@ -264,10 +264,10 @@ Section "un.Application" uninst_app
     ; Remove bin-folder (and content)
     RMDir /r /REBOOTOK "$LOCALAPPDATA\CnC Suite\bin"
     ; Remove manual
-    RMDir /r /REBOOTOK "$LOCALAPPDATA\Manual"
+    RMDir /r /REBOOTOK "$LOCALAPPDATA\CnC Suite\Manual"
 
     ; Remove the Installation-Directory (DO NOT USE \r !!! - See: https://nsis.sourceforge.io/Reference/RMDir for more info)
-    ; This is done later, because the could have selected the choice to keep some data...
+    ; This is done later, because the user could have selected the choice to keep some data...
     ;RMDir "$INSTDIR"
 
     ;Delete startmenu-entry

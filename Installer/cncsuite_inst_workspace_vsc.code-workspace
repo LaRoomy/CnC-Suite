@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "..\\..\\..\\..\\Desktop\\Html lesson"
+		},
+		{
+			"path": "..\\Manual"
+		}
+	],
+	"settings": {
+		"files.autoSave": "onWindowChange"
+	}
+}
