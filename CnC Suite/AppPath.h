@@ -80,7 +80,7 @@
 #define			PATHTOFILE_DESCPROPERTY_TWO					L"\\CnC Suite\\AppData\\Strings\\Dproperty2.dat"
 #define			PATHTOFILE_DESCPROPERTY_THREE				L"\\CnC Suite\\AppData\\Strings\\Dproperty3.dat"
 
-#define			PATHTOFILE_FIRSTUSE_EXAMPLEFILE				L"\\CnC Suite\\Projects\\ExampleProject1\\example one.cnc3"
+#define			PATHTOFILE_FIRSTUSE_EXAMPLEFILE				L"\\CnC-Suite\\Projects\\ExampleProject1\\example one.cnc3"
 //##############################################################################################################################
 //##############################################################################################################################
 // FILES in Local-App-Data Folder:  ############################################################################################
@@ -90,13 +90,13 @@
 //##############################################################################################################################
 // FOLDERS in Documents Folder: ################################################################################################
 #define			PATHTOFOLDER_CNCSUITE_USERFOLDER				L"\\CnC Suite"
-#define			PATHTOFOLDER_CNCSUITE_DOCUMENTSFOLDER			L"\\CnC Suite"
+#define			PATHTOFOLDER_CNCSUITE_DOCUMENTSFOLDER			L"\\CnC-Suite"
 #define			PATHTOFOLDER_CNCSUITE_APPDATA					L"\\CnC Suite\\AppData"
 #define			PATHTOFOLDER_CNCSUITE_APPDATA_SESSION			L"\\CnC Suite\\AppData\\Session"
 #define			PATHTOFOLDER_CNCSUITE_APPDATA_SETTINGS			L"\\CnC Suite\\AppData\\Settings"
 #define			PATHTOFOLDER_CNCSUITE_APPDATA_STRINGS			L"\\CnC Suite\\AppData\\Strings"
-#define			PATHTOFOLDER_CNCSUITE_PROJECTS					L"\\CnC Suite\\Projects"
-#define			PATHTOFOLDER_CNCSUITE_SAMPLES					L"\\CnC Suite\\Templates"
+#define			PATHTOFOLDER_CNCSUITE_PROJECTS					L"\\CnC-Suite\\Projects"
+#define			PATHTOFOLDER_CNCSUITE_SAMPLES					L"\\CnC-Suite\\Templates"
 #define			PATHTOFOLDER_CNCSUITE_USERSTYLES				L"\\CnC Suite\\UserStyles"
 #define			PATHTOFOLDER_CNCSUITE_USERSTYLES_EDITOR			L"\\CnC Suite\\UserStyles\\Editor"
 
