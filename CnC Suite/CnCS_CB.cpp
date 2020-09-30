@@ -114,6 +114,8 @@ HRESULT CnCS_CB::InitColumns()
 	lvc.pszText = firstcol;
 	lvc.cx = c1;
 
+	lvc.fmt = LVCFMT_CENTER;
+
 	hr = (ListView_InsertColumn(this->Listview, 0, &lvc) == -1) ? E_FAIL : S_OK;
 	if (SUCCEEDED(hr))
 	{

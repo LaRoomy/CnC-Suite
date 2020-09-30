@@ -17,6 +17,7 @@ public:
 	virtual void Clear() = 0;
 	virtual BOOL RequestErrorValidity() = 0;
 	virtual void onDpiChanged() = 0;
+	virtual void ResizeWindow() = 0;
 };
 
 CnCSuite_CBox* CreateCBoxInstance(HINSTANCE hInst, HWND MainWindow);

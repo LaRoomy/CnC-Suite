@@ -74,6 +74,7 @@ public:
 	void OnEntryClicked(cObject sender, HistoryItem* item);
 	
 	void OnWindowClosed(cObject sender) {
+		UNREFERENCED_PARAMETER(sender);
 		this->FileNavigator->Show();
 	}
 

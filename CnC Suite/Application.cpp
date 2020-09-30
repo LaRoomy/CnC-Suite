@@ -283,6 +283,8 @@ LONG_PTR Application::getHistoryComponent()
 
 void Application::OnEntryClicked(cObject sender, HistoryItem* item)
 {
+	UNREFERENCED_PARAMETER(sender);
+
 	iString message(
 		getStringFromResource(UI_FILEINFO)
 	);

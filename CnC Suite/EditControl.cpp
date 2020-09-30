@@ -4953,6 +4953,8 @@ void EditControl::redoReplacedContent(LPUNDOREDOACTIONS action)
 
 void EditControl::applyColorToSelection(CHARRANGE * colorSegment, CHARRANGE * restoreRange, COLORREF colorToSet, BOOL suppressSelNotification, BOOL overrideSystemSelectionColor)
 {
+	// temp??
+	UNREFERENCED_PARAMETER(overrideSystemSelectionColor);
 	// temp
 	//iString text(L"color applied\n");
 	//text.Append(L"\nR-Value: ");

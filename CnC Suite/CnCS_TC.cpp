@@ -209,6 +209,8 @@ void CnCS_TC::GetCurrentTabDataAsStringCollection(itemCollection<iString> & data
 
 void CnCS_TC::SaveAsPathWasSelected(cObject sender, LPCTSTR path)
 {
+	UNREFERENCED_PARAMETER(sender);
+
 	// check if the file will be overwritten
 	BOOL fOverwritten = CheckForFileExist(path);
 	if (fOverwritten)

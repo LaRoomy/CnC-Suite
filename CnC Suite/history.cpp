@@ -293,6 +293,9 @@ bool History::FromFile(LPCTSTR path)
 
 void History::CollectionComplete(cObject sender)
 {
+	// temp??
+	UNREFERENCED_PARAMETER(sender);
+
 	//reinterpret_cast<EditorContentManager*>(sender)
 	//	->InsertLineAt(
 	//		L"CNCSUITE:HISTORY FORMAT:UTF8",
@@ -585,6 +588,8 @@ void UIHistory::OnFilesystemModification(LPFILESYSTEMOBJECT fso)
 
 void UIHistory::onCustomButtonClick(cObject sender, CTRLID ID)
 {
+	UNREFERENCED_PARAMETER(sender);
+
 	switch (ID)
 	{
 	case BID_QUIT:

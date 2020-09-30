@@ -23,6 +23,9 @@ public:		CnCS_CB(HINSTANCE, HWND);
 			void CnCS_CB::Clear() { ListView_DeleteAllItems(this->Listview); }
 			BOOL CnCS_CB::RequestErrorValidity() { return this->_requestErrorValidity(); }
 			void CnCS_CB::onDpiChanged() { this->onDPIChanged(); }
+
+			// ??? temp ???
+			void CnCS_CB::ResizeWindow() { this->OnSize(); }
 private:
 	HWND CBFrame;
 	HWND Listview;
