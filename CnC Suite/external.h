@@ -12,6 +12,7 @@
 #pragma comment(lib, "Comdlg32.lib")
 #pragma comment(lib, "Shcore.lib")
 #pragma comment(lib, "Setupapi.lib")
+#pragma comment(lib, "Dwmapi.lib")
 
 //	EXTERNAL DEPENDENCIES >>
 
@@ -27,6 +28,7 @@
 #include<WinInet.h>
 #include<commdlg.h>
 #include<sal.h>
+#include<dwmapi.h>
 
 // C-RUNTIME:
 #include<stdio.h>
