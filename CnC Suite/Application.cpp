@@ -450,8 +450,12 @@ HRESULT Application::Init_Mainframe()
 				hr = (this->MainWindow != nullptr) ? S_OK : E_FAIL;
 				if (SUCCEEDED(hr))
 				{
-					// ...
-					
+					// apply rounded corners (only if the window is not maximized)
+					if (this->AppData.WndSizeData.nCmdShow != SW_SHOWMAXIMIZED)
+					{
+						DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_ROUND;
+						DwmSetWindowAttribute(this->MainWindow, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
+					}
 				}
 			}
 		}

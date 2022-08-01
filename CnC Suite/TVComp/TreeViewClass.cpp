@@ -353,169 +353,179 @@ BOOL TreeViewCTRL::InitTreeViewItems( LPCTSTR Root, int Init_Mode )
 								{
 									hFind = FindFirstFile(path_buffer, &ffd);
 
-									hr = (hFind == INVALID_HANDLE_VALUE) ? E_HANDLE : S_OK;
-									if (SUCCEEDED(hr))
+									auto lastError = GetLastError();
+
+									if ((hFind == INVALID_HANDLE_VALUE) && ((lastError == ERROR_FILE_NOT_FOUND) || (lastError == ERROR_PATH_NOT_FOUND))) {
+
+										// root directory path is empty or invalid, this is not an error
+										hr = S_OK;
+									}
+									else
 									{
-										while (ffd.cFileName[0] == '.')
+										hr = (hFind == INVALID_HANDLE_VALUE) ? E_HANDLE : S_OK;
+										if (SUCCEEDED(hr))
 										{
-											if (FindNextFile(hFind, &ffd) == 0)
+											while (ffd.cFileName[0] == '.')
 											{
-												type = EMPTY_DIR;
-												break;
-											}
-										}
-
-										do// SUB
-										{
-											if (type == EMPTY_DIR)// root directory is empty...
-											{
-												type = 0;
-
-												// set empty child item
-												items[count].Level = 1;//level + 1;
-												items[count].type = A__EMPTYITEM;
-												StringCbCopy(items[count].Heading, sizeof(TCHAR)*MAX_HEADING_LEN, L"< . . . >\0");
-
-												count++;
-												this->stepProgressIfApplicable();
-
-												break;
-											}
-											if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-											{
-												if (count == (C_Items + 1))
-													break;
-
-												items[count].Level = level;
-												items[count].type = A__FOLDER;
-
-												hr = StringCbCopy(items[count].Heading, sizeof(TCHAR) * MAX_HEADING_LEN, ffd.cFileName);
-												if (SUCCEEDED(hr))
+												if (FindNextFile(hFind, &ffd) == 0)
 												{
+													type = EMPTY_DIR;
+													break;
+												}
+											}
+
+											do// SUB
+											{
+												if (type == EMPTY_DIR)// root directory is empty...
+												{
+													type = 0;
+
+													// set empty child item
+													items[count].Level = 1;//level + 1;
+													items[count].type = A__EMPTYITEM;
+													StringCbCopy(items[count].Heading, sizeof(TCHAR) * MAX_HEADING_LEN, L"< . . . >\0");
+
 													count++;
 													this->stepProgressIfApplicable();
 
-													WIN32_FIND_DATA ffd_sub;
-													HANDLE hFind_sub = INVALID_HANDLE_VALUE;
+													break;
+												}
+												if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+												{
+													if (count == (C_Items + 1))
+														break;
 
-													hr = StringCbLength(ffd.cFileName, STRSAFE_MAX_CCH * sizeof(TCHAR), &fName_len);
+													items[count].Level = level;
+													items[count].type = A__FOLDER;
+
+													hr = StringCbCopy(items[count].Heading, sizeof(TCHAR) * MAX_HEADING_LEN, ffd.cFileName);
 													if (SUCCEEDED(hr))
 													{
-														TCHAR* subitem1 = new TCHAR[(buffer_len + fName_len + 1)];
+														count++;
+														this->stepProgressIfApplicable();
 
-														hr = (subitem1 == nullptr) ? E_OUTOFMEMORY : S_OK;
+														WIN32_FIND_DATA ffd_sub;
+														HANDLE hFind_sub = INVALID_HANDLE_VALUE;
+
+														hr = StringCbLength(ffd.cFileName, STRSAFE_MAX_CCH * sizeof(TCHAR), &fName_len);
 														if (SUCCEEDED(hr))
 														{
-															hr = StringCbPrintf(subitem1, sizeof(TCHAR) * (buffer_len + fName_len + 1), L"\\\\?\\%s\\%s\\*", Root, ffd.cFileName);
+															TCHAR* subitem1 = new TCHAR[(buffer_len + fName_len + 1)];
+
+															hr = (subitem1 == nullptr) ? E_OUTOFMEMORY : S_OK;
 															if (SUCCEEDED(hr))
 															{
-																hFind_sub = FindFirstFile(subitem1, &ffd_sub);
-
-																hr = (hFind_sub == INVALID_HANDLE_VALUE) ? E_HANDLE : S_OK;
+																hr = StringCbPrintf(subitem1, sizeof(TCHAR) * (buffer_len + fName_len + 1), L"\\\\?\\%s\\%s\\*", Root, ffd.cFileName);
 																if (SUCCEEDED(hr))
 																{
-																	while (ffd_sub.cFileName[0] == '.')
+																	hFind_sub = FindFirstFile(subitem1, &ffd_sub);
+
+																	hr = (hFind_sub == INVALID_HANDLE_VALUE) ? E_HANDLE : S_OK;
+																	if (SUCCEEDED(hr))
 																	{
-																		if (FindNextFile(hFind_sub, &ffd_sub) == 0)
+																		while (ffd_sub.cFileName[0] == '.')
 																		{
-																			type = EMPTY_DIR;
-																			break;
+																			if (FindNextFile(hFind_sub, &ffd_sub) == 0)
+																			{
+																				type = EMPTY_DIR;
+																				break;
+																			}
 																		}
-																	}
-																	if (type != EMPTY_DIR)
-																	{
-																		// next level ....
-																		hr = this->InitNextLevelItems(hFind_sub, &ffd_sub, items, subitem1, type, level + 1, count);
-																	}
-																	else
-																	{
-																		if (count >= max_items)		// C6385 suppressor
+																		if (type != EMPTY_DIR)
 																		{
-																			OutputDebugString(L"CRITICAL EVENT::TREEVIEWCLASS::INITTREEVIEWITEMS::MAXITEMS REACHED - POSITION 2");
-																			break;
+																			// next level ....
+																			hr = this->InitNextLevelItems(hFind_sub, &ffd_sub, items, subitem1, type, level + 1, count);
 																		}
 																		else
 																		{
-																			type = 0;
-																			// set empty child item
-																			items[count].Level = level + 1;
-																			items[count].type = A__EMPTYITEM;
-																			StringCbCopy(items[count].Heading, sizeof(TCHAR)*MAX_HEADING_LEN, L"< . . . >\0");
+																			if (count >= max_items)		// C6385 suppressor
+																			{
+																				OutputDebugString(L"CRITICAL EVENT::TREEVIEWCLASS::INITTREEVIEWITEMS::MAXITEMS REACHED - POSITION 2");
+																				break;
+																			}
+																			else
+																			{
+																				type = 0;
+																				// set empty child item
+																				items[count].Level = level + 1;
+																				items[count].type = A__EMPTYITEM;
+																				StringCbCopy(items[count].Heading, sizeof(TCHAR) * MAX_HEADING_LEN, L"< . . . >\0");
 
-																			count++;
-																			this->stepProgressIfApplicable();
+																				count++;
+																				this->stepProgressIfApplicable();
+																			}
 																		}
+																		FindClose(hFind_sub);
 																	}
-																	FindClose(hFind_sub);
 																}
+																delete[] subitem1;
 															}
-															delete[] subitem1;
 														}
 													}
 												}
-											}
-											else
-											{
-												if (count >= max_items)		// C6385 suppressor
-												{
-													OutputDebugString(L"CRITICAL EVENT::TREEVIEWCLASS::INITTREEVIEWITEMS::MAXITEMS REACHED - POSITION 1");
-													break;
-												}
 												else
 												{
-													items[count].Level = level;
-													items[count].type = A__FILE;
-													StringCbCopy(items[count].Heading, sizeof(TCHAR) * MAX_HEADING_LEN, ffd.cFileName);
-
-													count++;
-													this->stepProgressIfApplicable();
-												}
-											}
-										} while (FindNextFile(hFind, &ffd) != 0);
-
-										FindClose(hFind);
-
-										LPHEADING a_items = new HEADING[count];
-
-										hr = (a_items != NULL) ? S_OK : E_OUTOFMEMORY;
-										if(SUCCEEDED(hr))
-										{
-											if (this->iTVUserEvents != nullptr)
-											{
-												this->enableSelchangeNotification(false);
-											}
-
-											hr = this->Sequencing(SQC_ROOT, a_items, items, count) ? S_OK : E_FAIL;
-											if (SUCCEEDED(hr))
-											{
-												HTREEITEM hti;
-
-												for (int k = 0; k < count; k++)
-												{
-													hti = this->AddItemToTree(this->hwndTV, a_items[k].Heading, a_items[k].Level, a_items[k].type);
-
-													this->stepProgressIfApplicable();
-
-													if (!hti)
+													if (count >= max_items)		// C6385 suppressor
 													{
-														hr = E_FAIL;
+														OutputDebugString(L"CRITICAL EVENT::TREEVIEWCLASS::INITTREEVIEWITEMS::MAXITEMS REACHED - POSITION 1");
 														break;
 													}
+													else
+													{
+														items[count].Level = level;
+														items[count].type = A__FILE;
+														StringCbCopy(items[count].Heading, sizeof(TCHAR) * MAX_HEADING_LEN, ffd.cFileName);
+
+														count++;
+														this->stepProgressIfApplicable();
+													}
 												}
+											} while (FindNextFile(hFind, &ffd) != 0);
+
+											FindClose(hFind);
+
+											LPHEADING a_items = new HEADING[count];
+
+											hr = (a_items != NULL) ? S_OK : E_OUTOFMEMORY;
+											if (SUCCEEDED(hr))
+											{
+												if (this->iTVUserEvents != nullptr)
+												{
+													this->enableSelchangeNotification(false);
+												}
+
+												hr = this->Sequencing(SQC_ROOT, a_items, items, count) ? S_OK : E_FAIL;
 												if (SUCCEEDED(hr))
 												{
-													TreeView_Expand(this->hwndTV, TreeView_GetRoot(this->hwndTV), TVE_EXPAND);
-													TreeView_SelectItem(this->hwndTV, TreeView_GetRoot(this->hwndTV));
+													HTREEITEM hti;
+
+													for (int k = 0; k < count; k++)
+													{
+														hti = this->AddItemToTree(this->hwndTV, a_items[k].Heading, a_items[k].Level, a_items[k].type);
+
+														this->stepProgressIfApplicable();
+
+														if (!hti)
+														{
+															hr = E_FAIL;
+															break;
+														}
+													}
+													if (SUCCEEDED(hr))
+													{
+														TreeView_Expand(this->hwndTV, TreeView_GetRoot(this->hwndTV), TVE_EXPAND);
+														TreeView_SelectItem(this->hwndTV, TreeView_GetRoot(this->hwndTV));
+													}
 												}
-											}
 
-											if (this->temporaryPtr != nullptr)
-											{
-												this->enableSelchangeNotification(true);
-											}
+												if (this->temporaryPtr != nullptr)
+												{
+													this->enableSelchangeNotification(true);
+												}
 
-											delete[] a_items;
-										}													
+												delete[] a_items;
+											}
+										}
 									}
 								}
 							}

@@ -1265,6 +1265,13 @@ void CnCS_UI::OnRestoreWindow(HWND hWnd, LPARAM lParam)
 		return;
 	else
 	{
+		if (!(this->iParam->WindowIsMaximized) || (this->iParam->WindowIsMinimized))
+		{
+			// apply rounded corners if not maximized
+			DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_ROUND;
+			DwmSetWindowAttribute(this->MainWindow, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
+		}
+
 		RECT rc_client;
 		auto result = GetClientRect(hWnd, &rc_client);
 		if (result)
@@ -1579,6 +1586,10 @@ void CnCS_UI::OnMaximized()
 			else
 			{
 				MoveWindow(this->MainWindow, rc.left, rc.top, rc.right, rc.bottom, TRUE);
+
+				// do not round corners if maximized!
+				DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_DONOTROUND;
+				DwmSetWindowAttribute(this->MainWindow, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));				
 			}
 		}
 	}

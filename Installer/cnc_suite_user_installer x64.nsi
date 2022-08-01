@@ -337,7 +337,7 @@ Section /o "un.Projects and Templates" uninst_projects    ; /o == unselected
 
     ${If} ${SectionIsSelected} ${uninst_userdata}
         ${If} ${SectionIsSelected} ${uninst_projects}
-            RMDir "$DOCUMENTS\CnC Suite"                ; Remove the containing folder only if not data is in it!
+            RMDir "$DOCUMENTS\CnC Suite"                ; Remove the containing folder only if no data is in it!
         ${EndIf}
     ${EndIf}
 SectionEnd
