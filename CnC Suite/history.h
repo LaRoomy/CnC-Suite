@@ -131,7 +131,7 @@ private:
 	void generateStringRepresentation();
 };
 
-__interface IHistroyEventProtocoll {
+__interface IHistroyEventProtocol {
 public:
 	void OnEntryClicked(cObject sender, HistoryItem* item);
 	void OnWindowClosed(cObject sender);
@@ -233,7 +233,7 @@ public:
 
 	void SetColors(COLORREF BackgroundColor,COLORREF ItemColor, COLORREF SelectedItemColor, COLORREF TextColor, COLORREF AccentTextColor, COLORREF OutlineColor);
 
-	void SetEventHandler(IHistroyEventProtocoll* hEvent) {
+	void SetEventHandler(IHistroyEventProtocol* hEvent) {
 		this->hHistoryEvent = hEvent;
 	}
 
@@ -357,7 +357,7 @@ private:
 
 	APPSTYLEINFO styleInfo;
 
-	IHistroyEventProtocoll* hHistoryEvent;
+	IHistroyEventProtocol* hHistoryEvent;
 
 	History historyData;
 	CSScrollbar* verticalScrollbar;

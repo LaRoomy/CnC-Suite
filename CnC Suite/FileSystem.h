@@ -42,7 +42,7 @@ public:
 
 }FILESYSTEMOBJECT, *LPFILESYSTEMOBJECT;
 
-__interface IFileSystemModificationProtocoll
+__interface IFileSystemModificationProtocol
 {
 public:
 	void onFilesysItemMoved(cObject sender, LPFILESYSTEMOBJECT fso);

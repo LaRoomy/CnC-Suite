@@ -14,7 +14,7 @@
 #include"CnC3FileManager.h"
 
 class Application
-	:public IFileSystemModificationProtocoll, public IHistroyEventProtocoll, public IExportFormatProtocol
+	:public IFileSystemModificationProtocol, public IHistroyEventProtocol, public IExportFormatProtocol
 {
 
 public:
@@ -51,7 +51,7 @@ public:
 		return this->restartOptions;
 	}
 
-	// IFileSystemModificationProtocoll Base
+	// IFileSystemModificationProtocol Base
 	void Application::onFilesysItemCreated(cObject sender, LPFILESYSTEMOBJECT fso){
 		UNREFERENCED_PARAMETER(sender);
 		UNREFERENCED_PARAMETER(fso);
@@ -70,7 +70,7 @@ public:
 		this->FileHistory->OnFilesystemModification(fso);
 	}
 
-	// IHistroyEventProtocoll Base
+	// IHistroyEventProtocol Base
 	void OnEntryClicked(cObject sender, HistoryItem* item);
 	
 	void OnWindowClosed(cObject sender) {

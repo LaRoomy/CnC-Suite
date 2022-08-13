@@ -552,7 +552,7 @@ HRESULT Application::Init_Components()
 									this->FileNavigator->LoadCondition();
 								}
 
-								this->FileNavigator->SetEventHandler(dynamic_cast<IFileSystemModificationProtocoll*>(this));
+								this->FileNavigator->SetEventHandler(dynamic_cast<IFileSystemModificationProtocol*>(this));
 
 								this->Tabcontrol->SetFocusOnCurrentVisibleEditbox();
 
@@ -568,7 +568,7 @@ HRESULT Application::Init_Components()
 								if (SUCCEEDED(hr))
 								{
 									this->FileHistory->SetEventHandler(
-										dynamic_cast<IHistroyEventProtocoll*>(this)
+										dynamic_cast<IHistroyEventProtocol*>(this)
 									);
 
 									// ...

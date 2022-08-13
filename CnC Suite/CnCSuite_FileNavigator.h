@@ -19,7 +19,7 @@ public:
 	virtual void onDpiChanged() = 0;
 	virtual void Reload() = 0;
 	virtual void ReloadAsync() = 0;// scroll recovering does not work async, and is therefore disabled!
-	virtual void SetEventHandler(IFileSystemModificationProtocoll *FileSystemEvents_) = 0;
+	virtual void SetEventHandler(IFileSystemModificationProtocol *FileSystemEvents_) = 0;
 	virtual void Hide() = 0;
 	virtual void Show() = 0;
 	virtual LPCTSTR GetRootFolder() const = 0;

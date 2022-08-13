@@ -87,6 +87,7 @@ bool ApplicationData::saveValue(DATAKEY key, int value)
 			propertY.propertyName.Replace(L"key");
 			propertY.propertyContent.Replace(key);
 			tag.hasProperties = true;
+			tag.initallyClosed = false;
 			tag.tagProperties.AddItem(propertY);
 			propertY.propertyName.Replace(L"type");
 			propertY.propertyContent.Replace(L"integer");
@@ -131,6 +132,7 @@ bool ApplicationData::saveValue(DATAKEY key, unsigned int value)
 			propertY.propertyName.Replace(L"key");
 			propertY.propertyContent.Replace(key);
 			tag.hasProperties = true;
+			tag.initallyClosed = false;
 			tag.tagProperties.AddItem(propertY);
 			propertY.propertyName.Replace(L"type");
 			propertY.propertyContent.Replace(L"unsigned_integer");
@@ -175,6 +177,7 @@ bool ApplicationData::saveValue(DATAKEY key, const iString & string)
 			propertY.propertyName.Replace(L"key");
 			propertY.propertyContent.Replace(key);
 			tag.hasProperties = true;
+			tag.initallyClosed = false;
 			tag.tagProperties.AddItem(propertY);
 			propertY.propertyName.Replace(L"type");
 			propertY.propertyContent.Replace(L"string");
@@ -220,6 +223,7 @@ bool ApplicationData::saveValue(DATAKEY key, bool value)
 			propertY.propertyName.Replace(L"key");
 			propertY.propertyContent.Replace(key);
 			tag.hasProperties = true;
+			tag.initallyClosed = false;
 			tag.tagProperties.AddItem(propertY);
 			propertY.propertyName.Replace(L"type");
 			propertY.propertyContent.Replace(L"boolean");

@@ -256,7 +256,7 @@ public:
 		//}
 	}
 
-	void CnCS_FN::SetEventHandler(IFileSystemModificationProtocoll* FileSystemEvents_) {
+	void CnCS_FN::SetEventHandler(IFileSystemModificationProtocol* FileSystemEvents_) {
 		this->FileSystemEvents = FileSystemEvents_;
 	}
 
@@ -270,7 +270,7 @@ private:
 
 	APPSTYLEINFO styleInfo;
 
-	IFileSystemModificationProtocoll* FileSystemEvents;
+	IFileSystemModificationProtocol* FileSystemEvents;
 
 	HRESULT _Init(HWND, LPTSTR);
 	HRESULT CreateCtrlButtons();

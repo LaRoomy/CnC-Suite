@@ -334,7 +334,7 @@ LRESULT EditControl::OnChar(HWND Edit, WPARAM wParam, LPARAM lParam)
 	auto altKeyIsPressed = (altKeyState & 0x8000) ? true : false;
 	
 	if (ctrlKeyIsPressed && !altKeyIsPressed)
-		return 0;	// this was a ctrl command, don't insert it
+		return 0;	// this was a ctrl command, don't insert it 
 
 	this->EditChangeCTRL();
 
@@ -3022,7 +3022,52 @@ BOOL EditControl::AutocompleteControl()
 	{
 		for (int i = 0; i < this->numOfAutocompleteStrings; i++)
 		{
-			for (int j = 0; j < this->pAcStrings[i].length; j++)
+			// if the last character of the autocomplete-string matches the current character -> execute
+				// check the length of the autocomplete-string and the current position -> if min pos > 0 -> execute
+					// get the min max selection mit getsel
+						// check if the strings are equal ! -> if true -> apply
+
+			// the inputbuffer is not a reliable source anymore!!
+
+			
+			// check if the last entered character matches the last of the trigger
+			if (this->pAcStrings[i].trigger[(this->pAcStrings[i].length - 1)] == this->inputBuffer[0]) {
+
+				// get selection
+				CHARRANGE cr;
+				this->_getsel(&cr);
+
+				cr.cpMin = cr.cpMax - this->pAcStrings[i].length;
+
+				// check if position is applicable for the length of the ac string
+				if (cr.cpMin >= 0) {
+
+					// get text from range
+
+					TCHAR* textBuffer = nullptr;
+
+					if(GetRichEditContent(this->EditWnd, &textBuffer)){
+
+						bool isEqual = true;
+						int bCount = this->pAcStrings[i].length - 2;
+						
+						for (int j = (cr.cpMax - 1); j > cr.cpMin; j--)
+						{
+							if (textBuffer[j] != this->pAcStrings[i].trigger[bCount]) {
+								isEqual = false;
+							}
+							bCount--;
+						}
+
+						if (isEqual) {
+							this->InsertText(this->pAcStrings[i].appendix, TRUE);
+						}
+
+					}
+				}
+			}
+
+	/*		for (int j = 0; j < this->pAcStrings[i].length; j++)
 			{
 				if (j == 56)return FALSE;
 				else
@@ -3051,7 +3096,7 @@ BOOL EditControl::AutocompleteControl()
 					else
 						break;
 				}
-			}
+			}*/
 		}
 	}
 	return FALSE;
@@ -4783,7 +4828,8 @@ int EditControl::getFocusMarkCorrectionValue(int type)
 
 TCHAR EditControl::getCharAtCaret(CHARRANGE* pcr)
 {
-	CHARRANGE cr;
+	CHARRANGE cr = { 0,0 };
+
 	if (pcr == nullptr)
 		GETCURRENTCHARRANGE(this->EditWnd, &cr);
 	else
