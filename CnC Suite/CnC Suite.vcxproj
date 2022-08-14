@@ -291,27 +291,8 @@
   <ItemGroup>
     <Image Include="res\CnC_Suite_mIcon.ico" />
     <Image Include="res\CnC_Suite_mIcon_small.ico" />
-    <Image Include="res\gtk_close_1.ico" />
-    <Image Include="res\gtk_close_mark_1.ico" />
-    <Image Include="res\gtk_close_pressed_1.ico" />
-    <Image Include="res\Mainbutton78.ico" />
     <Image Include="res\Mainbutton78_marked.ico" />
     <Image Include="res\Mainbutton78_pressed.ico" />
-    <Image Include="res\maximize_mark.bmp" />
-    <Image Include="res\maximize_min_mark.bmp" />
-    <Image Include="res\maximize_min_norm.bmp" />
-    <Image Include="res\maximize_min_pressed.bmp" />
-    <Image Include="res\maximize_norm.bmp" />
-    <Image Include="res\maximize_pressed.bmp" />
-    <Image Include="res\minimize_mark.bmp" />
-    <Image Include="res\minimize_norm.bmp" />
-    <Image Include="res\minimize_pressed.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Font Include="res\Fonts\Code New Roman.otf" />
-    <Font Include="res\Fonts\Courier Prime Code.ttf" />
-    <Font Include="res\Fonts\Inconsolata-Bold.ttf" />
-    <Font Include="res\Fonts\ProFontWindowsEdit.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\CnC Suite Setup\Program Folder Resources\CnC Suite.VisualElementsManifest.xml" />

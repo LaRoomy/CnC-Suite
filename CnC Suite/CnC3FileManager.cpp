@@ -900,7 +900,7 @@ HRESULT CnC3FileManager::ExportAs(const CnC3File & file)
 							hr = Ifd->SetFileTypeIndex(0);
 							if (SUCCEEDED(hr))
 							{
-								hr = Ifd->SetDefaultExtension(L".txt");
+								hr = Ifd->SetDefaultExtension(L"txt");
 								if (SUCCEEDED(hr))
 								{
 									hr = Ifd->Show(this->owner);

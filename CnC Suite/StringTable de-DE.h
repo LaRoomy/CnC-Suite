@@ -189,7 +189,7 @@
 #define				_UI_PROPWND_INTERFACECONFIG			L"Schnittstellenkonfiguration"
 #define				_UI_PROPWND_MANAGECOLORSCHEMES		L"Farbschema verwalten"
 #define				_UI_PROPWND_CHOOSECOLOR				L"\xbb Farbe wählen"
-#define				_UI_PROPWND_NEWSCHEME				L"Neues Farbschema"
+#define				_UI_PROPWND_NEWSCHEME				L"Neue Farbgebung"
 #define				_UI_PROPWND_ANNOTATION				L"{ ( Kommentar ) }"
 #define				_UI_PROPWND_DEFAULTTEXTCOLOR		L"standard Text"
 #define				_UI_PROPWND_LINENUMBERCOLOR			L"Satznummer"
@@ -235,6 +235,7 @@
 #define				_UI_PROPWND_SUBPROGDETECTION				L"Unterprogramm-Erkennung"
 #define				_UI_PROPWND_TRIGGER							L"Auslöser"
 #define				_UI_PROPWND_PROGRAMRESTARTNECCESSARY		L"Programmneustart erforderlich"
+#define				_UI_PROPWND_CONFIRMHISTORYDELETITION		L"Die gesamte Chronik wird gelöscht?"
 
 #define				_UI_PROPWND_STANDARDTEMPLATE				L"Standard-Vorlage"
 #define				_UI_PROPWND_INSERTSTANDARDTEMPLATE			L"Standard Vorlage in \"Neuen Tab\" einfügen"

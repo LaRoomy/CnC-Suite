@@ -3586,6 +3586,7 @@ void CnCS_PI::onButtonClick(CustomButton* sender, CTRLID ctrlID)
 		this->deleteSelectedScheme();
 		break;
 	case CTRLID_DELETEHISTORYNOW:
+		PostMessage(this->propWnd, WM_CLOSE, 0, 0);
 		this->deleteHistory();
 		break;
 	case CTRLID_MANAGECOLORSCHEMES:
@@ -4486,6 +4487,8 @@ void CnCS_PI::deleteSelectedScheme()
 
 				this->reloadColorSchemes();
 				this->selectColorSchemeFromIndex(1);
+
+				reinterpret_cast<ApplicationData*>(getDefaultApplicationDataContainer())->saveValue(DATAKEY_SETTINGS_COLORSCHEME, 1);
 			}
 		}
 	}
@@ -4850,24 +4853,35 @@ void CnCS_PI::setInitialControlParameter()
 
 void CnCS_PI::deleteHistory()
 {
-	auto fileHistory =
-		reinterpret_cast<UIHistory*>(
-			getComponentHandle(COMP_ID_HISTORY)
+	auto res =
+		MessageBox(
+			this->mainWnd,
+			getStringFromResource(UI_PROPWND_CONFIRMHISTORYDELETITION),
+			L"History",
+			MB_OKCANCEL | MB_ICONEXCLAMATION
 		);
-	if (fileHistory != nullptr)
+
+	if (res == IDOK)
 	{
-		AppPath path;
-
-		auto historyPath =
-			path.Get(PATHID_FILE_HISTORY);
-
-		if (historyPath.succeeded())
+		auto fileHistory =
+			reinterpret_cast<UIHistory*>(
+				getComponentHandle(COMP_ID_HISTORY)
+				);
+		if (fileHistory != nullptr)
 		{
-			// delete the file and clear the UI
-			DeleteFile(
-				historyPath.GetData()
-			);
-			fileHistory->ClearCompleteHistory();
+			AppPath path;
+
+			auto historyPath =
+				path.Get(PATHID_FILE_HISTORY);
+
+			if (historyPath.succeeded())
+			{
+				// delete the file and clear the UI
+				DeleteFile(
+					historyPath.GetData()
+				);
+				fileHistory->ClearCompleteHistory();
+			}
 		}
 	}
 }

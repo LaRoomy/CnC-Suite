@@ -575,7 +575,7 @@ void EditControl::onCut()
 	action.range = cr;
 	action.content = nullptr;
 	action.replacedContent = nullptr;
-	action.replacedRange = { 0 };
+	action.replacedRange = { 0,0 };
 
 	GetRichEditSelectionContent(this->EditWnd, &action.content);
 
@@ -596,6 +596,8 @@ void EditControl::onDeleteKeyWasPressed()
 		ura.action = UNDOACTION_BACKSPACE;
 		ura.range = cr;
 		ura.content = cont;
+		ura.replacedContent = nullptr;
+		ura.replacedRange = { 0,0 };
 
 		this->UndoStack.addNewUndoAction(&ura);
 	}
@@ -1402,7 +1404,14 @@ void EditControl::InsertText(LPCTSTR text, BOOL addToUndoStack)
 		SETTEXTEX stx;
 		stx.codepage = 1200;
 		stx.flags = ST_NEWCHARS | ST_SELECTION;
-		SendMessage(this->EditWnd, EM_SETTEXTEX, reinterpret_cast<WPARAM>(&stx), reinterpret_cast<LPARAM>(text));
+
+		auto result =
+			SendMessage(this->EditWnd, EM_SETTEXTEX, reinterpret_cast<WPARAM>(&stx), reinterpret_cast<LPARAM>(text));
+
+		if (result == 0)
+		{
+			// ...
+		}
 
 
 		// Undo-Redo-Section two //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2686,7 +2695,7 @@ BOOL EditControl::ControlInputBuffer(WPARAM wParam)
 	// process autocomplete
 	if (this->editControlProperties.autocomplete)
 	{
-		if (this->AutocompleteControl())
+		if (this->AutocompleteControl(static_cast<TCHAR>(wParam)))
 		{
 			// an autocomplete-string was inserted so
 			// reset the input-buffer and prevent the default processing
@@ -3016,22 +3025,14 @@ void EditControl::WordcolorControl(TCHAR* buffer)
 	}
 }
 
-BOOL EditControl::AutocompleteControl()
+BOOL EditControl::AutocompleteControl(TCHAR c)
 {
 	if (this->pAcStrings != nullptr)
 	{
 		for (int i = 0; i < this->numOfAutocompleteStrings; i++)
-		{
-			// if the last character of the autocomplete-string matches the current character -> execute
-				// check the length of the autocomplete-string and the current position -> if min pos > 0 -> execute
-					// get the min max selection mit getsel
-						// check if the strings are equal ! -> if true -> apply
-
-			// the inputbuffer is not a reliable source anymore!!
-
-			
+		{			
 			// check if the last entered character matches the last of the trigger
-			if (this->pAcStrings[i].trigger[(this->pAcStrings[i].length - 1)] == this->inputBuffer[0]) {
+			if (this->pAcStrings[i].trigger[(this->pAcStrings[i].length - 1)] == c) {
 
 				// get selection
 				CHARRANGE cr;
@@ -3043,14 +3044,15 @@ BOOL EditControl::AutocompleteControl()
 				if (cr.cpMin >= 0) {
 
 					// get text from range
-
 					TCHAR* textBuffer = nullptr;
+					BOOL result = FALSE;
 
 					if(GetRichEditContent(this->EditWnd, &textBuffer)){
 
 						bool isEqual = true;
 						int bCount = this->pAcStrings[i].length - 2;
 						
+						// check if the string equals in reverse
 						for (int j = (cr.cpMax - 1); j > cr.cpMin; j--)
 						{
 							if (textBuffer[j] != this->pAcStrings[i].trigger[bCount]) {
@@ -3060,12 +3062,42 @@ BOOL EditControl::AutocompleteControl()
 						}
 
 						if (isEqual) {
-							this->InsertText(this->pAcStrings[i].appendix, TRUE);
-						}
+							// the entered character is omitted, so we have to add it on the start of the buffer
+							auto bLen = _lengthOfString(this->pAcStrings[i].appendix);
+							bLen += 2;
 
+							TCHAR* insertBuffer = new TCHAR[bLen];
+							if (insertBuffer != nullptr)
+							{
+								insertBuffer[0] = c;
+
+								for (int k = 1; k < bLen; k++) {
+									insertBuffer[k] = this->pAcStrings[i].appendix[k - 1];
+								}
+								// terminate string
+								insertBuffer[bLen - 1] = L'\0';
+
+								// insert the buffer
+								this->InsertText(insertBuffer, TRUE);
+
+								// update focus mark
+								this->UpdateFocusRectAsync(50);
+
+								// delete buffer
+								SafeDeleteArray(&insertBuffer);
+
+								// returning true means, the default processing will be blocked (c is not inserted)
+								result = TRUE;
+							}
+						}
+						SafeDeleteArray(&textBuffer);
 					}
+					return result;
 				}
 			}
+
+			// !! the inputbuffer is not a reliable source anymore!!
+
 
 	/*		for (int j = 0; j < this->pAcStrings[i].length; j++)
 			{
@@ -3379,6 +3411,8 @@ void EditControl::AutoNumControl(TCHAR* buffer)
 			action.action = UNDOACTION_NEWCHAR_ADDED;
 			action.range = cr;
 			action.content = L"\r";
+			action.replacedContent = nullptr;
+			action.replacedRange = { 0,0 };
 
 			this->UndoStack.addNewUndoAction(&action);
 		}

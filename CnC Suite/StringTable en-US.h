@@ -187,7 +187,7 @@
 #define				_UI_PROPWND_INTERFACECONFIG			L"Interface Configuration"
 #define				_UI_PROPWND_MANAGECOLORSCHEMES		L"Manage color schemes"
 #define				_UI_PROPWND_CHOOSECOLOR				L"\xbb Choose color"
-#define				_UI_PROPWND_NEWSCHEME				L"New color scheme"
+#define				_UI_PROPWND_NEWSCHEME				L"New colors"
 #define				_UI_PROPWND_ANNOTATION				L"{ ( Annotation ) }"
 #define				_UI_PROPWND_DEFAULTTEXTCOLOR		L"default text"
 #define				_UI_PROPWND_LINENUMBERCOLOR			L"linenumber"
@@ -232,6 +232,7 @@
 #define				_UI_PROPWND_SUBPROGDETECTION				L"Sub-program detection"
 #define				_UI_PROPWND_TRIGGER							L"Trigger"
 #define				_UI_PROPWND_PROGRAMRESTARTNECCESSARY		L"Program-restart required"
+#define				_UI_PROPWND_CONFIRMHISTORYDELETITION		L"All history entries will be erased?"
 
 #define				_UI_PROPWND_STANDARDTEMPLATE				L"Standard-Template"
 #define				_UI_PROPWND_INSERTSTANDARDTEMPLATE			L"Insert standard-template in \"New Tab\""

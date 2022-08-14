@@ -941,6 +941,7 @@ bool colorSchemeManager::saveCurrentScheme()
 
 		tag.tagName.Replace(L"color");
 		tag.hasProperties = true;
+		tag.initallyClosed = false;
 		prop.propertyName = L"forType\0";
 
 		TCHAR buffer[2] = { L'\0' };

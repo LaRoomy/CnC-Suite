@@ -581,7 +581,7 @@ private:
 
 	BOOL AnnotationControl(WPARAM, TCHAR*);		// (buffer allocation v)
 	void WordcolorControl(TCHAR*);				// (buffer allocation v)
-	BOOL AutocompleteControl();
+	BOOL AutocompleteControl(TCHAR c);
 	void AutoNumControl(TCHAR*);				// (buffer allocation v) + (internal selection)
 
 	BOOL CheckForNumber(TCHAR);

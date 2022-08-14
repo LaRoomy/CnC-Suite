@@ -435,65 +435,12 @@
     <Image Include="res\CnC_Suite_mIcon_small.ico">
       <Filter>Ressourcendateien</Filter>
     </Image>
-    <Image Include="res\Mainbutton78.ico">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
     <Image Include="res\Mainbutton78_marked.ico">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="res\gtk_close_1.ico">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="res\gtk_close_mark_1.ico">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="res\gtk_close_pressed_1.ico">
       <Filter>Ressourcendateien</Filter>
     </Image>
     <Image Include="res\Mainbutton78_pressed.ico">
       <Filter>Ressourcendateien</Filter>
     </Image>
-    <Image Include="res\maximize_norm.bmp">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="res\maximize_mark.bmp">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="res\maximize_pressed.bmp">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="res\maximize_min_mark.bmp">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="res\maximize_min_norm.bmp">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="res\maximize_min_pressed.bmp">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="res\minimize_pressed.bmp">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="res\minimize_norm.bmp">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="res\minimize_mark.bmp">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Font Include="res\Fonts\ProFontWindowsEdit.ttf">
-      <Filter>Ressourcendateien</Filter>
-    </Font>
-    <Font Include="res\Fonts\Code New Roman.otf">
-      <Filter>Ressourcendateien</Filter>
-    </Font>
-    <Font Include="res\Fonts\Courier Prime Code.ttf">
-      <Filter>Ressourcendateien</Filter>
-    </Font>
-    <Font Include="res\Fonts\Inconsolata-Bold.ttf">
-      <Filter>Ressourcendateien</Filter>
-    </Font>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="cncsuite_manifest.xml">

@@ -90,6 +90,7 @@
 //##############################################################################################################################
 // FOLDERS in Documents Folder: ################################################################################################
 #define			PATHTOFOLDER_CNCSUITE_USERFOLDER				L"\\CnC Suite"
+#define			PATHTOFOLDER_CNCSUITE_BINARY_FOLDER				L"\\CnC Suite\\bin"
 #define			PATHTOFOLDER_CNCSUITE_DOCUMENTSFOLDER			L"\\CnC-Suite"
 #define			PATHTOFOLDER_CNCSUITE_APPDATA					L"\\CnC Suite\\AppData"
 #define			PATHTOFOLDER_CNCSUITE_APPDATA_SESSION			L"\\CnC Suite\\AppData\\Session"
@@ -229,7 +230,7 @@ public:
 #ifndef CNCSUITE_USERINSTALLATION
 			return iString(PATHTOFOLDER_CNCSUITE_APPLICATIONFOLDER);
 #else	
-			return this->localAppDataPath + PATHTOFOLDER_CNCSUITE_USERFOLDER;
+			return this->localAppDataPath + PATHTOFOLDER_CNCSUITE_BINARY_FOLDER;
 #endif
 
 //////////////////////////////////////////////////////////////////////////////////////////////
