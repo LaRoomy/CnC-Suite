@@ -78,12 +78,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)CnC Suite\CommonControls;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)Installer\buildOutput\out_x86\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)CnC Suite\CommonControls;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)CnC Suite\CommonControls;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)Installer\buildOutput\out_x64\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

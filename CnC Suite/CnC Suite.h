@@ -36,7 +36,7 @@
 /// buildinfo section ///////////////////////////////////////////////////////////////////////////////////////////////
 // this section contains displayable information regarding the buildinfo of the application (displayed on info page)
 #define		CNCSUITE_BUILDVERSION		L"CnC Suite Build 1.3.8"
-#define		CNCSUITE_BUILDDATE			L"Build-date: October 25th 2018"
+#define		CNCSUITE_BUILDDATE			L"Build-date: August 18th 2022"
 /// buildinfo section END ///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// app identity section ///////////////////////////////////////////////////////////////////////////////////////////
@@ -145,48 +145,5 @@ void ScheduleRestart(DWORD restartOption);
 BOOL GetApplicationStyleInformation(LPAPPSTYLEINFO pSInfo);
 LPCRITICAL_SECTION GetCriticalSection();
 
-
-/* TODO GLOBAL !!!
-
-- Information in Autocompletemanager: keine Leerzeichen am Ende
-- Satznummer-Steuerung überarbeiten
-- Autosyntax implementieren
-- Editcontrol-property-setup in tabclass speichern
-- Samplemanager -> manche samples wurden nicht gelöscht, andere werden gelistet, sind aber gar nicht vorhanden???
-- Autosave integrieren
-- Sessiondaten speichern
-- Samplemanager anders aufrufen
-- Tabcontrol: Standardfarben für editbox anpassen
-- Basisklasse ObjectRelease bereiningen (virtueller Destruktor?)
-
-*/
-
-
-/*	Remarks for the lineend-format
-
-	-	standard in unicode (codepage 1200) is only '\r'(carriage return) -> this format must be applied when inserting the buffer in 'OpenSaveCtrl'
-	-	
-
-
-	NOTE: when searching for codepage-issues, use the mark '//CODEPAGE' for searching
-*/
-
-/*
-
-old .gitignore (BUILDRESULTS)
-
-# Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-
-*/
 
 #endif

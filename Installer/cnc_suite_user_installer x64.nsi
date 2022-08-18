@@ -14,10 +14,6 @@ Name "CnC Suite ${VERSION}"
 OutFile "installer_output\CnC Suite USRINST x64 ${VERSION}.exe"             ;MARK: x86/x64
 
 InstallDir "$LOCALAPPDATA\CnC Suite"                                        ;MARK: x86/x64 ($PROGRAMFILES64 for x64)
-; NOTE: The program directory should be for the user: C:\Users\hans-\AppData\Local\CnC Suite\... or
-    ;   C:\Users\hans-\AppData\Local\Programs\CnC Suite\...
-
-
 
 VIProductVersion 1.3.8.0
 VIAddVersionKey /LANG=0 "ProductName" "CnC Suite Installer x64"
@@ -51,11 +47,6 @@ BrandingText "Laroomy Designs"
 ; ----------------------------------------------------------------;
 ; ----------------------------------------------------------------;
 ; pages region ---------------------------------------------------;
-
-; TODO: define the ui-strings for the pages and make it language-dependent !!
-
-
-;!insertmacro ${GetTime} "" "L" $day $month $year $weekday $hours $minute $seconds
 
 ; Installer:
 !insertmacro MUI_PAGE_WELCOME
@@ -107,83 +98,71 @@ Section "Installer Section"
 
     ;    Program files
     File "CnC Suite.VisualElementsManifest.xml"
-    File "exe_user_x64\CnC Suite.exe"                        ;MARK: x64 only !
+    File "buildOutput\out_x64\CnC Suite.exe"                        ;MARK: x64 only !
     
     ; NOTE: Write the dependency dll's direct in the installation directory
     ; ************************************************************************************** ;
 
-    ;Visual Studio distributed dll's - Path: C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.24.28127\x64
-    File "DLLs\Microsoft.VC142.CRT\concrt140.dll"
-    File "DLLs\Microsoft.VC142.CRT\msvcp140.dll"
-    File "DLLs\Microsoft.VC142.CRT\msvcp140_1.dll"
-    File "DLLs\Microsoft.VC142.CRT\msvcp140_2.dll"
-    File "DLLs\Microsoft.VC142.CRT\msvcp140_codecvt_ids.dll"
-    File "DLLs\Microsoft.VC142.CRT\vccorlib140.dll"
-    File "DLLs\Microsoft.VC142.CRT\vcruntime140.dll"
-    File "DLLs\Microsoft.VC142.CRT\vcruntime140_1.dll"
+    ;Visual Studio distributed dll's:
+    File "DLLs\Microsoft.VC143.CRT.x64\concrt140.dll"
+    File "DLLs\Microsoft.VC143.CRT.x64\msvcp140.dll"
+    File "DLLs\Microsoft.VC143.CRT.x64\msvcp140_1.dll"
+    File "DLLs\Microsoft.VC143.CRT.x64\msvcp140_2.dll"
+    File "DLLs\Microsoft.VC143.CRT.x64\msvcp140_codecvt_ids.dll"
+    File "DLLs\Microsoft.VC143.CRT.x64\msvcp140_atomic_wait.dll"
+    File "DLLs\Microsoft.VC143.CRT.x64\vccorlib140.dll"
+    File "DLLs\Microsoft.VC143.CRT.x64\vcruntime140.dll"
+    File "DLLs\Microsoft.VC143.CRT.x64\vcruntime140_1.dll"
 
-
-    ;Other dependency files - not all are necessary but it's easier to copy the hole folder
-    ;Path: C:\Program Files (x86)\Windows Kits\10\Redist\10.0.18362.0\ucrt\DLLs\...
-    File "DLLs\x64\api-ms-win-core-console-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-console-l1-2-0.dll"
-    File "DLLs\x64\api-ms-win-core-datetime-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-debug-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-errorhandling-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-file-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-file-l1-2-0.dll"
-    File "DLLs\x64\api-ms-win-core-file-l2-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-handle-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-heap-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-interlocked-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-libraryloader-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-localization-l1-2-0.dll"
-    File "DLLs\x64\api-ms-win-core-memory-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-namedpipe-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-processenvironment-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-processthreads-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-processthreads-l1-1-1.dll"
-    File "DLLs\x64\api-ms-win-core-profile-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-rtlsupport-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-string-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-synch-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-synch-l1-2-0.dll"
-    File "DLLs\x64\api-ms-win-core-sysinfo-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-timezone-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-core-util-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-conio-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-convert-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-environment-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-filesystem-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-heap-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-locale-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-math-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-multibyte-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-private-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-process-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-runtime-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-stdio-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-string-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-time-l1-1-0.dll"
-    File "DLLs\x64\api-ms-win-crt-utility-l1-1-0.dll"
-    File "DLLs\x64\ucrtbase.dll"
+    File "DLLs\api.x64\api-ms-win-core-console-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-console-l1-2-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-datetime-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-debug-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-errorhandling-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-fibers-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-file-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-file-l1-2-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-file-l2-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-handle-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-heap-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-interlocked-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-libraryloader-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-localization-l1-2-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-memory-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-namedpipe-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-processenvironment-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-processthreads-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-processthreads-l1-1-1.dll"
+    File "DLLs\api.x64\api-ms-win-core-profile-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-rtlsupport-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-string-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-synch-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-synch-l1-2-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-sysinfo-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-timezone-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-core-util-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-conio-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-convert-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-environment-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-filesystem-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-heap-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-locale-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-math-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-multibyte-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-private-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-process-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-runtime-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-stdio-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-string-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-time-l1-1-0.dll"
+    File "DLLs\api.x64\api-ms-win-crt-utility-l1-1-0.dll"
+    File "DLLs\api.x64\ucrtbase.dll"
 
 
     ;Write the assets-folder
     SetOutPath "$INSTDIR\bin\assets"
     File "logo_sq70.png"
     File "logo_sq150.png"
-
-    ;   Write the fonts-folder (deprecated - this is not used anymore - the application uses the systemfont consolas!)
-    ;SetOutPath "$INSTDIR\fonts"
-    ;File "Code New Roman.otf"
-    ;File "Courier Prime Code.ttf"
-    ;File "Courier Prime Sans.ttf"
-    ;File "Inconsolata-Bold.ttf"
-    ;File "ProFontWindowsEdit.ttf"
-    ;File "PTM55FT.ttf"
-    ;File "SVBasicManual.ttf"
-    ;File "VeraMono.ttf"
 
     ;Write the image folder
     SetOutPath "$INSTDIR\image"
@@ -201,17 +180,8 @@ Section "Installer Section"
     ;Create desktop shortcut
     CreateShortCut "$DESKTOP\CnC Suite.lnk" "$INSTDIR\bin\CnC Suite.exe"
 
-    ;Write registry (Admin level required - only necessary for Admin Installation (deprecated))
     ;------------------------------------------------------------------------------------------->
-    ;Filetype association
-    ;WriteRegStr HKCR ".cnc3" "" "cnc.file"
-    ;WriteRegStr HKCR ".cnc3\DefaultIcon" "" "$\"$INSTDIR\image\cnc3_file_ico.ico$\""
-    ;WriteRegStr HKCR ".cnc3\PersistentHandler" "" "{5e941d80-bf96-11cd-b579-08002b30bfeb}"
-
-    ;WriteRegStr HKCR "cnc.file\DefaultIcon" "" "$\"$INSTDIR\image\cnc3_file_ico.ico$\""
-    ;WriteRegStr HKCR "cnc.file\shell\edit\command" "" "$\"$INSTDIR\CnC Suite.exe$\" $\"%1$\""
-    ;WriteRegStr HKCR "cnc.file\shell\open\command" "" "$\"$INSTDIR\CnC Suite.exe$\" $\"%1$\""
-    ;------------------------------------------------------------------------------------------->
+    
     ${GetTime} "" "L" $day $month $year $weekday $hours $minute $seconds
 
 

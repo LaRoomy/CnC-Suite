@@ -106,7 +106,7 @@ Section "Installer Section"
     ;Create files and directories
     SetOutPath "$INSTDIR"
 
-    File "..\x64\Release\CnC Suite.exe"			;"exe_x64\CnC Suite.exe"                            ;MARK: x86/x64
+    File "buildOutput\out_x64\CnC Suite.exe"			;"exe_x64\CnC Suite.exe"                            ;MARK: x86/x64
     File "CnC Suite.VisualElementsManifest.xml"
 
     SetOutPath "$INSTDIR\assets"
