@@ -25,7 +25,8 @@ ToDo: Add link to website where to download the installers! And how to use!?
 - Select the desired build configuration (Release/Debug and x86/x64) in the toolbar
 - Click on the Build-Button.
 
-#### NOTE:
+**NOTE:**
+
 When built in Release mode, the output location of the executables is set to the appropriate installer directory: *($ProjectDirectory)/Installer/buildOutput* (depending on the target platform).
 This folder is the source location for the installer generation. The output directory can be changed in the Visual Studio project properties.
 
@@ -37,7 +38,8 @@ This folder is the source location for the installer generation. The output dire
 - The default output location of the generated installer is *($ProjectDirectory)/Installer/installer_output/*
 - Optional: To edit the scripts I would recommend to download [Visual Studio Code](https://code.visualstudio.com/) and when done, install the NSIS language support extension from the Extension Marketplace inside VS Code.
 
-#### NOTE:
+**NOTE:**
+
 The installer section contains nsis files for x86/x64 target platform for two types of installations, the user and the admin type. Means when creating the classic installer which requires administrator privilegues, the application is installed in the programs folder and uses the HKLM registry section of the target machine. This is out-dated. I would recommend to use the user-installer scripts instead. When build from these scripts, no administrator privilegues are required and the application is installed to the local app-data folder and uses the HKCU registry section of the target machine.
 
 ## How to use the application
