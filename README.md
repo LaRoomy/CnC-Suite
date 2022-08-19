@@ -1,5 +1,5 @@
 # CnC-Suite - Extended NC-Editor
-The purpose of this application is to create, manage, transmit and archive nc-content files. It was created for EPL2 based programs and machines but should also fullfill the need for other issues where editing of g-code is required. A special file format *.cnc3 is used for storing files. These files have tags describing the content, like *.mp3 for example. This enables the facility to save extra data with the files and later search for it. 
+The purpose of this application is to create, manage, transmit and archive nc-content files. It was created for EPL2 based programs and machines but should also fullfill the need for other issues where editing of g-code is required. A special file format (*.cnc3) is used for storing files. These files have tags describing the content, like *.mp3 for example. This enables the facility to save extra data with the files and later search for it. 
 The application consists of the following fragments:
 - File explorer box to create, open, save and copy files
 - Tabcontrol to edit several files at the same time
@@ -9,7 +9,7 @@ The application consists of the following fragments:
 - History box to show the history of edited files
 - Serial transmission functionality to send/receive files over a serial interface
 
-The application is a Windows-Application and is primary written in C++. Supported OS-Versions are Windows 7/10/11. This project includes the source for the executable and NSI scripts to generate an installer with NSIS.
+The application is a Windows-Application and is primarily written in C++. Supported OS-Versions are Windows 7/10/11. This project includes the source for the executable and NSI scripts to generate an installer with NSIS.
 
 ToDo: Add link to website where to download the installers! And how to use!?
 
