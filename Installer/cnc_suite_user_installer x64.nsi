@@ -11,7 +11,8 @@ Unicode true
 !define VERSION "1.3.8"
 
 Name "CnC Suite ${VERSION}"
-OutFile "installer_output\CnC Suite USRINST x64 ${VERSION}.exe"             ;MARK: x86/x64
+;OutFile "installer_output\CnC Suite USRINST x64 ${VERSION}.exe"             ;MARK: x86/x64
+OutFile "installer_output\CnC-Suite Installer 64bit.exe"
 
 InstallDir "$LOCALAPPDATA\CnC Suite"                                        ;MARK: x86/x64 ($PROGRAMFILES64 for x64)
 
