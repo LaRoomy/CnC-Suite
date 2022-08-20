@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html>
-    <head>
+    <head lang="de">
         <title>CnC Suite Handbuch</title>
         <meta name="description" content="Dieses Handbuch beschreibt die Verwendung der Anwendung CnC Suite">
         <meta name="keywords" content="CnC Suite, Handbuch, Verwendung, NC Editor, PAL">
         <meta name="Author" content="Hans Philipp Zimmermann">
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <style type="text/css">
             body, html {
-                background-color: #333333;
+                background-color: #444444;
                 font-size: 0pt;
                 margin: 0pt;
                 padding: 0pt;
                 width: 100%;
-                height: 100%;
+                height: auto;
             }
             #mainHeaderDiv {
-                background-color: #555555;
+                background-color: #444444;
                 padding: 0pt;
                 padding-bottom: 0pt;
                 margin: 0pt;
@@ -26,6 +28,7 @@
                 min-height: 60px;
                 display: table;
                 float: left;
+                border-bottom: 1px solid black;
             }
             #subHeaderDiv{
                 float: left;                
@@ -54,7 +57,6 @@
                 margin-top: 2pt;
                 font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
             }
-
             #pHeader {
                 font-size: 8pt;
                 margin-left: 80pt;
@@ -67,16 +69,12 @@
             }
             #indexDiv {
                 display: inline-block;
-                background-color: #555555;
+                background-color: #444444;
                 color: #ffffff;
                 width: 20%;
                 height: 93%;
-                margin: 0;
-                padding: 0;
             }
             #subPageDiv {
-                margin: 0;
-                padding: 0;
                 display: inline-block;
                 width: 79.7%;
                 height: 93%;
@@ -84,38 +82,32 @@
                 vertical-align: top;
                 overflow: hidden;
             }
-
             .divAsButtonStyle {
-                background-color: #666666;
+                background-color: #555555;
                 padding: 5pt;
                 font-size: 16pt;
                 color: white;
                 cursor: default;
             }
-
             h2 {
                 font-size: 22pt;
                 color: #ffffff;
                 font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
             }
-
-            .framePage {
-                width: 100%;
-                height: 100%;
-            }
-
             #contentFrame {
                 width: 100%;
-                height: 93%;
                 border: none;
-                margin: 0;
-                padding: 0;
-            }
+            }           
         </style>
         <script type="text/javascript">
+            var buttonCount = 6; // amount of buttons
+            var selectorIndexes = [1,0,0,0,0,0]; //appropriate fields to the amount of buttons - button with index 0 is initally selected
 
-            var buttonCount = 3;// amount of buttons
-            var selectorIndexes = [1,0,0];//appropriate fields to the amount of buttons - button 1 is initally selected
+            window.onmessage = (e) => {
+                if (e.data.hasOwnProperty("frameHeight")) {
+                    document.getElementById("contentFrame").style.height = `${e.data.frameHeight + 150}px`;
+                }
+            };
 
             function mouseoverbutton(index, markColor){
                 // control button behavior
@@ -127,7 +119,7 @@
             function mouseoutofbutton(index){
                 // control button behavior
                 if(selectorIndexes[index] != 1){
-                    document.getElementsByClassName('divAsButtonStyle')[index].style.backgroundColor = '#666666';
+                    document.getElementsByClassName('divAsButtonStyle')[index].style.backgroundColor = '#555555';
                 }
             }
 
@@ -137,11 +129,11 @@
                     for(i = 0; i < buttonCount; i++){                    
                         if(i != index)
                         {
-                            document.getElementsByClassName('divAsButtonStyle')[i].style.backgroundColor = '#666666';
+                            document.getElementsByClassName('divAsButtonStyle')[i].style.backgroundColor = '#555555';
                         }
                         selectorIndexes[i] = 0;
                     }
-                    document.getElementsByClassName('divAsButtonStyle')[index].style.backgroundColor = '#AAAAAA';
+                    document.getElementsByClassName('divAsButtonStyle')[index].style.backgroundColor = '#888888';
                     selectorIndexes[index] = 1;
                 }
                 // execute button action
@@ -160,60 +152,13 @@
                 }
             }
 
-			function getDocHeight(doc) {
-				doc = doc || document;
-				var body = doc.body, html = doc.documentElement;
-				var height = Math.max( body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );
-				return height;
-			}
-
-			function setIframeHeight(myiframeid) {
-				var ifrm = document.getElementById(myiframeid);
-				var doc = ifrm.contentDocument? ifrm.contentDocument: ifrm.contentWindow.document;
-				ifrm.style.visibility = 'hidden';
-				ifrm.style.height = "10px";
-				ifrm.style.height = getDocHeight( doc ) + 5+"px";
-				ifrm.style.visibility = 'visible';
-			}
-
             function setPage(loc) {
-
+                // get iframe
                 var iframe = document.getElementById('contentFrame')
-
-                // if this is chrome change the attributes, because the sizer will not work properly
-                var isChrome = !!window.chrome && !!window.chrome.webstore;
-                if(isChrome)
-                {
-                    iframe.setAttribute('scrolling', 'yes');
-                    iframe.style.height = '80%';
-                }
-
                 // set new source
                 iframe.setAttribute('src', loc);
             }
-
         </script>
-		<script>(
-			function(run){
-				for (i=0;i<frames.length; i++) {
-					var f1 = document.getElementsByTagName('contentFrameTag')[i];
-					if(!f1 && window.addEventListener && !run){
-						document.addEventListener('DOMContentLoaded', arguments.callee, false);
-						return;
-					}
-					if(!f1){
-						setTimeout(arguments.callee, 300);
-						return;
-					}
-					f2 = f1.cloneNode(false);
-					f1.src = 'about: blank';
-					f2.frameBorder = '0';
-					f2.allowTransparency = 'yes';
-					f2.scrolling = 'no';
-					f1.parentNode.replaceChild(f2, f1);
-				}
-			})();
-		</script>
     </head>
     <body>
         <div id="mainHeaderDiv">
@@ -230,23 +175,39 @@
             <!--The first button is initally selected-->
             <div
                 class="divAsButtonStyle"
-                style="background-color: #AAAAAA;"
-                onmouseover="mouseoverbutton(0, '#888888')"
+                style="background-color: #888888;"
+                onmouseover="mouseoverbutton(0, '#777777')"
                 onmouseout="mouseoutofbutton(0)"
-                onclick="mousebuttonclicked(0)">First Button</div>
+                onclick="mousebuttonclicked(0)">Grundlagen</div>
             <div
                 class="divAsButtonStyle" 
-                onmouseover="mouseoverbutton(1, '#888888')" 
+                onmouseover="mouseoverbutton(1, '#777777')" 
                 onmouseout="mouseoutofbutton(1)" 
-                onclick="mousebuttonclicked(1)">Second Button</div>
+                onclick="mousebuttonclicked(1)">Programm erstellen</div>
             <div 
                 class="divAsButtonStyle" 
-                onmouseover="mouseoverbutton(2, '#888888')" 
+                onmouseover="mouseoverbutton(2, '#777777')" 
                 onmouseout="mouseoutofbutton(2)" 
-                onclick="mousebuttonclicked(2)">Third Button</div>
+                onclick="mousebuttonclicked(2)">Editor</div>
+            <div 
+                class="divAsButtonStyle" 
+                onmouseover="mouseoverbutton(3, '#777777')" 
+                onmouseout="mouseoutofbutton(3)" 
+                onclick="mousebuttonclicked(3)">Vorlagen erstellen</div>
+            <div 
+                class="divAsButtonStyle" 
+                onmouseover="mouseoverbutton(4, '#777777')" 
+                onmouseout="mouseoutofbutton(4)" 
+                onclick="mousebuttonclicked(4)">Serieller Datenverkehr</div>
+            <div 
+                class="divAsButtonStyle" 
+                onmouseover="mouseoverbutton(5, '#777777')" 
+                onmouseout="mouseoutofbutton(5)" 
+                onclick="mousebuttonclicked(5)">Infos</div>
         </div>
+
         <div id="subPageDiv">
-            <iframe id="contentFrame" name="contentFrameTag" src="contentPages_de/firstStepsPage_de.html" scrolling="no" frameborder="0" onload="javascript:setIframeHeight(this.id);">
+            <iframe id="contentFrame" src="contentPages_de/firstStepsPage_de.html" frameborder="0" scrolling="no">
             </iframe>
         </div>
     </body>

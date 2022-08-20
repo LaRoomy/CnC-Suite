@@ -2,12 +2,29 @@
 <html>
 	<head>
 		<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>first steps page</title>
 		<link rel="stylesheet" type="text/css" href="../css/manualStyles.css">
 		
 	</head>
 	<body>
-		<div class="pageHostDiv">
+        <script>
+            let height;
+
+            const sendPostMessage = () => {
+                if (height !== document.getElementById('container').offsetHeight) {
+                    height = document.getElementById('container').offsetHeight;
+                    window.parent.postMessage({
+                        frameHeight: height
+                    }, '*');
+                    console.log(height);
+                }
+            }
+            window.onload = () => sendPostMessage();
+            window.onresize = () => sendPostMessage();
+        </script>
+
+		<div id="container" class="pageHostDiv">
 			<h2 class="h2Pages">Allgemeine Hinweise zu Zweck und Verwendung der App</h2>
 			<p>
 				<b>CnC Suite ist ein Editor für NC Programme auf PAL-Basis.</b>
@@ -66,6 +83,7 @@
 				
 					Das Dateiformat *.cnc3 besteht aus dem eigentlichen NC-Programm und 3 zusätzlichen Beschreibungen, welche durch die Beschreibungsboxen gesetzt werden können.
 			</p>
+            <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 		</div>
 	</body>
 </html>

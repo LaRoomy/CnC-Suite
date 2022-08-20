@@ -7,7 +7,25 @@
 
 	</head>
 	<body>
-		<div class="pageHostDiv">
+
+        <script>
+            let height;
+
+            const sendPostMessage = () => {
+                if (height !== document.getElementById('container').offsetHeight) {
+                    height = document.getElementById('container').offsetHeight;
+                    window.parent.postMessage({
+                        frameHeight: height
+                    }, '*');
+                    console.log(height);
+                }
+            }
+
+            window.onload = () => sendPostMessage();
+            window.onresize = () => sendPostMessage();
+        </script>
+
+		<div id="container" class="pageHostDiv">
 			<h2 class="h2Pages">This is the program-creation-site</h2>
 		</div>
 	</body>

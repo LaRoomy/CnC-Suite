@@ -114,7 +114,8 @@ button:hover span {
 	width: 75%;
 }
 .pageHostDiv {
-	margin: 20px;
+	margin: 0 auto;
+    padding: 20px;
 }
 .pageHostDiv p {
 	color: #FF8800;
