@@ -10,9 +10,10 @@
             body, html {
                 background-color: #333333;
                 font-size: 0pt;
-                height: 100%;
                 margin: 0pt;
                 padding: 0pt;
+                width: 100%;
+                height: 100%;
             }
             #mainHeaderDiv {
                 background-color: #555555;
@@ -68,14 +69,20 @@
                 display: inline-block;
                 background-color: #555555;
                 color: #ffffff;
-                width: 15%;
-                height: 90%;
-                min-width: 280px;
+                width: 20%;
+                height: 93%;
+                margin: 0;
+                padding: 0;
             }
             #subPageDiv {
+                margin: 0;
+                padding: 0;
                 display: inline-block;
-                width: 85%;
-                background-color: aquamarine;
+                width: 79.7%;
+                height: 93%;
+                background-color: black;
+                vertical-align: top;
+                overflow: hidden;
             }
 
             .divAsButtonStyle {
@@ -83,6 +90,7 @@
                 padding: 5pt;
                 font-size: 16pt;
                 color: white;
+                cursor: default;
             }
 
             h2 {
@@ -90,24 +98,41 @@
                 color: #ffffff;
                 font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
             }
+
+            .framePage {
+                width: 100%;
+                height: 100%;
+            }
+
+            #contentFrame {
+                width: 100%;
+                height: 93%;
+                border: none;
+                margin: 0;
+                padding: 0;
+            }
         </style>
         <script type="text/javascript">
+
             var buttonCount = 3;// amount of buttons
             var selectorIndexes = [1,0,0];//appropriate fields to the amount of buttons - button 1 is initally selected
 
             function mouseoverbutton(index, markColor){
+                // control button behavior
                 if(selectorIndexes[index] != 1){
                     document.getElementsByClassName('divAsButtonStyle')[index].style.backgroundColor = markColor;
                 }
             }
 
             function mouseoutofbutton(index){
+                // control button behavior
                 if(selectorIndexes[index] != 1){
                     document.getElementsByClassName('divAsButtonStyle')[index].style.backgroundColor = '#666666';
                 }
             }
 
             function mousebuttonclicked(index){
+                // control button behavior
                 if(selectorIndexes[index] == 0){                
                     for(i = 0; i < buttonCount; i++){                    
                         if(i != index)
@@ -119,8 +144,76 @@
                     document.getElementsByClassName('divAsButtonStyle')[index].style.backgroundColor = '#AAAAAA';
                     selectorIndexes[index] = 1;
                 }
+                // execute button action
+                switch(index){
+                    case 0:
+                        setPage('contentPages_de/firstStepsPage_de.html');
+                        break;
+                    case 1:
+                        setPage('contentPages_de/createProgramPage_de.html');
+                        break;
+                    case 2:
+                        setPage('contentPages_de/useEditorPage_de.html');
+                        break;
+                    default:
+                        break;
+                }
             }
+
+			function getDocHeight(doc) {
+				doc = doc || document;
+				var body = doc.body, html = doc.documentElement;
+				var height = Math.max( body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );
+				return height;
+			}
+
+			function setIframeHeight(myiframeid) {
+				var ifrm = document.getElementById(myiframeid);
+				var doc = ifrm.contentDocument? ifrm.contentDocument: ifrm.contentWindow.document;
+				ifrm.style.visibility = 'hidden';
+				ifrm.style.height = "10px";
+				ifrm.style.height = getDocHeight( doc ) + 5+"px";
+				ifrm.style.visibility = 'visible';
+			}
+
+            function setPage(loc) {
+
+                var iframe = document.getElementById('contentFrame')
+
+                // if this is chrome change the attributes, because the sizer will not work properly
+                var isChrome = !!window.chrome && !!window.chrome.webstore;
+                if(isChrome)
+                {
+                    iframe.setAttribute('scrolling', 'yes');
+                    iframe.style.height = '80%';
+                }
+
+                // set new source
+                iframe.setAttribute('src', loc);
+            }
+
         </script>
+		<script>(
+			function(run){
+				for (i=0;i<frames.length; i++) {
+					var f1 = document.getElementsByTagName('contentFrameTag')[i];
+					if(!f1 && window.addEventListener && !run){
+						document.addEventListener('DOMContentLoaded', arguments.callee, false);
+						return;
+					}
+					if(!f1){
+						setTimeout(arguments.callee, 300);
+						return;
+					}
+					f2 = f1.cloneNode(false);
+					f1.src = 'about: blank';
+					f2.frameBorder = '0';
+					f2.allowTransparency = 'yes';
+					f2.scrolling = 'no';
+					f1.parentNode.replaceChild(f2, f1);
+				}
+			})();
+		</script>
     </head>
     <body>
         <div id="mainHeaderDiv">
@@ -129,7 +222,7 @@
                 <h2 id="headerText">
                     CnC Suite Handbuch
                 </h2>
-                <p id="pHeader">&#xa9;2017 by LaroomySoft</p>
+                <p id="pHeader">Zuletzt aktualisiert: 20.08.2022</p>
             </div>
         </div>
         
@@ -153,7 +246,8 @@
                 onclick="mousebuttonclicked(2)">Third Button</div>
         </div>
         <div id="subPageDiv">
-
+            <iframe id="contentFrame" name="contentFrameTag" src="contentPages_de/firstStepsPage_de.html" scrolling="no" frameborder="0" onload="javascript:setIframeHeight(this.id);">
+            </iframe>
         </div>
     </body>
 </html>
