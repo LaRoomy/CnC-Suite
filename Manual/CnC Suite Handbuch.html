@@ -8,6 +8,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="icon" type="image/x-icon" href="img/favicon.ico"/>
         <style type="text/css">
             body, html {
                 background-color: #444444;
@@ -81,6 +82,7 @@
                 background-color: black;
                 vertical-align: top;
                 overflow: hidden;
+                border-left: 1px solid black;
             }
             .divAsButtonStyle {
                 background-color: #555555;
@@ -100,8 +102,8 @@
             }           
         </style>
         <script type="text/javascript">
-            var buttonCount = 6; // amount of buttons
-            var selectorIndexes = [1,0,0,0,0,0]; //appropriate fields to the amount of buttons - button with index 0 is initally selected
+            var buttonCount = 7; // amount of buttons
+            var selectorIndexes = [1,0,0,0,0,0,0]; //appropriate fields to the amount of buttons - button with index 0 is initally selected
 
             window.onmessage = (e) => {
                 if (e.data.hasOwnProperty("frameHeight")) {
@@ -139,13 +141,25 @@
                 // execute button action
                 switch(index){
                     case 0:
-                        setPage('contentPages_de/firstStepsPage_de.html');
+                        setPage('content_pages_de/basics_de.html');
                         break;
                     case 1:
-                        setPage('contentPages_de/createProgramPage_de.html');
+                        setPage('content_pages_de/settings_de.html');
                         break;
                     case 2:
-                        setPage('contentPages_de/useEditorPage_de.html');
+                        setPage('content_pages_de/createProgram_de.html');
+                        break;
+                    case 3:
+                        setPage('content_pages_de/editor_de.html');
+                        break;
+                    case 4:
+                        setPage('content_pages_de/createTemplates_de.html');
+                        break;
+                    case 5:
+                        setPage('content_pages_de/serialData_de.html');
+                        break;
+                    case 6:
+                        setPage('content_pages_de/info_de.html');
                         break;
                     default:
                         break;
@@ -183,31 +197,36 @@
                 class="divAsButtonStyle" 
                 onmouseover="mouseoverbutton(1, '#777777')" 
                 onmouseout="mouseoutofbutton(1)" 
-                onclick="mousebuttonclicked(1)">Programm erstellen</div>
-            <div 
+                onclick="mousebuttonclicked(1)">Einstellungen</div>
+            <div
                 class="divAsButtonStyle" 
                 onmouseover="mouseoverbutton(2, '#777777')" 
                 onmouseout="mouseoutofbutton(2)" 
-                onclick="mousebuttonclicked(2)">Editor</div>
+                onclick="mousebuttonclicked(2)">Programm erstellen</div>
             <div 
                 class="divAsButtonStyle" 
                 onmouseover="mouseoverbutton(3, '#777777')" 
                 onmouseout="mouseoutofbutton(3)" 
-                onclick="mousebuttonclicked(3)">Vorlagen erstellen</div>
+                onclick="mousebuttonclicked(3)">Editor</div>
             <div 
                 class="divAsButtonStyle" 
                 onmouseover="mouseoverbutton(4, '#777777')" 
                 onmouseout="mouseoutofbutton(4)" 
-                onclick="mousebuttonclicked(4)">Serieller Datenverkehr</div>
+                onclick="mousebuttonclicked(4)">Vorlagen erstellen</div>
             <div 
                 class="divAsButtonStyle" 
                 onmouseover="mouseoverbutton(5, '#777777')" 
                 onmouseout="mouseoutofbutton(5)" 
-                onclick="mousebuttonclicked(5)">Infos</div>
+                onclick="mousebuttonclicked(5)">Serieller Datenverkehr</div>
+            <div 
+                class="divAsButtonStyle" 
+                onmouseover="mouseoverbutton(6, '#777777')" 
+                onmouseout="mouseoutofbutton(6)" 
+                onclick="mousebuttonclicked(6)">Infos</div>
         </div>
 
         <div id="subPageDiv">
-            <iframe id="contentFrame" src="contentPages_de/firstStepsPage_de.html" frameborder="0" scrolling="no">
+            <iframe id="contentFrame" src="content_pages_de/basics_de.html" frameborder="0" scrolling="no">
             </iframe>
         </div>
     </body>

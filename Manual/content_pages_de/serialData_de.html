@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head lang="de">
+        <title>Serieller Datenverkehr</title>
+        <meta name="description" content="Verwenden der seriellen Schnittstelle">
+        <meta name="keywords" content="CnC Suite, Handbuch, Verwendung, NC Editor">
+        <meta name="Author" content="Hans Philipp Zimmermann">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" type="text/css" href="../css/contentPageStyles.css">
+    </head>
+    <body>
+        <script>
+            // send size changes to parent
+            let height;
+
+            const sendPostMessage = () => {
+                if (height !== document.getElementById('serialDataPageRootDiv').offsetHeight) {
+                    height = document.getElementById('serialDataPageRootDiv').offsetHeight;
+                    window.parent.postMessage({
+                        frameHeight: height
+                    }, '*');
+                }
+            }
+            window.onload = () => sendPostMessage();
+            window.onresize = () => sendPostMessage();
+        </script>
+        <div id="serialDataPageRootDiv"  class="contentDiv">
+            <h2>Serielle Datenübertragung</h2>
+
+        </div>
+    </body>
+</html>
