@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <title>Basics</title>
+        <meta name="description" content="Basic description of the application">
+        <meta name="keywords" content="CnC Suite, Manual, Usage, NC Editor">
+        <meta name="Author" content="Hans Philipp Zimmermann">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" type="text/css" href="../css/contentPageStyles.css">
+    </head>
+    <body>
+        <script>
+            // send size changes to parent
+            let height;
+
+            const sendPostMessage = () => {
+                if (height !== document.getElementById('basicsPageRootDiv').offsetHeight) {
+                    height = document.getElementById('basicsPageRootDiv').offsetHeight;
+                    window.parent.postMessage({
+                        frameHeight: height
+                    }, '*');
+                }
+            }
+            window.onload = () => sendPostMessage();
+            window.onresize = () => sendPostMessage();
+        </script>
+        <div id="basicsPageRootDiv"  class="contentDiv">
+            <h2>Basics</h2>
+            <div class="separatorDiv"></div>
+            <p>
+                With this application NC-Files can be managed, organized, edited and archived. Moreover it enables transmitting data via serial interface.<br/>
+                This application is developed especially for EPL2 programs but should also be appropriate for other types of use.<br/>
+                The following application-components are available:
+            </p>
+            <ul type="disc">
+                <li>File-Explorer to organize files.</li>
+                <li>Editor with tab-control to edit multiple files at the same time.</li>
+                <li>Template-Manager for creation and organization of Snippets.</li>
+                <li>Search functionality to search for files and document-properties.</li>
+                <li>Serial transmission manager to transmit or receive files.</li>
+            </ul>
+            <br/>
+            <div class="importantSectionClass">
+                <h4>Filetype</h4>
+                <p>
+                    This application uses a special filetype (*.cnc3). With this type it is possible to save tags beside the NC-Content. This Tags could be set by using the document-properties box on the right of the editor. 
+                    The search function could be used to find specific data within the document-properties. Other text-based filetypes can be imported and exported but not managed.
+                </p>
+            </div>
+            <br/>
+            <div class="separatorDiv"></div>
+            <br/>
+            <h3>Title-Menu</h3>
+            <p>The title-menu gives access to global settings, data and information.</p>
+            <img class="appImages" src="../img_content_pages/title_menu.png"/>
+            <p>The following functions are included:</p>
+            <ul type="disc">
+                <li>Settings of the application</li>
+                <li>Help / Manual</li>
+                <li>Invokation of the Website</li>
+                <li>Invokation of the File-History</li>
+            </ul>
+            <br/>
+            <div class="separatorDiv"></div>
+            <br/>
+            <h3>File-Explorer</h3>
+            <p>
+                The File-Explorer can be used to organize the Files. Folders and Files can be created, deleted, copied, moved or renamed.<br/>
+                With a double-click the target-file will be opened in the editor.<br/>
+                If a right-click is performed on the file, a context-menu is opened with the options that can be applied on the object.<br/>
+                The toolbar on the top of the explorer also includes all executable functions.
+            </p>
+            <img class="appImages" src="../img_content_pages/explorer_with_context_menu.png"/>
+            <br/>
+            <br/>
+            <div class="separatorDiv"></div>
+            <br/>
+            <h3>Editor</h3>
+            <p>
+                go on here!
+
+                Mit dem Editor können Dateien bearbeitet werden. Die horizontale Toolbar bietet bekannte Funktionen wie Öffnen, Speichern, Kopieren, Ausschneiden, usw.<br/>
+                Zudem kann der Inhalt des Editors durch Schaltflächen auf der Toolbar auch Exportiert und über die serielle Schnittstelle gesendet bzw. empfangen werden.<br/>
+                Die vertikale Toolbar dient der Steuerung den Editor-Verhaltens. Es können Eigenschaften wie automatische Großbuchstaben, automatische Satznummern, automatische Vervollständigung, Textfarbe und der Zeilenfokus an- und abgeschaltet werden.<br/>
+                Ausserdem kann der gesamte Inhalt des Editors neu formatiert werden und die Satznummern sequenziert werden.
+            </p>
+            <img class="appImages" src="../img_content_pages/editor_tabcontrol.png"/>
+            <p>
+                Durch die Tab-Steuerung können viele Dateien gleichzeitig bearbeitet werden.<br/>
+                Jeder Tab beinhaltet eine Schaltfläche die ein Kontext-Menü öffnet welches Aktionen auf dem entsprechenden Tab ausführen kann.
+            </p>
+            <img class="appImages" src="../img_content_pages/tab_context_menu.png"/>
+            <p>
+                Zum Beispiel kann der Pfad im Explorer expandiert werden um die Position in der Baum-Ansicht anzuzeigen.<br/>
+                Oder der Inhalt des Editors kann als Standard-Vorlage festgelegt werden. Die Standard-Vorlage wird in jeden neuen Tab eingefügt, wenn die entsprechende Einstellung gesetzt ist.
+            </p>
+            <br/>
+            <p>
+                Auf der rechten Seite befindet sich das Eigenschaftenfenster für die entsprechende Datei im Editor.
+            </p>
+            <img class="appImages" src="../img_content_pages/description_area.png"/>
+            <p>
+                Die hier festgelegten Eigenschaften werden zusammen mit dem NC-Inhalt gespeichert. Später kann gezielt danach gesucht werden.
+            </p>
+            <br/>
+            <div class="separatorDiv"></div>
+            <br/>
+            <h3>Vorlagen-Manager</h3>
+            <p>
+                Der Vorlagen-Manager dient dem Erstellunen und Verwalten von Vorlagen.<br/>
+                Die Steuerung erfolgt wie im Datei-Explorer über ein Kontext-Menü welches über Rechtsklick geöffnet wird oder über die Toolbar.
+            </p>
+            <img class="appImages" src="../img_content_pages/templates_with_context_menu.png"/>
+            <p>
+                Vorlagen können mit Filtern geordnet und organisiert werden. Soll ein Ausschnitt hinzugefügt werden, dann öffnet sich ein PopUp Fenster.<br/>
+                Der Inhalt für den Ausschnitt kann dort direkt geschrieben werden oder einfach hineinkopiert werden. Wenn vorher ein Bereich im Editor markiert wurde dann befindet sich dieser bereits im Eingabefenster wenn sich das Fenster öffnet.
+            </p>
+            <br/>
+            <div class="separatorDiv"></div>
+            <br/>
+            <h3>Suchfunktion</h3>
+            <p>
+                Die Suchfunktion ermöglich das schnelle Finden von Dateien. Es kann sowohl klassisch nach Dateinamen und Ordnernamen gesucht werden oder auch nach den Dateieigenschaften die im Eigenschaftenfenster festgelegt wurden.
+            </p>
+            <img class="appImages" src="../img_content_pages/searchwindow_pure.png"/>
+            <p>
+                Wonach genau gesucht bzw. nicht gesucht werden soll kann in den Einstellungen der Anwendung als auch über das Menü der Suchfensters festgelegt werden.<br/>
+                Es können auch mehrere gefundene Dateien gleichzeitig geöffnet werden.
+            </p>
+            <br/>
+            <div class="separatorDiv"></div>
+            <br/>
+            <h3>Serielle Datenübertragung</h3>
+            <p>
+                Durch betätigen der Schaltflächen für Senden/Empfangen über die serielle Schnittstelle öffnet sich das Fenster für die Datenübertragung.<br/>
+                Das Verhalten dieses Fensters kann über die Einstellungen angepasst werden. Die Konfiguration der Schnittstelle kann ebenfalls über die Einstellungen der Anwendung festgelegt werden.
+            </p>
+            <img class="appImages" src="../img_content_pages/serial_transmission_window.png"/>
+            <p>
+                Wird auf senden geklickt, dann wird der aktuelle Inhalt des aktiven Tabs gesendet.<br/>
+                Wird auf empfangen geklickt, dann wird auf Daten gewartet. Ist der Empfang abgeschlossen können die Daten in den aktiven Tab übertragen werden.
+            </p>
+        </div> 
+    </body>
+</html>

@@ -1,0 +1,90 @@
+body, html {
+    background-color: #444444;
+    font-size: 0pt;
+    margin: 0pt;
+    padding: 0pt;
+    width: 100%;
+    height: auto;
+}
+#mainHeaderDiv {
+    background-color: #444444;
+    padding: 0pt;
+    padding-bottom: 0pt;
+    margin: 0pt;
+    width: 100%;
+    height: 10%;
+    max-height: 50pt;
+    min-height: 60px;
+    display: table;
+    float: left;
+    border-bottom: 1px solid black;
+}
+#subHeaderDiv{
+    float: left;                
+    margin-left: 5pt;
+    margin-top: 5pt;
+    margin-bottom: 0pt;
+    margin-right: 0pt;
+    height: 100%;
+    display: table-cell;
+}
+#cncSuiteMainIcon {
+    width: 44px;
+    height: 44px;
+    margin: 0pt;
+    margin-left: 5pt;
+    margin-top: 5pt;
+    padding: 0pt;
+    float: left;
+    display: table-cell;
+}
+#headerText {
+    font-size: 20pt;
+    color: #ffffff;
+    padding: 0pt;
+    margin: 0pt;
+    margin-top: 2pt;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+#pHeader {
+    font-size: 8pt;
+    margin-left: 80pt;
+    margin-top: 0pt;
+    margin-right: 0pt;
+    margin-bottom: 0pt;
+    padding: 0pt;
+    color: #ffffff;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+#indexDiv {
+    display: inline-block;
+    background-color: #444444;
+    color: #ffffff;
+    width: 20%;
+    height: 93%;
+}
+#subPageDiv {
+    display: inline-block;
+    width: 79.7%;
+    height: 93%;
+    background-color: black;
+    vertical-align: top;
+    overflow: hidden;
+    border-left: 1px solid black;
+}
+.divAsButtonStyle {
+    background-color: #555555;
+    padding: 5pt;
+    font-size: 16pt;
+    color: white;
+    cursor: default;
+}
+h2 {
+    font-size: 22pt;
+    color: #ffffff;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+#contentFrame {
+    width: 100%;
+    border: none;
+}           

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head lang="de">
+        <title>Serieller Datenverkehr</title>
+        <meta name="description" content="Verwenden der seriellen Schnittstelle">
+        <meta name="keywords" content="CnC Suite, Handbuch, Verwendung, NC Editor">
+        <meta name="Author" content="Hans Philipp Zimmermann">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" type="text/css" href="../css/contentPageStyles.css">
+    </head>
+    <body>
+        <script>
+            // send size changes to parent
+            let height;
+
+            const sendPostMessage = () => {
+                if (height !== document.getElementById('serialDataPageRootDiv').offsetHeight) {
+                    height = document.getElementById('serialDataPageRootDiv').offsetHeight;
+                    window.parent.postMessage({
+                        frameHeight: height
+                    }, '*');
+                }
+            }
+            window.onload = () => sendPostMessage();
+            window.onresize = () => sendPostMessage();
+        </script>
+        <div id="serialDataPageRootDiv"  class="contentDiv">
+            <h2>Serielle Datenübertragung</h2>
+            <div class="separatorDiv"></div>
+            <h4>Einstellen der seriellen Schnittstelle</h4>
+            <p>
+                Die Schnittstelle kann über die App-Einstellungen ausgewählt und konfiguriert werden.
+            </p>
+            <img class="appImages" src="../img_content_pages/settings_serial_interface.png"/>
+            <p>
+                Über den Button 'Serielle Geräte suchen' werden alle im System verfügbaren Geräte aufgelistet.<br/>
+                Die allgemeinen Schnittstellen-Parameter sind für EPL2-Steuerungen gesetzt, lediglich die Baudrate muss individuell an die entsprechende Maschine angepasst werden.
+            </p>
+            <div class="importantSectionClass">
+                <h4>Erweiterte Einstellungen</h4>
+                <p>
+                    Veränderungen an den erweiterten Einstellungen sollten nur vorgenommen werden wenn die Auswirkung der einzelnen Werte bekannt ist. 
+                    Die gesetzten Werte sind Standart-Werte und sollten für fast alle Anwendungsbereiche passen.
+                </p>
+            </div>
+            <p>
+                Über den Button 'Ein-/Ausgabe-Einstellungen' kann das Verhalten der Ausgabefensters und die Ausgabe-Formatierung festgelegt werden.
+            </p>
+            <br/>
+            <div class="separatorDiv"></div>
+            <h4>Senden und Empfangen von Daten</h4>
+            <p>
+                Zum Senden und Empfangen von Daten werden die letzten beiden Schaltflächen der oberen Toolbar verwendet. 
+                Alternativ kann auch mit Strg+T gesendet und mit Strg+R empfangen werden.
+            </p>
+            <p>
+                <b>Senden:</b><br/>
+                Wird der Sendevorgang gestartet, öffnet sich das Ausgabefenster (sofern das Monitoring aktiviert ist). Gesendet wird der aktuelle Inhalt des 
+                aktiven (sichtbaren) Editors bzw. Tabs. Nachdem alle Daten gesendet wurden schließt sich das Ausgabefenster automatisch. Dies kann in den Einstellungen 
+                deaktiviert werden. Ist die ausführliche Ausgabe aktiviert, dann werden erweiterte Informationen im Ausgabefenster angezeigt. Bei eventuellen Übertragungsproblemen 
+                kann das eine Hilfestellung sein.
+            </p>
+            <img class="appImages" src="../img_content_pages/serial_send.png"/>
+            <p>
+                <b>Empfangen:</b><br/>
+                Wird der Empfangsvorgang gestartet, öffnet sich das Eingabe-Fenster (sofern das Monitoring aktiviert ist). Es wird auf eintreffende Daten gewartet. 
+                Ist der Vorgang abgeschlossen, kann der empfangene Inhalt in der aktiven Tab übertragen oder verworfen werden.
+            </p>
+            <img class="appImages" src="../img_content_pages/serial_receive.png"/>
+        </div>
+    </body>
+</html>

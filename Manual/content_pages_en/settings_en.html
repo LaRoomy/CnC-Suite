@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head lang="de">
+        <title>Einstellungen</title>
+        <meta name="description" content="Wichtige Einstellungen der Anwendung">
+        <meta name="keywords" content="CnC Suite, Handbuch, Verwendung, NC Editor">
+        <meta name="Author" content="Hans Philipp Zimmermann">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" type="text/css" href="../css/contentPageStyles.css">
+    </head>
+    <body>
+        <script>
+            // send size changes to parent
+            let height;
+
+            const sendPostMessage = () => {
+                if (height !== document.getElementById('settingsPageRootDiv').offsetHeight) {
+                    height = document.getElementById('settingsPageRootDiv').offsetHeight;
+                    window.parent.postMessage({
+                        frameHeight: height
+                    }, '*');
+                }
+            }
+            window.onload = () => sendPostMessage();
+            window.onresize = () => sendPostMessage();
+        </script>
+        <div id="settingsPageRootDiv"  class="contentDiv">
+            <h2>Einstellungen der Anwendung</h2>
+            <div class="separatorDiv"></div>
+            <h4>Allgemeine Einstellungen</h4>
+            <p>
+                Hier können grundlegende Einstellungen wie Sprache und Design festgelegt werden,<br/>
+                sowie das Verhalten beim Programmstart und ob eine Chronik der bearbeiteten Dateien angelegt werden soll.<br/>
+                Wird die Sprache angepasst muss die Anwendung neu gestartet werden, damit die erforderlichen Resourcen neu geladen werden können.<br/>
+                Bei der Design-Auswahl stehen 3 Möglichkeiten zur Verfügung Hell, Mittel und Dunkel (Hellgrau/Dunkelgrau/Schwarz).
+            </p>
+            <img class="appImages" src="../img_content_pages/settings_general_page.png"/>
+            <p>
+                Beim Programmstart-Verhalten kann festgelegt werden ob die expandierten Programmpfade in der Baum-Ansicht wiederhergestellt werden sollen,<br/>
+                ob die letzten Tabs samt Inhalt wieder geladen werden sollen und ob Tabs die nicht gespeichert waren wiederhergestellt werden sollen.
+            </p>
+            <br/>
+            <div class="separatorDiv"></div>
+            <h4>Tab-Steuerung</h4>
+            <p>
+                Hier kann das Verhalten der Tabs angepasst werden. Wenn automatisch Speichern aktiv ist, dann wird (sofern ein Pfad festgelegt wurde) alle 15 Sekunden gespeichert.<br/>
+                Dadurch das eine Datei immer in einem neuen Tab geöffnet wird, kann verhindert werden das der aktuelle Tab überschrieben wird. Sollte der aktuelle Tab nicht gespeichert worden sein,<br/>
+                ist trotzdem eine Bestätigung erforderlich. Ungespeicherter Inhalt wird nicht überschrieben.<br/>
+                Sollten die Dokument-Eigenschaften nicht benutzt werden kann hier festgelegt werden das diese ausgeblendet werden.
+            </p>
+            <img class="appImages" src="../img_content_pages/settings_tabcontrol.png"/>
+            <p>
+                Die Beschreibung der Dokument-Eigenschaften können an die eigenen Bedürfnisse angepasst werden.<br/>
+                Wenn eine Standard-Vorlage gespeichert wurde kann festgelegt werden ob sie bei einem neuen Tab mit eingefügt wird.<br/>
+                Zuletzt kann das Format des Zeilenendes der Export-Funktion festgelegt werden.
+            </p>
+            <br/>
+            <div class="separatorDiv"></div>
+            <h4>Explorer Einstellungen</h4>
+            <p>
+                Wenn eine Datei über den Öffnen-Button in der oberen Toolbar geöffnet wurde,<br/>
+                kann hier bestimmt werden ob der Pfad in der Baum-Ansicht des Explorers expandiert wird. Vorraussetzung ist sich der Pfad innerhalb der Struktur des Stammordners befindet.<br/>
+                Sollte eine neue Datei im Explorer erzeugt werden, kann hier festgelegt werden ob diese auch direkt als Tab geöffnet wird.<br/>
+                Die dritte Checkbox legt fest ob die Dokument-Eigenschaften als Tooltips angezeigt werden wenn mit der Maus darauf gezeigt wird.
+            </p>
+            <img class="appImages" src="../img_content_pages/settings_file_explorer.png"/>
+            <p>
+                Zudem kann hier das Verhalten des Suchfensters angepasst werden und die Elemente nach denen gesucht wird können hier festgelegt werden.
+            </p>
+            <br/>
+            <div class="separatorDiv"></div>
+            <h4>Weitere Einstellungen</h4>
+            <p>
+                Alle weiteren Einstellungs-Seiten sind bei den jeweiligen Sektionen in diesem Handbuch erläutert.
+            </p>
+        </div>
+    </body>
+</html>
