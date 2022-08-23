@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
-    <head lang="de">
-        <title>Programm erstellen</title>
-        <meta name="description" content="Erstellen eines Programmes">
-        <meta name="keywords" content="CnC Suite, Handbuch, Verwendung, NC Editor">
+    <head lang="en">
+        <title>Program creation</title>
+        <meta name="description" content="Creation of a program">
+        <meta name="keywords" content="CnC Suite, manual, usage, NC Editor">
         <meta name="Author" content="Hans Philipp Zimmermann">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,42 +27,40 @@
             window.onresize = () => sendPostMessage();
         </script>
         <div id="createProgPageRootDiv"  class="contentDiv">
-            <h2>Erstellen eines Programmes</h2>
+            <h2>Program creation</h2>
             <div class="separatorDiv"></div>
             <p>
-                Ein neues Programm bzw. eine neue Datei kann auf verschiedene Weise erstellt werden.
+                There are different ways to create a new program.
             </p>
             <ul type="disc">
-                <li>Im Explorer kann über das Kontext-Menü oder die Toolbar eine neue Datei erzeugt werden.</li>
-                <li>Im Editor kann über 'Neuer Tab' und 'Speichern unter' eine Datei gespeichert werden.</li>
+                <li>With the explorer, a new file could be created with the context-menu or via toolbar.</li>
+                <li>With the editor, a new file could be created by opening a new tab and saving it with the 'save as' button.</li>
             </ul>
             <p>
-                Ein Beispiel-Video zur Programmerstellung habe ich <a target="_blank" href="https://youtu.be/fcFwHXq4el0">HIER</a></a> bereitgestellt.
+                An example video is provided <a target="_blank" href="https://youtu.be/fcFwHXq4el0">HERE</a></a>.
             </p>
             <div class="importantSectionClass">
-                <h4>Dateiformat</h4>
+                <h4>Filetype</h4>
                 <p>
-                    Diese Anwendung verwendet ein spezielles Dateiformat (*.cnc3). Dieses Format ermöglicht es sogenannte Tags mit dem eigentlichen NC-Inhalt abzuspeichern. Diese Tags können über das Dokument-Eigenschaften Fenster im Editor erstellt werden. 
-                    Über die Suchfunktion kann auch direkt nach diesen Dokument-Eigenschaften gesucht werden. Andere Text-basierte Dateiformate können importiert und exportiert werden, jedoch nicht aktiv verwaltet werden.
+                    This application uses a special filetype (*.cnc3). With this type it is possible to save tags beside the NC-Content. This Tags could be set by using the document-properties box on the right of the editor. 
+                    The search function could be used to find specific data within the document-properties. Other text-based filetypes can be imported and exported but not managed.
                 </p>
             </div>
             <p>
-                Wird eine neue Datei oder ein neuer Tab erzeugt und es wurde eine Standard-Vorlage festgelegt, dann wird diese mit eingefügt.<br/>
-                Die Programm-Eingabe kann nun über den Editor erfolgen. Vorlagen können eingefügt werden und der Inhalt des Editors<br/>
-                kann über die serielle Schnittstelle gesendet werden. Durch das Dokument-Eigenschaften Fenster können zusätzliche Beschreibungen für die Datei<br/>
-                eingegeben werden. Auch zeigt dieses Fenster die Zeit und das Datum der letzten Bearbeitung an und wann es zuletzt geöffnet wurde.
+                When creating a new file or a new tab and the a general template is set, it will be inserted. 
+                The program can be entered with the editor. Templates could be inserted and the content of the editor could be sent via serial interface. 
+                Through the document-property window additional descriptions can be defined. Moreover this window shows the date and time of the last modification 
+                and opening.
             </p>
             <p>
-                Inhalt von textbasierten Dateien kann über die Import-Funktion über die Toolbar oder durch das Kontext-Menü im Explorer importiert werden.<br/>
-                Auch kann durch Drag & Drop der Inhalt des Editors gesetzt werden, bzw. können cnc3 Dateien geöffnet werden.
+                The content of text-based files can be imported with the import function via toolbar or context-menu of the explorer. 
+                Also the the content of the editor can be set via drag & drop or cnc3 files can be opened this way.
             </p>
             <img class="appImages" src="../img_content_pages/foreign_files_context_menu.png"/>
             <p>
-                Ebenfalls können textbasierte Dateien im Explorer über das Kontext-Menü direkt in cnc3 Dateien konvertiert werden,<br/>
-                mit der Option die alte Datei zu behalten oder zu löschen.
+                Another possibility is to convert foreign files with the context-menu of the explorer. 
+                Included is the option to keep the old file or to delete it after conversion.
             </p>
-
-
         </div>
     </body>
 </html>

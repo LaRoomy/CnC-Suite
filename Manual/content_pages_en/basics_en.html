@@ -81,66 +81,69 @@
             <p>
                 go on here!
 
-                Mit dem Editor können Dateien bearbeitet werden. Die horizontale Toolbar bietet bekannte Funktionen wie Öffnen, Speichern, Kopieren, Ausschneiden, usw.<br/>
-                Zudem kann der Inhalt des Editors durch Schaltflächen auf der Toolbar auch Exportiert und über die serielle Schnittstelle gesendet bzw. empfangen werden.<br/>
-                Die vertikale Toolbar dient der Steuerung den Editor-Verhaltens. Es können Eigenschaften wie automatische Großbuchstaben, automatische Satznummern, automatische Vervollständigung, Textfarbe und der Zeilenfokus an- und abgeschaltet werden.<br/>
-                Ausserdem kann der gesamte Inhalt des Editors neu formatiert werden und die Satznummern sequenziert werden.
+                With the editor, programs can be created. The horizontal toolbar provides known function like open, save, copy, cut and so on.<br/>
+                Moreover files can be exported or transmitted and received using the serial interface.<br/>
+                The vertical toolbar modifies the behavior of the editor. Properties like uppercase letters, automatic numeration, text-color and line-focus can be switched on and off.<br/>
+                Also the complete content of the editor can be formatted and line-numbers can be sequenced.
             </p>
             <img class="appImages" src="../img_content_pages/editor_tabcontrol.png"/>
             <p>
-                Durch die Tab-Steuerung können viele Dateien gleichzeitig bearbeitet werden.<br/>
-                Jeder Tab beinhaltet eine Schaltfläche die ein Kontext-Menü öffnet welches Aktionen auf dem entsprechenden Tab ausführen kann.
+                Using the tab-control, multiple files can be opened and edited at the same time.<br/>
+                Every tab contains a button to open a context-menu with actions that can be performed on the tab.
             </p>
             <img class="appImages" src="../img_content_pages/tab_context_menu.png"/>
             <p>
-                Zum Beispiel kann der Pfad im Explorer expandiert werden um die Position in der Baum-Ansicht anzuzeigen.<br/>
-                Oder der Inhalt des Editors kann als Standard-Vorlage festgelegt werden. Die Standard-Vorlage wird in jeden neuen Tab eingefügt, wenn die entsprechende Einstellung gesetzt ist.
+                The path to the current file may be expanded to locate the position in the tree-view of the explorer.<br/>
+                Or the content could be set as a general template. The general template is inserted in every new tab if the appropriate setting is set.
             </p>
             <br/>
             <p>
-                Auf der rechten Seite befindet sich das Eigenschaftenfenster für die entsprechende Datei im Editor.
+                On the right side of the editor, the document-property window is shown with information about the current file.
             </p>
             <img class="appImages" src="../img_content_pages/description_area.png"/>
             <p>
-                Die hier festgelegten Eigenschaften werden zusammen mit dem NC-Inhalt gespeichert. Später kann gezielt danach gesucht werden.
+                The document-property tags will be saved together with the nc-content. The search-function enables to search directly for these properties.
             </p>
             <br/>
             <div class="separatorDiv"></div>
             <br/>
-            <h3>Vorlagen-Manager</h3>
+            <h3>Template-Manager</h3>
             <p>
-                Der Vorlagen-Manager dient dem Erstellunen und Verwalten von Vorlagen.<br/>
-                Die Steuerung erfolgt wie im Datei-Explorer über ein Kontext-Menü welches über Rechtsklick geöffnet wird oder über die Toolbar.
+                With the Template-Manager, code-snippets can be created and organized.<br/>
+                The usage is done via context-menu (right-click on item) or via toolbar, like in the explorer window.
             </p>
             <img class="appImages" src="../img_content_pages/templates_with_context_menu.png"/>
             <p>
-                Vorlagen können mit Filtern geordnet und organisiert werden. Soll ein Ausschnitt hinzugefügt werden, dann öffnet sich ein PopUp Fenster.<br/>
-                Der Inhalt für den Ausschnitt kann dort direkt geschrieben werden oder einfach hineinkopiert werden. Wenn vorher ein Bereich im Editor markiert wurde dann befindet sich dieser bereits im Eingabefenster wenn sich das Fenster öffnet.
+                Templates can be arranged and organized by filters. When a template is to be added, a popup-window will open.<br/>
+                The content for the template could be directly entered into the editbox in the popup-window or inserted with a copy-paste operation. 
+                If some text was previously selected in the main editor, it will be set as the template-content when the popup-window opens.
             </p>
             <br/>
             <div class="separatorDiv"></div>
             <br/>
-            <h3>Suchfunktion</h3>
+            <h3>Search-Function</h3>
             <p>
-                Die Suchfunktion ermöglich das schnelle Finden von Dateien. Es kann sowohl klassisch nach Dateinamen und Ordnernamen gesucht werden oder auch nach den Dateieigenschaften die im Eigenschaftenfenster festgelegt wurden.
+                With the search-function, files can be found and accessed quickly. A classic search for file- and foldernames could be performed as well as 
+                a search for the document-properties defined in the document description tags.
             </p>
             <img class="appImages" src="../img_content_pages/searchwindow_pure.png"/>
             <p>
-                Wonach genau gesucht bzw. nicht gesucht werden soll kann in den Einstellungen der Anwendung als auch über das Menü der Suchfensters festgelegt werden.<br/>
-                Es können auch mehrere gefundene Dateien gleichzeitig geöffnet werden.
+                The precise search targets can be set up using the settings of the application or with the menu of the search-window. 
+                Opening multiple search results is possible and the search-window can remain visible after results are opened.
             </p>
             <br/>
             <div class="separatorDiv"></div>
             <br/>
-            <h3>Serielle Datenübertragung</h3>
+            <h3>Serial Data-Transmission</h3>
             <p>
-                Durch betätigen der Schaltflächen für Senden/Empfangen über die serielle Schnittstelle öffnet sich das Fenster für die Datenübertragung.<br/>
-                Das Verhalten dieses Fensters kann über die Einstellungen angepasst werden. Die Konfiguration der Schnittstelle kann ebenfalls über die Einstellungen der Anwendung festgelegt werden.
+                By pressing the buttons for transmit/receive via serial interface a transmission window is opened.<br/>
+                The behavior of the window and the configuration of the interface could be adapted in the app settings.
             </p>
             <img class="appImages" src="../img_content_pages/serial_transmission_window.png"/>
             <p>
-                Wird auf senden geklickt, dann wird der aktuelle Inhalt des aktiven Tabs gesendet.<br/>
-                Wird auf empfangen geklickt, dann wird auf Daten gewartet. Ist der Empfang abgeschlossen können die Daten in den aktiven Tab übertragen werden.
+                If the transmit button is clicked, the current content of the active tab is written to the interface.<br/>
+                When the receive button is clicked, the transmission window is being opened and the module waits for incoming data. 
+                If the reception is complete the data could be set to the current active tab.
             </p>
         </div> 
     </body>
