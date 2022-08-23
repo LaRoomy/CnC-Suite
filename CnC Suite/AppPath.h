@@ -73,8 +73,8 @@
 #define			PATHTOFILE_TREEVIEWIMAGE					L"\\CnC Suite\\AppData\\Session\\TVimage.dat"
 #define			PATHTOFILE_LASTEXCEPTIONINFO				L"\\CnC Suite\\AppData\\Session\\lastExeptionInfo.dat"
 #define			PATHTOFILE_SEARCHSETTINGS					L"\\CnC Suite\\AppData\\srchset.sys"
-#define			PATHTOFILE_HELP_GERMAN						L"\\CnC Suite\\Manual\\Handbuch.html"
-#define			PATHTOFILE_HELP_ENGLISH						L"\\CnC Sutie\\Manual\\manual.html"
+#define			PATHTOFILE_HELP_GERMAN						L"\\CnC Suite\\manual\\CnC Suite Handbuch.html"
+#define			PATHTOFILE_HELP_ENGLISH						L"\\CnC Suite\\manual\\CnC Suite Manual.html"
 
 #define			PATHTOFILE_DESCPROPERTY_ONE					L"\\CnC Suite\\AppData\\Strings\\Dproperty1.dat"
 #define			PATHTOFILE_DESCPROPERTY_TWO					L"\\CnC Suite\\AppData\\Strings\\Dproperty2.dat"

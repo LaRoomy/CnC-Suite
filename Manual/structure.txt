@@ -1,0 +1,67 @@
+tree structure of the source files in the manual folder
+
+(d) = folder
+(f) = file
+
+Manual
+    |
+    |
+    |_ (d) content_pages_de
+            |
+            |_ (f) basics_de.html
+            |_ (f) createProgram_de.html
+            |_ (f) createTemplates_de.html
+            |_ (f) editor_de.html
+            |_ (f) info_de.html
+            |_ (f) serialData_de.html
+            |_ (f) settings_de.html
+    |
+    |
+    |_ (d) content_pages_en
+            |
+            |_ (f) basics_en.html
+            |_ (f) createProgram_en.html
+            |_ (f) createTemplates_en.html
+            |_ (f) editor_en.html
+            |_ (f) info_de.html
+            |_ (f) serialData_en.html
+            |_ (f) settings_en.html
+    |
+    |
+    |_ (d) css
+            |
+            |_ (f) contentPageStyles.css
+            |_ (f) mainPageStyles.css
+    |
+    |
+    |_ (d) img
+            |
+            |_ (f) favicon.ico
+            |_ (f) main_icon_png_88px.png
+    |
+    |
+    |_ (d) img_content_pages
+            |
+            |_ (f) add_template_window.png
+            |_ (f) cover.png
+            |_ (f) description_area.png
+            |_ (f) editor_autocomplete_control.png
+            |_ (f) editor_autosyntax_control.png
+            |_ (f) editor_color_manager.png
+            |_ (f) explorer_with_context_menu.png
+            |_ (f) foreign_files_context_menu.png
+            |_ (f) searchwindow_pure.png
+            |_ (f) serial_receive.png
+            |_ (f) serial_send.png
+            |_ (f) serail_transmission_window.png
+            |_ (f) settings_file_explorer.png
+            |_ (f) settings_general_page.png
+            |_ (f) settings_serial_interface.png
+            |_ (f) settings_tabcontrol.png
+            |_ (f) tab_context_menu.png
+            |_ (f) templates_with_context_menu.png
+            |_ (f) title_menu.png
+    |
+    |
+    |_ (f) "CnC Suite Handbuch.html"
+    |_ (f) "CnC Suite Manual.html"

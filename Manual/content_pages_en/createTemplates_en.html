@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
-    <head lang="de">
-        <title>Vorlagen erstellen</title>
-        <meta name="description" content="Erstellen von Vorlagen">
-        <meta name="keywords" content="CnC Suite, Handbuch, Verwendung, NC Editor">
+    <head lang="en">
+        <title>Template Creation</title>
+        <meta name="description" content="How to create templates">
+        <meta name="keywords" content="CnC Suite, Manual, Usage, NC Editor">
         <meta name="Author" content="Hans Philipp Zimmermann">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,42 +27,41 @@
             window.onresize = () => sendPostMessage();
         </script>
         <div id="createTemplatesPageRootDiv"  class="contentDiv">
-            <h2>Erstellen von Vorlagen</h2>
+            <h2>Template Creation</h2>
             <div class="separatorDiv"></div>
             <p>
-                Über den Vorlagen-Manager können Vorlagen erstellt, organisiert und eingefügt werden. 
-                Wie auch beim Datei-Explorer können Vorlagen über das Kontext-Menü oder über die Toolbar erstellt werden.
+                With the template-manager, code-templates can be created, organized and inserted. 
+                As with the file explorer, templates can be created using the context menu or the toolbar.
             </p>
             <p>
-                Ein Beispiel-Programm zur Verwendung der Vorlagen habe ich <a target="_blank" href="https://youtu.be/D96kOml0uGk">HIER</a> bereitgestellt.
+                An example video is provided <a target="_blank" href="https://youtu.be/D96kOml0uGk">HERE</a>.
             </p>
             <img class="appImages" src="../img_content_pages/templates_with_context_menu.png"/>
             <p>
-                Durch die Schaltfläche 'Ausschnitt hinzufügen' wird ein Eingabe-Fenster geöffnet.
+                By pressing the button 'Add template', an input window will be opened.
             </p>
             <img class="appImages" src="../img_content_pages/add_template_window.png"/>
             <p>
-                Dort kann der Name der Ausschnittes, eine Beschreibung des Ausschnittes und 
-                der eigentliche Inhalt eingegeben werden. Wurde vorher im Editor ein Text-Ausschnitt markiert ist dieser 
-                automatisch als Inhalt gesetzt.<br/>
-                Die Beschreibung des Ausschnittes ist als Tooltip sichbar wenn mit der Maus über das entsprechende Element im Ausschnitt-Manager gezeigt wird.
+                The name of the template, a description and the content can be defined. 
+                If text was previously selected in the editor, it is set automatically as the content of the template. 
+                The description of the template is visible if the mouse-cursor is hovering over the appropriate item in the template manager tree-view.
             </p>
             <p>
-                Alle Element des Ausschnitt-Managers können über Toolbar oder Kontext-Menü nachträglich geändert werden.
+                All elements of the template manager can be modified via toolbar or context-menu.
             </p>
             <br/>
             <div class="importantSectionClass">
                 <h4>Filter</h4>
                 <p>
-                    Filter dienen wie Ordner der Organisation der Ausschnitte und können wie diese verwendet werden, haben jedoch 
-                    keine physische Entsprechung im Dateisystem. Sollte ein Filter der noch Ausschnitte enthält gelöscht werden, so 
-                    werden die enthaltenen Ausschnitte dem übergeordneten Filter zugeordnet.
+                    Like folders, filters have the purpose to organize items and can be used likewise. But filters have no physical 
+                    equivalent in the file-system. If a filter that contains templates is deleted, 
+                    the included templates will be assigned to the super folder.
                 </p>
             </div>
             <br/>
             <p>
-                Der Speicherort der Ausschnitte ist im Dokumenten-Ordner im Unterverzeichnis CnC-Suite/Templates. 
-                Dieser Ordner darf nicht entfernt oder umbenannt werden, ansonsten kann es zu Funktionsstörungen der Anwendung kommen.
+                The storage location of the templates is the CnC-Suite folder in the users documents directory (CnC-Suite/Templates). 
+                This location must not be removed or renamed, otherwise this could cause malfunction of the application.
             </p>
         </div>
     </body>

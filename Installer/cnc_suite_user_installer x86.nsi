@@ -169,7 +169,21 @@ Section "Installer Section"
     File "Cnc_Suite_mIcon.ico"
     File "cnc3_file_ico.ico"
 
-    ;TODO: write the manual to the application folder!!!! (if it is ready)
+    ;Write the manual
+    SetOutPath "$INSTDIR\manual"
+    File "..\Manual\CnC Suite Handbuch.html"
+    File "..\Manual\CnC Suite Manual.html"
+    SetOutPath "$INSTDIR\manual\content_pages_de"
+    File /r "..\Manual\content_pages_de\*.html*"
+    SetOutPath "$INSTDIR\manual\content_pages_en"
+    File /r "..\Manual\content_pages_en\*.html*"
+    SetOutPath "$INSTDIR\manual\css"
+    File /r "..\Manual\css\*.css*"
+    SetOutPath "$INSTDIR\manual\img"
+    File "..\Manual\img\favicon.ico"
+    File "..\Manual\img\main_icon_png_88px.png"
+    SetOutPath "$INSTDIR\manual\img_content_pages"
+    File /r "..\Manual\img_content_pages\*.png*"
 
     ;Create uninstaller
     WriteUninstaller "$INSTDIR\bin\Uninstall.exe"
@@ -236,7 +250,7 @@ Section "un.Application" uninst_app
     ; Remove bin-folder (and content)
     RMDir /r /REBOOTOK "$LOCALAPPDATA\CnC Suite\bin"
     ; Remove manual
-    RMDir /r /REBOOTOK "$LOCALAPPDATA\CnC Suite\Manual"
+    RMDir /r /REBOOTOK "$LOCALAPPDATA\CnC Suite\manual"
 
     ; Remove the Installation-Directory (DO NOT USE \r !!! - See: https://nsis.sourceforge.io/Reference/RMDir for more info)
     ; This is done later, because the user could have selected the choice to keep some data...
@@ -287,7 +301,7 @@ Section "un.User Data" uninst_userdata
     RMDir /r "$LOCALAPPDATA\CnC Suite\UserStyles"
     RMDir /r "$LOCALAPPDATA\CnC Suite\Templates"; this folder remains in the documents/CnC Suite folder
 
-    ;if the previous sections are completely executed, the folder must be empty, if so, delete it
+    ;if the previous sections are completely executed, the folder must be empty, if so, delete it (if the folder is not empty this will not work so we are save)
     RMDir   "$LOCALAPPDATA\CnC Suite"
 SectionEnd
 
