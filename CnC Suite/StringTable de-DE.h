@@ -301,7 +301,7 @@
 #define				_UI_PROPWND_DELETEHISTORYNOW		L"Chronik löschen"
 
 
-#define				_UI_GNRL_COPYRIGHT					L"\xa9 2018 LaroomySoft"
+#define				_UI_GNRL_COPYRIGHT					L"Created 2017 von Hans Philipp Zimmermann (LaroomySoft)"
 #define				_UI_GNRL_RIGHTS						L"Alle Rechte vorbehalten."
 #define				_UI_GNRL_USERCANCELCONFIRM			L"Wird abgebrochen..."
 #define				_UI_GNRL_NEWSUBFOLDER				L"Neuer Unterordner"
@@ -309,6 +309,8 @@
 #define				_UI_GNRL_HISTORY					L"Chronik"
 #define				_UI_GNRL_STARTUPTEXTPLACEHOLDER		L"  %5555\n\nN   1 "
 #define				_UI_GNRL_SEARCHINFOLDER				L"Durchsuchen..."
+#define				_UI_GNRL_MANUAL						L"Handbuch"
+#define				_UI_GNRL_WEBSITE					L"Website"
 
 
 #define				_UI_FILETIME_CREATED				L"Erstellt:        "

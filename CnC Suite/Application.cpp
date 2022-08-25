@@ -1963,7 +1963,7 @@ void Application::SaveSession()
 
 void Application::LaunchWebsite()
 {
-	ShellExecute(nullptr, nullptr, L"http://www.cnc-suite.de", nullptr, nullptr, SW_SHOW);
+	ShellExecute(nullptr, nullptr, L"http://cnc-suite.blogspot.com/", nullptr, nullptr, SW_SHOW);
 }
 
 void Application::ShowHelpExtension()

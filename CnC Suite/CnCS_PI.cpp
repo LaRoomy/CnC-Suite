@@ -12,6 +12,7 @@
 #include"ResetDialog.h"
 #include"splashScreen.h"
 #include"history.h"
+#include"Url.h"
 
 CnCS_PI::CnCS_PI()
 	: Success(TRUE), propWnd(nullptr), hInstance(nullptr), wki(nullptr)
@@ -2927,8 +2928,89 @@ HRESULT CnCS_PI::_createInfoPage()
 															hr = resetButton->Create();
 															if (SUCCEEDED(hr))
 															{
+																bText = getStringFromResource(UI_GNRL_MANUAL);
 
+																pos.x = DPIScale(60);
+																pos.y = DPIScale(220);
+																sz.cx = DPIScale(160);
+																sz.cy = DPIScale(58);
 
+																auto manualButton = new CustomButton(this->iParam.infoPage, BUTTONMODE_ICONTEXT, &pos, &sz, CTRLID_MANUALBUTTON, this->hInstance);
+																hr =
+																	(manualButton != nullptr)
+																	? S_OK : E_FAIL;
+
+																if (SUCCEEDED(hr)) {
+
+																	auto mB_id = (this->sInfo.StyleID == STYLEID_LIGHTGRAY) ? IDI_HELPMARK_PRESSED : IDI_HELPMARK_MARKED;
+
+																	manualButton->setColors(this->sInfo.TabColor, COLOR_BUTTON_MOUSE_OVER, COLOR_BUTTON_PRESSED);
+																	manualButton->setAppearance_IconText(mB_id, 48, bText);
+																	manualButton->setBorder(TRUE, this->sInfo.OutlineColor);
+																	manualButton->setFont(
+																		CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
+																	);
+																	manualButton->setTextColor(this->sInfo.TextColor);
+																	manualButton->setAlignment(BAL_LEFT);
+																	manualButton->setConstraints(
+																		DPIScale(10), DPIScale(20)
+																	);
+
+																	if (this->sInfo.StyleID == STYLEID_LIGHTGRAY)
+																	{
+																		manualButton->setTextHighlight(
+																			TRUE,
+																			RGB(255, 255, 255)
+																		);
+																	}
+																	manualButton->setEventListener(dynamic_cast<customButtonEventSink*>(this));
+
+																	hr = manualButton->Create();
+																	if (SUCCEEDED(hr)) {
+
+																		bText = getStringFromResource(UI_GNRL_WEBSITE);
+
+																		pos.y = 320;
+
+																		auto websiteButton = new CustomButton(this->iParam.infoPage, BUTTONMODE_ICONTEXT, &pos, &sz, CTRLID_WEBSITEBUTTON, this->hInstance);
+																		hr =
+																			(websiteButton != nullptr)
+																			? S_OK : E_FAIL;
+																		
+																		if (SUCCEEDED(hr)) {
+
+																			auto wB_id = (this->sInfo.StyleID == STYLEID_LIGHTGRAY) ? IDI_WEB_PRESSED : IDI_WEB_MARKED;
+
+																			websiteButton->setColors(this->sInfo.TabColor, COLOR_BUTTON_MOUSE_OVER, COLOR_BUTTON_PRESSED);
+																			websiteButton->setAppearance_IconText(wB_id, 48, bText);
+																			websiteButton->setBorder(TRUE, this->sInfo.OutlineColor);
+																			websiteButton->setFont(
+																				CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
+																			);
+																			websiteButton->setTextColor(this->sInfo.TextColor);
+																			websiteButton->setAlignment(BAL_LEFT);
+																			websiteButton->setConstraints(
+																				DPIScale(10), DPIScale(20)
+																			);
+
+																			if (this->sInfo.StyleID == STYLEID_LIGHTGRAY)
+																			{
+																				websiteButton->setTextHighlight(
+																					TRUE,
+																					RGB(255, 255, 255)
+																				);
+																			}
+																			websiteButton->setEventListener(dynamic_cast<customButtonEventSink*>(this));
+
+																			hr = websiteButton->Create();
+																			if (SUCCEEDED(hr)) {
+
+																				// ...
+
+																			}
+																		}
+																	}
+																}
 															}
 														}
 													}
@@ -3705,22 +3787,59 @@ void CnCS_PI::onButtonClick(CustomButton* sender, CTRLID ctrlID)
 		}
 		break;
 	case CTRLID_RESETAPPBUTTON:
-	{
-		auto resetAppDialog = new ResetDialog();
-		if (resetAppDialog != nullptr)
 		{
-			resetAppDialog->SetColors(
-				this->sInfo.MenuPopUpColor,
-				/*(this->sInfo.StyleID == STYLEID_DARKGRAY) ? RGB(220,220,220) :*/ this->sInfo.TextColor
-			);
-
-			auto hr = resetAppDialog->Create(this->hInstance, this->mainWnd);
-			if (SUCCEEDED(hr))
+			auto resetAppDialog = new ResetDialog();
+			if (resetAppDialog != nullptr)
 			{
-				SendMessage(this->propWnd, WM_CLOSE, 0, 0);
+				resetAppDialog->SetColors(
+					this->sInfo.MenuPopUpColor,
+					/*(this->sInfo.StyleID == STYLEID_DARKGRAY) ? RGB(220,220,220) :*/ this->sInfo.TextColor
+				);
+
+				auto hr = resetAppDialog->Create(this->hInstance, this->mainWnd);
+				if (SUCCEEDED(hr))
+				{
+					SendMessage(this->propWnd, WM_CLOSE, 0, 0);
+				}
 			}
 		}
-	}
+		break;
+	case CTRLID_MANUALBUTTON:
+		{
+			auto lang = getCurrentAppLanguage();
+			AppPath appPath;
+			iString pathToManual;
+			Url manualUrl;
+
+			if (lang == LANG_GERMAN) {
+				pathToManual = appPath.Get(PATHID_FILE_HELPHTML_GERMAN);
+				manualUrl.SetUrlFromLocalPath(
+					pathToManual
+				);
+				ShellExecute(
+					nullptr, nullptr,
+					manualUrl.GetUrl(),
+					nullptr, nullptr,
+					SW_SHOW
+				);
+			}
+			else
+			{
+				pathToManual = appPath.Get(PATHID_FILE_HELPHTML_ENGLISH);
+				manualUrl.SetUrlFromLocalPath(
+					pathToManual
+				);
+				ShellExecute(
+					nullptr, nullptr,
+					manualUrl.GetUrl(),
+					nullptr, nullptr,
+					SW_SHOW
+				);
+			}
+		}
+		break;
+	case CTRLID_WEBSITEBUTTON:
+		ShellExecute(nullptr, nullptr, L"http://cnc-suite.blogspot.com/", nullptr, nullptr, SW_SHOW);
 		break;
 	default:
 		break;

@@ -293,7 +293,7 @@
 #define				_UI_PROPWND_SAVEHISTORY				L"Generate chronicle"
 #define				_UI_PROPWND_DELETEHISTORYNOW		L"Reset chronicle"
 
-#define				_UI_GNRL_COPYRIGHT					L"\xa9 2018 LaroomySoft"
+#define				_UI_GNRL_COPYRIGHT					L"Created 2017 by Hans Philipp Zimmermann (LaroomySoft)"
 #define				_UI_GNRL_RIGHTS						L"All Rights reserved."
 #define				_UI_GNRL_USERCANCELCONFIRM			L"Is canceled..."
 #define				_UI_GNRL_NEWSUBFOLDER				L"New Sub-Folder"
@@ -301,6 +301,10 @@
 #define				_UI_GNRL_HISTORY					L"Chronicle"
 #define				_UI_GNRL_STARTUPTEXTPLACEHOLDER		L"  %5555\n\nN   1 "
 #define				_UI_GNRL_SEARCHINFOLDER				L"Search through..."
+#define				_UI_GNRL_MANUAL						L"Manual"
+#define				_UI_GNRL_WEBSITE					L"Website"
+
+
 
 #define				_UI_FILETIME_CREATED				L"Created:      "
 #define				_UI_FILETIME_LASTWRITE				L"Last modified:"

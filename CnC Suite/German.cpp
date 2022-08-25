@@ -582,6 +582,11 @@ TCHAR* LanguageDispatcher::getGermanString(int ID)
 		return _UI_GNRL_STARTUPTEXTPLACEHOLDER;
 	case UI_GNRL_SEARCHINFOLDER:
 		return _UI_GNRL_SEARCHINFOLDER;
+	case UI_GNRL_MANUAL:
+		return _UI_GNRL_MANUAL;
+	case UI_GNRL_WEBSITE:
+		return _UI_GNRL_WEBSITE;
+
 
 	case UI_FILETIME_CREATED:
 		return _UI_FILETIME_CREATED;
