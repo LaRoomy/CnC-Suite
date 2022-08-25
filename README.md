@@ -11,7 +11,7 @@ The application consists of the following fragments:
 
 The application is a Windows-Application and is primarily written in C++. Supported OS-Versions are Windows 7/10/11. This project includes the source for the executable and NSI scripts to generate an installer with NSIS.
 
-ToDo: Add link to website where to download the installers! And how to use!?
+[Click here to download the installers for the application.](https://cnc-suite.blogspot.com/)
 
 ![User interface screenshot](Img/full_prog_black.png)
 
@@ -43,4 +43,6 @@ This folder is the source location for the installer generation. The output dire
 The installer section contains nsis files for x86/x64 target platform for two types of installations, the user and the admin type. Means when creating the classic installer which requires administrator privilegues, the application is installed in the programs folder and uses the HKLM registry section of the target machine. This is out-dated. I would recommend to use the user-installer scripts instead. When build from these scripts, no administrator privilegues are required and the application is installed to the local app-data folder and uses the HKCU registry section of the target machine.
 
 ## How to use the application
-Instructions how to use this app are available here.  TODO: add url to website
+This repository contains a [manual](Manual) with instructions and explanations for usage of the application. It is written in html/css/javascript and can be viewed with a browser. This manual is also included in the installer and will be installed with the application. When the help button in the titlebar of the application is pressed the manual is opened. You can use this manual or visit the [website](https://cnc-suite.blogspot.com/)
+
+
