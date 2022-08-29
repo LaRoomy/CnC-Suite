@@ -21,6 +21,7 @@ extern int APIENTRY _tWinMain(
 	UNREFERENCED_PARAMETER(nCmdShow);
 
 	SetUnhandledExceptionFilter(lpTopLevelExceptionFilter);
+	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
 	auto notused = InitializeCriticalSectionAndSpinCount(&CriticalSection, 0x00000400);
 	_NOT_USED(notused);
