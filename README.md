@@ -1,5 +1,6 @@
 # CnC-Suite - Extended NC-Editor
 ![](https://img.shields.io/badge/Platform-Windows-informational)
+![](https://img.shields.io/badge/NC%20Control-EPL2-yellowgreen)
 
 The purpose of this application is to create, manage, transmit and archive nc-content files. It was created for EPL2 based programs and machines but should also fullfill the need for other issues where editing of g-code is required. A special file format (*.cnc3) is used for storing files. These files have tags describing the content, like *.mp3 for example. This enables the facility to save extra data with the files and later search for it. 
 The application consists of the following fragments:
