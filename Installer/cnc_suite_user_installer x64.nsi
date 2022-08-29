@@ -290,7 +290,7 @@ Section "un.Application Data" uninst_appdata
     SetShellVarContext current
 
     ;remove:
-    RMDir /r "$DOCUMENTS\CnC Suite\AppData"         ;in case of old-installation
+    RMDir /r "$DOCUMENTS\CnC-Suite\AppData"         ;in case of old-installation
     RMDir /r "$LOCALAPPDATA\CnC Suite\AppData"      ;in case of new-installation
 
     RMDir /r "$LOCALAPPDATA\CnC Suite\CtrlData"     ;remove ctrl-data folder
@@ -304,7 +304,7 @@ Section "un.User Data" uninst_userdata
 
     ;old!
     RMDir /r "$DOCUMENTS\CnC Suite\UserStyles"
-    RMDir /r "$DOCUMENTS\CnC Suite\Templates"
+    RMDir /r "$DOCUMENTS\CnC-Suite\Templates"
     ;new!
     RMDir /r "$LOCALAPPDATA\CnC Suite\UserStyles"
     RMDir /r "$LOCALAPPDATA\CnC Suite\Templates"; this folder remains in the documents/CnC Suite folder
@@ -318,11 +318,11 @@ Section /o "un.Projects and Templates" uninst_projects    ; /o == unselected
     ;select the current user:
     SetShellVarContext current
 
-    RMDir /r "$DOCUMENTS\CnC Suite\Projects"
+    RMDir /r "$DOCUMENTS\CnC-Suite\Projects"
 
     ${If} ${SectionIsSelected} ${uninst_userdata}
         ${If} ${SectionIsSelected} ${uninst_projects}
-            RMDir "$DOCUMENTS\CnC Suite"                ; Remove the containing folder only if no data is in it!
+            RMDir "$DOCUMENTS\CnC-Suite"                ; Remove the containing folder only if no data is in it!
         ${EndIf}
     ${EndIf}
 SectionEnd

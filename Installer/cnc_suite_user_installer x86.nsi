@@ -296,7 +296,7 @@ Section "un.User Data" uninst_userdata
 
     ;old!
     RMDir /r "$DOCUMENTS\CnC Suite\UserStyles"
-    RMDir /r "$DOCUMENTS\CnC Suite\Templates"
+    RMDir /r "$DOCUMENTS\CnC-Suite\Templates"
     ;new!
     RMDir /r "$LOCALAPPDATA\CnC Suite\UserStyles"
     RMDir /r "$LOCALAPPDATA\CnC Suite\Templates"; this folder remains in the documents/CnC Suite folder
@@ -310,11 +310,11 @@ Section /o "un.Projects and Templates" uninst_projects    ; /o == unselected
     ;select the current user:
     SetShellVarContext current
 
-    RMDir /r "$DOCUMENTS\CnC Suite\Projects"
+    RMDir /r "$DOCUMENTS\CnC-Suite\Projects"
 
     ${If} ${SectionIsSelected} ${uninst_userdata}
         ${If} ${SectionIsSelected} ${uninst_projects}
-            RMDir "$DOCUMENTS\CnC Suite"                ; Remove the containing folder only if not data is in it!
+            RMDir "$DOCUMENTS\CnC-Suite"                ; Remove the containing folder only if not data is in it!
         ${EndIf}
     ${EndIf}
 SectionEnd
