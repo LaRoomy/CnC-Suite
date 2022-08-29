@@ -1,6 +1,5 @@
 # CnC-Suite - Extended NC-Editor
-![GitHub](https://img.shields.io/github/license/LaRoomy/CnC-Suite)
-![GitHub last commit (branch)](https://img.shields.io/github/last-commit/LaRoomy/CnC-Suite/master)
+![](https://img.shields.io/badge/Platform-Windows-informational)
 
 The purpose of this application is to create, manage, transmit and archive nc-content files. It was created for EPL2 based programs and machines but should also fullfill the need for other issues where editing of g-code is required. A special file format (*.cnc3) is used for storing files. These files have tags describing the content, like *.mp3 for example. This enables the facility to save extra data with the files and later search for it. 
 The application consists of the following fragments:
@@ -47,5 +46,8 @@ The installer section contains nsis files for x86/x64 target platform for two ty
 
 ## How to use the application
 This repository contains a [manual](Manual) with instructions and explanations for usage of the application. It is written in html/css/javascript and can be viewed with a browser. This manual is also included in the installer and will be installed with the application. When the help button in the titlebar of the application is pressed the manual is opened. You can use this manual or visit the [website](https://cnc-suite.blogspot.com/)
+
+![GitHub](https://img.shields.io/github/license/LaRoomy/CnC-Suite)
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/LaRoomy/CnC-Suite/master)
 
 
