@@ -13,6 +13,7 @@
 #pragma comment(lib, "Shcore.lib")
 #pragma comment(lib, "Setupapi.lib")
 #pragma comment(lib, "Dwmapi.lib")
+#pragma comment(lib, "Pathcch.lib")
 
 //	EXTERNAL DEPENDENCIES >>
 
@@ -41,6 +42,7 @@
 // SPECIFIC DEPENDENCIES
 #include<shellscalingapi.h>
 #include<SetupAPI.h>
+#include<PathCch.h>
 
 // OWN:
 #include"Resource.h"

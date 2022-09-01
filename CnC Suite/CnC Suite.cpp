@@ -415,6 +415,32 @@ void ScheduleRestart(DWORD restartOption)
 {
 	UNREFERENCED_PARAMETER(restartOption);
 
+#ifdef COMPILE_FOR_WINSTORE_DISTRIBUTION
+	// the path for the executable is not redirected in a store installation, so relaunch the current module path
+
+	TCHAR path_buffer[4096] = { 0 };
+
+	auto nSize = GetModuleFileName(nullptr, path_buffer, (DWORD)4096);
+	if (nSize > 0) {
+
+		auto bfpo = CreateBasicFPO();
+		if (bfpo != nullptr) {
+
+			if (bfpo->RemoveFilenameFromPath(path_buffer))
+			{
+				ShellExecute(
+					nullptr,
+					L"open",
+					EXECUTABLE_NAME,
+					nullptr,
+					path_buffer,
+					SW_SHOW
+				);
+				SafeRelease(&bfpo);
+			}
+		}
+	}
+#else
 	AppPath appPath;
 
 	auto exe_path =
@@ -428,6 +454,7 @@ void ScheduleRestart(DWORD restartOption)
 		exe_path.GetData(),
 		SW_SHOW
 	);
+#endif
 }
 
 BOOL GetApplicationStyleInformation(LPAPPSTYLEINFO pSInfo)

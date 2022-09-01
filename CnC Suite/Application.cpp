@@ -1969,6 +1969,46 @@ void Application::LaunchWebsite()
 void Application::ShowHelpExtension()
 {
 	auto lang = getCurrentAppLanguage();
+
+#ifdef COMPILE_FOR_WINSTORE_DISTRIBUTION
+
+	TCHAR path_buffer[4096] = { 0 };
+
+	auto nSize = GetModuleFileName(nullptr, path_buffer, (DWORD)4096);
+	if (nSize > 0) {
+
+		auto bfpo = CreateBasicFPO();
+		if (bfpo != nullptr) {
+
+			if (bfpo->RemoveFilenameFromPath(path_buffer))
+			{
+				auto hr = PathCchRemoveFileSpec(path_buffer, (size_t)4096);
+				if (SUCCEEDED(hr)) {
+					iString manualPath(path_buffer);
+					Url manualUrl;
+
+					if (lang == LANG_GERMAN) {
+						manualPath += L"\\manual\\CnC Suite Handbuch.html";
+					}
+					else
+					{
+						manualPath += L"\\manual\\CnC Suite Manual.html";
+					}
+					manualUrl.SetUrlFromLocalPath(manualPath);
+
+					ShellExecute(
+						nullptr, nullptr,
+						manualUrl.GetUrl(),
+						nullptr, nullptr,
+						SW_SHOW
+					);
+				}
+				SafeRelease(&bfpo);
+			}
+		}
+	}
+
+#else
 	AppPath appPath;
 	iString pathToManual;
 	Url manualUrl;
@@ -2002,6 +2042,7 @@ void Application::ShowHelpExtension()
 	default:
 		break;
 	}
+#endif
 }
 
 void Application::LaunchCommandlineTool()

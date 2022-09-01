@@ -44,6 +44,8 @@
 #define		APPTYPE_STOREAPP		1
 #define		APPTYPE_FREEAPP			2
 
+#define		COMPILE_FOR_WINSTORE_DISTRIBUTION	/* this enables the handling of the virtualized path system when the executable is
+													included in an msix package for store distribution			*/
 #define			CNCSUITE_USERINSTALLATION		// disable this to create the executable for the classic installation
 
 #define		IDSEX_APPLICATIONCLASS			L"CNCSUITECLASS"
@@ -65,7 +67,7 @@
 /// app id section END ///////////////////////////////////////////////////////////////////////////////////////////////
 
 static const int AppVersion = 3001;
-static const int AppType = APPTYPE_STOREAPP;
+static const int AppType = APPTYPE_STOREAPP;	// if this is a store-app the update-manager is disabled (the windows store will handle that)
 
 typedef int LanguageID;
 typedef TCHAR** LPPTSTR;
