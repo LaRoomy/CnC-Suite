@@ -7,7 +7,7 @@ Unicode true
 ; ----------------------------------------------------------------;
 ; ----------------------------------------------------------------;
 ; general_region--------------------------------------------------;
-!define VERSION "1.3.8"
+!define VERSION "1.4.0"
 
 Name "CnC Suite ${VERSION}"
 ; old: OutFile "installer_output\CnC Suite USRINST x86 ${VERSION}.exe"             ;MARK: x86/x86
@@ -16,14 +16,14 @@ OutFile "installer_output\CnC-Suite Installer 32bit.exe"
 InstallDir "$LOCALAPPDATA\CnC Suite"                                        ;MARK: x86/x86 ($PROGRAMFILES64 for x86)
 
 
-VIProductVersion 1.3.8.0
+VIProductVersion 1.4.0.0
 VIAddVersionKey /LANG=0 "ProductName" "CnC Suite Installer x86"
 VIAddVersionKey /LANG=0 "Comments" "Windows 10/8/7"
 VIAddVersionKey /LANG=0 "CompanyName" "LaroomySoft"
 VIAddVersionKey /LANG=0 "FileDescription" "This file installs CnC Suite on your Computer"
 VIAddVersionKey /LANG=0 "LegalCopyright" "(C) LaroomySoft"
-VIAddVersionKey /LANG=0 "ProductVersion" "1.3.8"
-VIAddVersionKey /LANG=0 "FileVersion" "1.3.8"
+VIAddVersionKey /LANG=0 "ProductVersion" "1.4.0"
+VIAddVersionKey /LANG=0 "FileVersion" "1.4.0"
 
 RequestExecutionLevel user
 
@@ -173,6 +173,8 @@ Section "Installer Section"
     SetOutPath "$INSTDIR\manual"
     File "..\Manual\CnC Suite Handbuch.html"
     File "..\Manual\CnC Suite Manual.html"
+    File "..\Manual\privacy_policy_en.html"
+    File "..\Manual\privacy_policy_de.html"
     SetOutPath "$INSTDIR\manual\content_pages_de"
     File /r "..\Manual\content_pages_de\*.html*"
     SetOutPath "$INSTDIR\manual\content_pages_en"
@@ -184,8 +186,6 @@ Section "Installer Section"
     File "..\Manual\img\main_icon_png_88px.png"
     SetOutPath "$INSTDIR\manual\img_content_pages"
     File /r "..\Manual\img_content_pages\*.png*"
-    File "..\Manual\privacy_policy_en.html"
-    File "..\Manual\privacy_policy_de.html"
 
     ;Create uninstaller
     WriteUninstaller "$INSTDIR\bin\Uninstall.exe"
