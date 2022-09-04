@@ -30,6 +30,8 @@
 #define			PATHID_FILE_HISTORY				36
 #define			PATHID_FILE_HELPHTML_GERMAN		37
 #define			PATHID_FILE_HELPHTML_ENGLISH	38
+#define			PATHID_FILE_PRIVACYPOLICY_DE	39
+#define			PATHID_FILE_PRIVACYPOLICY_EN	40
 
 // ##########################################################################
 // important: this ID's must have successive numbers for iteration
@@ -75,6 +77,10 @@
 #define			PATHTOFILE_SEARCHSETTINGS					L"\\CnC Suite\\AppData\\srchset.sys"
 #define			PATHTOFILE_HELP_GERMAN						L"\\CnC Suite\\manual\\CnC Suite Handbuch.html"
 #define			PATHTOFILE_HELP_ENGLISH						L"\\CnC Suite\\manual\\CnC Suite Manual.html"
+
+#define			PATHTOFILE_PRIVACYPOLICY_ENGLISH			L"\\CnC Suite\\manual\\privacy_policy_en.html"
+#define			PATHTOFILE_PRIVACYPOLICY_GERMAN				L"\\CnC Suite\\manual\\privacy_policy_de.html"
+
 
 #define			PATHTOFILE_DESCPROPERTY_ONE					L"\\CnC Suite\\AppData\\Strings\\Dproperty1.dat"
 #define			PATHTOFILE_DESCPROPERTY_TWO					L"\\CnC Suite\\AppData\\Strings\\Dproperty2.dat"
@@ -188,6 +194,10 @@ public:
 			return this->localAppDataPath + PATHTOFILE_HELP_GERMAN;				// local app data
 		case PATHID_FILE_HELPHTML_ENGLISH:
 			return this->localAppDataPath + PATHTOFILE_HELP_ENGLISH;			// local app data
+		case PATHID_FILE_PRIVACYPOLICY_EN:
+			return this->localAppDataPath + PATHTOFILE_PRIVACYPOLICY_ENGLISH;	// local app data
+		case PATHID_FILE_PRIVACYPOLICY_DE:
+			return this->localAppDataPath + PATHTOFILE_PRIVACYPOLICY_GERMAN;	// local app data
 
 
 		case PATHID_FOLDER_CNCSUITE_USERFOLDER:

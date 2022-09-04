@@ -184,6 +184,8 @@ Section "Installer Section"
     File "..\Manual\img\main_icon_png_88px.png"
     SetOutPath "$INSTDIR\manual\img_content_pages"
     File /r "..\Manual\img_content_pages\*.png*"
+    File "..\Manual\privacy_policy_en.html"
+    File "..\Manual\privacy_policy_de.html"
 
     ;Create uninstaller
     WriteUninstaller "$INSTDIR\bin\Uninstall.exe"

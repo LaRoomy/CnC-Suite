@@ -310,6 +310,7 @@
 #define				UI_GNRL_SEARCHINFOLDER			607
 #define				UI_GNRL_MANUAL					608
 #define				UI_GNRL_WEBSITE					609
+#define				UI_GNRL_PRIVACYPOLICY			610
 
 #define				UI_FILETIME_CREATED				630
 #define				UI_FILETIME_LASTWRITE			631

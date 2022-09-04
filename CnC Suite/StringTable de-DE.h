@@ -311,6 +311,8 @@
 #define				_UI_GNRL_SEARCHINFOLDER				L"Durchsuchen..."
 #define				_UI_GNRL_MANUAL						L"Handbuch"
 #define				_UI_GNRL_WEBSITE					L"Website"
+#define				_UI_GNRL_PRIVACYPOLICY				L"Datenschutzerklärung"
+
 
 
 #define				_UI_FILETIME_CREATED				L"Erstellt:        "

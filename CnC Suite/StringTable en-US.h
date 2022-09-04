@@ -303,6 +303,7 @@
 #define				_UI_GNRL_SEARCHINFOLDER				L"Search through..."
 #define				_UI_GNRL_MANUAL						L"Manual"
 #define				_UI_GNRL_WEBSITE					L"Website"
+#define				_UI_GNRL_PRIVACYPOLICY				L"Privacy Policy"
 
 
 

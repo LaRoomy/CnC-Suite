@@ -35,8 +35,8 @@
 
 /// buildinfo section ///////////////////////////////////////////////////////////////////////////////////////////////
 // this section contains displayable information regarding the buildinfo of the application (displayed on info page)
-#define		CNCSUITE_BUILDVERSION		L"CnC Suite Build 1.3.8"
-#define		CNCSUITE_BUILDDATE			L"Build-date: August 18th 2022"
+#define		CNCSUITE_BUILDVERSION		L"CnC Suite Build 1.4.0"
+#define		CNCSUITE_BUILDDATE			L"Build-date: September, 3rd 2022"
 /// buildinfo section END ///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// app identity section ///////////////////////////////////////////////////////////////////////////////////////////
@@ -46,12 +46,13 @@
 
 #define		COMPILE_FOR_WINSTORE_DISTRIBUTION	/* this enables the handling of the virtualized path system when the executable is
 													included in an msix package for store distribution			*/
+
 #define			CNCSUITE_USERINSTALLATION		// disable this to create the executable for the classic installation
 
 #define		IDSEX_APPLICATIONCLASS			L"CNCSUITECLASS"
 #define		APPLICATION_DISPLAY_NAME		L"CnC Suite"
-#define		APPLICATION_FULLVERSION_NAME	L"CnC Suite 1. 3. 8"
-#define		APPLICATION_VERSION				L"Version 1.3.84"
+#define		APPLICATION_FULLVERSION_NAME	L"CnC Suite 1. 4. 0"
+#define		APPLICATION_VERSION				L"Version 1.4.0"
 
 #define		EXECUTABLE_NAME					L"CnC Suite.exe"
 

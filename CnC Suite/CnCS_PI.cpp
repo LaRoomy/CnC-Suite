@@ -3005,8 +3005,42 @@ HRESULT CnCS_PI::_createInfoPage()
 																			hr = websiteButton->Create();
 																			if (SUCCEEDED(hr)) {
 
-																				// ...
+																				bText = getStringFromResource(UI_GNRL_PRIVACYPOLICY);
 
+																				pos.x = 260;
+																				pos.y = 220;
+
+																				auto privacyPolicyButton = new CustomButton(this->iParam.infoPage, BUTTONMODE_TEXT, &pos, &sz, CTRLID_PRIVACYPOLICYBUTTON, this->hInstance);
+																				hr =
+																					(privacyPolicyButton != nullptr)
+																					? S_OK : E_FAIL;
+
+																				if (SUCCEEDED(hr)) {
+
+																					privacyPolicyButton->setColors(this->sInfo.TabColor, COLOR_BUTTON_MOUSE_OVER, COLOR_BUTTON_PRESSED);
+																					privacyPolicyButton->setAppearance_onlyText(bText, TRUE);
+																					privacyPolicyButton->setBorder(TRUE, this->sInfo.OutlineColor);
+																					privacyPolicyButton->setFont(
+																						CreateScaledFont(18, FW_MEDIUM, APPLICATION_PRIMARY_FONT)
+																					);
+																					privacyPolicyButton->setTextColor(this->sInfo.TextColor);
+
+																					if (this->sInfo.StyleID == STYLEID_LIGHTGRAY)
+																					{
+																						privacyPolicyButton->setTextHighlight(
+																							TRUE,
+																							RGB(255, 255, 255)
+																						);
+																					}
+																					privacyPolicyButton->setEventListener(dynamic_cast<customButtonEventSink*>(this));
+
+																					hr = privacyPolicyButton->Create();
+																					if (SUCCEEDED(hr)) {
+
+																						// ...
+
+																					}
+																				}
 																			}
 																		}
 																	}
@@ -3879,12 +3913,91 @@ void CnCS_PI::onButtonClick(CustomButton* sender, CTRLID ctrlID)
 				break;
 			default:
 				break;
-			}
+						}
 #endif
-	}
+					}
 		break;
 	case CTRLID_WEBSITEBUTTON:
 		ShellExecute(nullptr, nullptr, L"http://cnc-suite.blogspot.com/", nullptr, nullptr, SW_SHOW);
+		break;
+	case CTRLID_PRIVACYPOLICYBUTTON:
+	{
+		auto lang = getCurrentAppLanguage();
+
+#ifdef COMPILE_FOR_WINSTORE_DISTRIBUTION
+
+		TCHAR path_buffer[4096] = { 0 };
+
+		auto nSize = GetModuleFileName(nullptr, path_buffer, (DWORD)4096);
+		if (nSize > 0) {
+
+			auto bfpo = CreateBasicFPO();
+			if (bfpo != nullptr) {
+
+				if (bfpo->RemoveFilenameFromPath(path_buffer))
+				{
+					auto hr = PathCchRemoveFileSpec(path_buffer, (size_t)4096);
+					if (SUCCEEDED(hr)) {
+						iString privPolPath(path_buffer);
+						Url privPolUrl;
+
+						if (lang == LANG_GERMAN) {
+							privPolPath += L"\\manual\\privacy_policy_de.html";
+						}
+						else
+						{
+							privPolPath += L"\\manual\\privacy_policy_en.html";
+						}
+						privPolUrl.SetUrlFromLocalPath(privPolPath);
+
+						ShellExecute(
+							nullptr, nullptr,
+							privPolUrl.GetUrl(),
+							nullptr, nullptr,
+							SW_SHOW
+						);
+					}
+					SafeRelease(&bfpo);
+				}
+			}
+		}
+
+#else
+		AppPath appPath;
+		iString pathToPrivacyPolicy;
+		Url privPolUrl;
+
+		switch (lang)
+		{
+		case LANG_GERMAN:
+			pathToPrivacyPolicy = appPath.Get(PATHID_FILE_PRIVACYPOLICY_DE);
+			privPolUrl.SetUrlFromLocalPath(
+				pathToPrivacyPolicy
+			);
+			ShellExecute(
+				nullptr, nullptr,
+				privPolUrl.GetUrl(),
+				nullptr, nullptr,
+				SW_SHOW
+			);
+			break;
+		case LANG_ENGLISH:
+			pathToPrivacyPolicy = appPath.Get(PATHID_FILE_PRIVACYPOLICY_EN);
+			privPolUrl.SetUrlFromLocalPath(
+				pathToPrivacyPolicy
+			);
+			ShellExecute(
+				nullptr, nullptr,
+				privPolUrl.GetUrl(),
+				nullptr, nullptr,
+				SW_SHOW
+			);
+			break;
+		default:
+			break;
+		}
+#endif
+	}
 		break;
 	default:
 		break;
