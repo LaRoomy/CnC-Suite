@@ -2872,11 +2872,15 @@ HRESULT CnCS_PI::_createInfoPage()
 												if (SUCCEEDED(hr))
 												{
 													iString insttype(L"Installation-Type: ");
+#ifdef COMPILE_FOR_WINSTORE_DISTRIBUTION
+													insttype += L"storeapp";
+#else
 #ifndef CNCSUITE_USERINSTALLATION
 													insttype += L"admin";
 #else
 													insttype += L"user";
 #endif // !CNCSUITE_USERINSTALLATION
+#endif // COMPILE_FOR_WINSTORE_DISTRIBUTION
 													insttypeTextfield->setText(
 														insttype.GetData()
 													);
