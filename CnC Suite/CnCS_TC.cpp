@@ -1959,7 +1959,7 @@ void CnCS_TC::OnVerticalToolBar_Textcolor()
 	LPTABPROPERTY ptb = reinterpret_cast<LPTABPROPERTY>(GetWindowLongPtr(this->iParam.hwndActiveTab, GWLP_USERDATA));
 	if (ptb != NULL)
 	{
-		this->iParam.textcolor_active = (!this->iParam.textcolor_active);
+		this->iParam.textcolor_active = (this->iParam.textcolor_active == TRUE) ? FALSE : TRUE;
 
 		ptb->Editcontrol->SetAutoColor(this->iParam.textcolor_active);
 		RedrawWindow(
@@ -1984,7 +1984,7 @@ void CnCS_TC::OnVerticalToolBar_Autocomplete()
 	auto ptb = this->GetActiveTabProperty();
 	if (ptb != NULL)
 	{
-		this->iParam.autocomplete_active = (!this->iParam.autocomplete_active);
+		this->iParam.autocomplete_active = (this->iParam.autocomplete_active == TRUE) ? FALSE : TRUE;
 		ptb->Editcontrol->SetAutoComplete(this->iParam.autocomplete_active);
 		RedrawWindow(
 			GetDlgItem(
@@ -2008,7 +2008,7 @@ void CnCS_TC::OnVerticalToolBar_Autonum()
 	auto ptb = this->GetActiveTabProperty();
 	if (ptb != NULL)
 	{
-		this->iParam.autonum_active = (!this->iParam.autonum_active);
+		this->iParam.autonum_active = (this->iParam.autonum_active == TRUE) ? FALSE : TRUE;
 		ptb->Editcontrol->SetAutoNum(this->iParam.autonum_active, -1);
 		RedrawWindow(
 			GetDlgItem(
@@ -2032,7 +2032,7 @@ void CnCS_TC::OnVerticalToolBar_Uppercase()
 	auto ptb = this->GetActiveTabProperty();
 	if (ptb != NULL)
 	{
-		this->iParam.uppercase_active = (!this->iParam.uppercase_active);
+		this->iParam.uppercase_active = (this->iParam.uppercase_active == TRUE) ? FALSE : TRUE;
 		ptb->Editcontrol->SetUppercase(this->iParam.uppercase_active);
 		RedrawWindow(
 			GetDlgItem(
@@ -2056,7 +2056,7 @@ void CnCS_TC::OnVerticalToolBar_FocusRect()
 	auto ptb = this->GetActiveTabProperty();
 	if (ptb != NULL)
 	{
-		this->iParam.focusmark_active = (!this->iParam.focusmark_active);
+		this->iParam.focusmark_active = (this->iParam.focusmark_active == TRUE) ? FALSE : TRUE;
 
 		ptb->Editcontrol->SetFocusMark(this->iParam.focusmark_active);
 		RedrawWindow(
@@ -5959,6 +5959,26 @@ void CnCS_TC::comboboxSelChange(comboBox * cBox, int selindex)
 				break;
 			}
 		}
+	}
+}
+
+void CnCS_TC::updateOtherSettings() {
+
+	auto dataContainer
+		= reinterpret_cast<ApplicationData*>(
+			getDefaultApplicationDataContainer());
+
+	if (dataContainer != nullptr) {
+
+		// execute open request in a new tab or the current visible tab
+		this->iParam.OpenNewPathInNewTab
+			= dataContainer->getBooleanData(DATAKEY_SETTINGS_OPEN_IN_NEW_TAB, true)
+			? TRUE : FALSE;
+
+		// auto save content
+		this->iParam.AutoSave
+			= dataContainer->getBooleanData(DATAKEY_SETTINGS_AUTOSAVE, false)
+			? TRUE : FALSE;
 	}
 }
 

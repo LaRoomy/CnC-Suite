@@ -664,6 +664,8 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 				return pApp->OnGetEditControlProperties(wParam, lParam);
 			case WM_UPDATEEDITCOLORS:
 				return pApp->OnUpdateEditColors(wParam);
+			case WM_UPDATETABMSCVALUES:
+				return pApp->OnUpdateTabMscValues();
 			case WM_INTERNALCOMMAND:
 				return pApp->OnInternalCommand(wParam, lParam);
 			case WM_CLEANUP:
@@ -1307,6 +1309,14 @@ LRESULT Application::OnRestartApp(WPARAM wParam)
 {
 	this->restartOptions = (DWORD)wParam;
 	PostMessage(this->MainWindow, WM_CLOSE, 0, 0);
+	return static_cast<LRESULT>(0);
+}
+
+LRESULT Application::OnUpdateTabMscValues()
+{
+	if (this->Tabcontrol != nullptr) {
+		this->Tabcontrol->UpdateOtherSettings();
+	}
 	return static_cast<LRESULT>(0);
 }
 

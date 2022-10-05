@@ -293,6 +293,9 @@ public:
 	void CnCS_TC::GetCurrentTabDataAsStringCollection(itemCollection<iString>& data);
 	void CnCS_TC::UpdateAutocompleteData() { this->updateAutocompleteData(); }
 	void CnCS_TC::UpdateAutosyntaxSettings() { this->updateAutosyntaxSettings(); }
+	void CnCS_TC::UpdateOtherSettings() {
+		this->updateOtherSettings();
+	}
 	void CnCS_TC::SaveTabCondition() { this->saveCondition(); }
 	void CnCS_TC::RestoreTabCondition() { this->restoreCondition(); }
 	void CnCS_TC::onDpiChanged() { this->DpiChanged(); }
@@ -528,6 +531,7 @@ private:
 
 	void updateAutocompleteData();
 	void comboboxSelChange(comboBox* cBox, int selindex);
+	void updateOtherSettings();
 
 	BOOL isPathAlreadyOpen(LPTSTR path);			// old!
 	bool isAlreadyOpened(const CnC3File& file);		// new!

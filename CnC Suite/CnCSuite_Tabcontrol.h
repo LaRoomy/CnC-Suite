@@ -71,6 +71,7 @@ public:
 	virtual void GetEditControlProperties(UINT_PTR editstylecolors, LONG_PTR editcontrolproperties) = 0;
 	virtual void UpdateAutocompleteData() = 0;
 	virtual void UpdateAutosyntaxSettings() = 0;
+	virtual void UpdateOtherSettings() = 0;
 	virtual void SaveTabCondition() = 0;
 	virtual void RestoreTabCondition() = 0;
 	virtual void onDpiChanged() = 0;

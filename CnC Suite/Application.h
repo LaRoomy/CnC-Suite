@@ -136,6 +136,7 @@ private:
 	LRESULT OnInternalCommand(WPARAM, LPARAM);
 	LRESULT OnDPIChanged(WPARAM, LPARAM);
 	LRESULT OnRestartApp(WPARAM);
+	LRESULT OnUpdateTabMscValues();
 
 	void Open();
 	void Save();

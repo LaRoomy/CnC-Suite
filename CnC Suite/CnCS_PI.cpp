@@ -4111,9 +4111,11 @@ void CnCS_PI::onCheckboxChecked(CustomCheckbox* checkBox, bool newState)
 				break;
 			case CTRLID_AUTOSAVECBX:
 				dataContainer->saveValue(DATAKEY_SETTINGS_AUTOSAVE, newState);
+				SendMessage(this->mainWnd, WM_UPDATETABMSCVALUES, (WPARAM)0, (LPARAM)0);
 				break;
 			case CTRLID_NEWTABCBX:
 				dataContainer->saveValue(DATAKEY_SETTINGS_OPEN_IN_NEW_TAB, newState);
+				SendMessage(this->mainWnd, WM_UPDATETABMSCVALUES, (WPARAM)0, (LPARAM)0);
 				break;
 			case CTRLID_SHOWPROPWNDCBX:
 				dataContainer->saveValue(DATAKEY_SETTINGS_SHOW_DESCWND, newState);
