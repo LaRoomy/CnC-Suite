@@ -8,7 +8,7 @@ Unicode true
 ; ----------------------------------------------------------------;
 ; ----------------------------------------------------------------;
 ; general_region--------------------------------------------------;
-!define VERSION "1.4.0"
+!define VERSION "1.4.1"
 
 Name "CnC Suite ${VERSION}"
 ;OutFile "installer_output\CnC Suite USRINST x64 ${VERSION}.exe"             ;MARK: x86/x64
@@ -16,14 +16,14 @@ OutFile "installer_output\CnC-Suite Installer 64bit.exe"
 
 InstallDir "$LOCALAPPDATA\CnC Suite"                                        ;MARK: x86/x64 ($PROGRAMFILES64 for x64)
 
-VIProductVersion 1.4.0.0
+VIProductVersion 1.4.1.0
 VIAddVersionKey /LANG=0 "ProductName" "CnC Suite Installer x64"
 VIAddVersionKey /LANG=0 "Comments" "Windows 10/8/7"
 VIAddVersionKey /LANG=0 "CompanyName" "LaroomySoft"
 VIAddVersionKey /LANG=0 "FileDescription" "This file installs CnC Suite on your Computer"
 VIAddVersionKey /LANG=0 "LegalCopyright" "(C) LaroomySoft"
-VIAddVersionKey /LANG=0 "ProductVersion" "1.4.0"
-VIAddVersionKey /LANG=0 "FileVersion" "1.4.0"
+VIAddVersionKey /LANG=0 "ProductVersion" "1.4.1"
+VIAddVersionKey /LANG=0 "FileVersion" "1.4.1"
 
 RequestExecutionLevel user
 
