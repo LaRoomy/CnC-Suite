@@ -272,3 +272,4 @@ __pycache__/
 # Visual Studio Code Section
 Installer/.vscode
 *.code-workspace
+*.lastcodeanalysissucceeded
