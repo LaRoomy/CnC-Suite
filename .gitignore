@@ -273,3 +273,4 @@ __pycache__/
 Installer/.vscode
 *.code-workspace
 *.lastcodeanalysissucceeded
+*.map
