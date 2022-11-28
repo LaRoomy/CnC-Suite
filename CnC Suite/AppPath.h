@@ -18,6 +18,7 @@
 #define			PATHID_FILE_TREEVIEWIMAGE	13
 #define			PATHID_FILE_SEARCHSETUP		14
 #define			PATHID_FILE_EXCEPTIONINFO	15
+#define			PATHID_FILE_TEMPLOGDATA		16
 
 #define			PATHID_FILE_DESCPROP_ONE	30
 #define			PATHID_FILE_DESCPROP_TWO	31
@@ -74,6 +75,7 @@
 #define			PATHTOFILE_TABIMAGE							L"\\CnC Suite\\AppData\\Session\\TABimage.xml"
 #define			PATHTOFILE_TREEVIEWIMAGE					L"\\CnC Suite\\AppData\\Session\\TVimage.dat"
 #define			PATHTOFILE_LASTEXCEPTIONINFO				L"\\CnC Suite\\AppData\\Session\\lastExeptionInfo.dat"
+#define			PATHTOFILE_TEMPLOGDATA						L"\\CnC Suite\\AppData\\Session\\tempLog.dat"
 #define			PATHTOFILE_SEARCHSETTINGS					L"\\CnC Suite\\AppData\\srchset.sys"
 #define			PATHTOFILE_HELP_GERMAN						L"\\CnC Suite\\manual\\CnC Suite Handbuch.html"
 #define			PATHTOFILE_HELP_ENGLISH						L"\\CnC Suite\\manual\\CnC Suite Manual.html"
@@ -190,6 +192,8 @@ public:
 			return this->localAppDataPath + PATHTOFILE_FILEHISTORY_DATA;		// local app data
 		case PATHID_FILE_EXCEPTIONINFO:
 			return this->localAppDataPath + PATHTOFILE_LASTEXCEPTIONINFO;		// local app data
+		case PATHID_FILE_TEMPLOGDATA:
+			return this->localAppDataPath + PATHTOFILE_TEMPLOGDATA;				// local app data
 		case PATHID_FILE_HELPHTML_GERMAN:
 			return this->localAppDataPath + PATHTOFILE_HELP_GERMAN;				// local app data
 		case PATHID_FILE_HELPHTML_ENGLISH:

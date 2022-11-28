@@ -3,12 +3,14 @@
 #include"ApplicationData.h"
 #include"CommonControls\ItemCollection.h"
 #include"AppPath.h"
+#include"LogControl.h"
 
 Application* pApplication = nullptr;
 ApplicationData* ApplicationDataContainer = nullptr;
 itemCollection<ApplicationData> extendedApplicationDataContainer;
 DPI_Assist* dpiAssist = nullptr;
 CRITICAL_SECTION CriticalSection;
+LogControl logControl;
 
 // Application entry:
 extern int APIENTRY _tWinMain(
@@ -408,6 +410,10 @@ LONG WINAPI lpTopLevelExceptionFilter(_EXCEPTION_POINTERS * exceptionInfo)
 			}
 		}
 	}
+	if (logControl.hasContent())
+	{
+		logControl.SaveToFile();
+	}
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
@@ -470,5 +476,13 @@ BOOL GetApplicationStyleInformation(LPAPPSTYLEINFO pSInfo)
 LPCRITICAL_SECTION GetCriticalSection()
 {
 	return &CriticalSection;
+}
+
+void AddLogData(LPCTSTR data)
+{
+	if (data != nullptr)
+	{
+		logControl.AddLogString(data);
+	}
 }
 

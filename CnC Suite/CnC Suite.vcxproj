@@ -152,6 +152,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -222,6 +223,7 @@
     <ClInclude Include="iBox.h" />
     <ClInclude Include="IPath.h" />
     <ClInclude Include="LanguageDispatcher.h" />
+    <ClInclude Include="LogControl.h" />
     <ClInclude Include="ResetDialog.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SafeRelease.h" />
@@ -284,6 +286,7 @@
     </ClCompile>
     <ClCompile Include="history.cpp" />
     <ClCompile Include="IPath.cpp" />
+    <ClCompile Include="LogControl.cpp" />
     <ClCompile Include="ResetDialog.cpp" />
     <ClCompile Include="SampleManager\SampleManager.cpp" />
     <ClCompile Include="Searchcontrol\SearchControl.cpp" />

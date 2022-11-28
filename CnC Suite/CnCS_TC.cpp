@@ -2131,22 +2131,25 @@ void CnCS_TC::OnVerticalToolBar_NumSequence()
 
 void CnCS_TC::OnVerticalToolBar_ErrorCheck()
 {
-	CnC3FileManager mngr(this->Main);
+	//int * test = nullptr;
+	//*test = 0;
 
-	auto files = mngr.Open();
-	if (files.Succeeded())
-	{
-		if (files.GetCount() > 0)
-		{
-			auto singleFile =
-				files.GetAt(0);
+	//CnC3FileManager mngr(this->Main);
 
-			if (singleFile.Succeeded())
-			{
+	//auto files = mngr.Open();
+	//if (files.Succeeded())
+	//{
+	//	if (files.GetCount() > 0)
+	//	{
+	//		auto singleFile =
+	//			files.GetAt(0);
 
-			}
-		}
-	}
+	//		if (singleFile.Succeeded())
+	//		{
+
+	//		}
+	//	}
+	//}
 
 
 	//auto ptp = this->GetActiveTabProperty();

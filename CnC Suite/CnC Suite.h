@@ -35,8 +35,8 @@
 
 /// buildinfo section ///////////////////////////////////////////////////////////////////////////////////////////////
 // this section contains displayable information regarding the buildinfo of the application (displayed on info page)
-#define		CNCSUITE_BUILDVERSION		L"CnC Suite Build 1.4.1"
-#define		CNCSUITE_BUILDDATE			L"Build-date: October, 6th 2022"
+#define		CNCSUITE_BUILDVERSION		L"CnC Suite Build 1.4.2"
+#define		CNCSUITE_BUILDDATE			L"Build-date: November, 28th 2022"
 /// buildinfo section END ///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// app identity section ///////////////////////////////////////////////////////////////////////////////////////////
@@ -51,8 +51,8 @@
 
 #define		IDSEX_APPLICATIONCLASS			L"CNCSUITECLASS"
 #define		APPLICATION_DISPLAY_NAME		L"CnC Suite"
-#define		APPLICATION_FULLVERSION_NAME	L"CnC Suite 1. 4. 1"
-#define		APPLICATION_VERSION				L"Version 1.4.1"
+#define		APPLICATION_FULLVERSION_NAME	L"CnC Suite 1. 4. 2"
+#define		APPLICATION_VERSION				L"Version 1.4.2"
 
 #define		EXECUTABLE_NAME					L"CnC Suite.exe"
 
@@ -147,6 +147,7 @@ LONG WINAPI lpTopLevelExceptionFilter(_EXCEPTION_POINTERS *exceptionInfo);
 void ScheduleRestart(DWORD restartOption);
 BOOL GetApplicationStyleInformation(LPAPPSTYLEINFO pSInfo);
 LPCRITICAL_SECTION GetCriticalSection();
+void AddLogData(LPCTSTR data);
 
 
 #endif

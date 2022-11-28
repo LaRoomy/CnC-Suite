@@ -1548,6 +1548,8 @@ BOOL Searchcontrol::SearchForString(LPCTSTR Searchstring, LPCTSTR buffer)
 
 BOOL Searchcontrol::SearchInRoot(LPTSTR Searchstring)
 {
+	AddLogData(L"SearchControl: SearchInRoot invoked.");
+
 	if (this->container != nullptr)
 	{
 		if (this->SC_info->Contsize < 2)
@@ -1592,6 +1594,8 @@ BOOL Searchcontrol::SearchInRoot(LPTSTR Searchstring)
 	}
 	else
 	{
+		AddLogData(L"SearchControl: SearchInRoot Pos 0x01.");
+
 		rootPath = new TCHAR[buffer_len + 15];
 
 		hr = StringCbPrintf(rootPath, sizeof(TCHAR) * (buffer_len + 15), L"\\\\?\\%s\\*", this->SC_info->RootSearchDir);
@@ -1612,10 +1616,14 @@ BOOL Searchcontrol::SearchInRoot(LPTSTR Searchstring)
 	}
 	else
 	{
+		AddLogData(L"SearchControl: SearchInRoot Pos 0x02.");
+
 		while (rootData.cFileName[0] == '.')
 		{
 			if (FindNextFile(hFindRoot, &rootData) == 0)
 			{
+				AddLogData(L"SearchControl: SearchInRoot Pos 0x03.");
+
 				immediateExit = this->ResultDisplayAndStorage(RSLT_TYPE_EMPTYDIR | SC_ERROR_NOSEARCHABLEDIRECTORY, index, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 0);
 				break;
 			}
@@ -1629,6 +1637,8 @@ BOOL Searchcontrol::SearchInRoot(LPTSTR Searchstring)
 
 			if (rootData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
+				AddLogData(L"SearchControl: SearchInRoot Pos 0x04.");
+
 				hr = StringCbLength(rootPath, UNIC_PATH, &buffer_len);
 				if (FAILED(hr))
 				{
@@ -1636,6 +1646,8 @@ BOOL Searchcontrol::SearchInRoot(LPTSTR Searchstring)
 				}
 				else
 				{
+					AddLogData(L"SearchControl: SearchInRoot Pos 0x05.");
+
 					hr = StringCbLength(rootData.cFileName, MAX_PATH * sizeof(TCHAR), &name_len);
 					if (FAILED(hr))
 					{
@@ -1643,10 +1655,14 @@ BOOL Searchcontrol::SearchInRoot(LPTSTR Searchstring)
 					}
 					else
 					{
+						AddLogData(L"SearchControl: SearchInRoot Pos 0x06.");
+
 						nextPath = new TCHAR[((sizeof(TCHAR) * 10) + buffer_len + name_len)];
 
 						if (nextPath != nullptr)
 						{
+							AddLogData(L"SearchControl: SearchInRoot Pos 0x07.");
+
 							hr = StringCbPrintf(
 								nextPath,
 								((sizeof(TCHAR) * 10) + buffer_len + name_len),
@@ -1659,6 +1675,8 @@ BOOL Searchcontrol::SearchInRoot(LPTSTR Searchstring)
 							}
 							else
 							{
+								AddLogData(L"SearchControl: SearchInRoot Pos 0x08.");
+
 								hFindNext = FindFirstFile(nextPath, &nextData);
 
 								this->ReconvertPath(nextPath);
@@ -1669,42 +1687,36 @@ BOOL Searchcontrol::SearchInRoot(LPTSTR Searchstring)
 								}
 								else
 								{
+									AddLogData(L"SearchControl: SearchInRoot Pos 0x09.");
+
 									BOOL Proceed = TRUE;
 
 									while (nextData.cFileName[0] == '.')
 									{
 										if (FindNextFile(hFindNext, &nextData) == 0)
 										{
-											__try
-											{
-												immediateExit = this->Analyse(Searchstring, index, nullptr, rootData.cFileName, nextPath, RSLT_TYPE_EMPTYDIR);
-												SendMessage(this->lps->Progress, PBM_STEPIT, 0, 0);
-												Proceed = FALSE;
-											}
-											__except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
-											{
-												break;
-											}
+											AddLogData(L"SearchControl: SearchInRoot Pos 0x0b.");
+
+											immediateExit = this->Analyse(Searchstring, index, nullptr, rootData.cFileName, nextPath, RSLT_TYPE_EMPTYDIR);
+											SendMessage(this->lps->Progress, PBM_STEPIT, 0, 0);
+											Proceed = FALSE;
 											break;
 										}
 									}
 									if (Proceed)
 									{
-										__try
-										{
-											immediateExit = this->Analyse(Searchstring, index, nullptr, rootData.cFileName, nextPath, RSLT_TYPE_DIRECTORY);
-											SendMessage(this->lps->Progress, PBM_STEPIT, 0, 0);
+										AddLogData(L"SearchControl: SearchInRoot Pos 0x0c.");
 
-											this->Interrupt();
+										immediateExit = this->Analyse(Searchstring, index, nullptr, rootData.cFileName, nextPath, RSLT_TYPE_DIRECTORY);
+										SendMessage(this->lps->Progress, PBM_STEPIT, 0, 0);
 
-											if (immediateExit)
-											{
-												immediateExit = this->ProcessNextLevel(1, index, Searchstring, nextPath, &nextData, hFindNext);
-											}
-										}
-										__except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+										this->Interrupt();
+
+										if (immediateExit)
 										{
-											immediateExit = FALSE;
+											AddLogData(L"SearchControl: SearchInRoot Pos 0x0d.");
+
+											immediateExit = this->ProcessNextLevel(1, index, Searchstring, nextPath, &nextData, hFindNext);
 										}
 									}
 									FindClose(hFindNext);
@@ -1721,15 +1733,10 @@ BOOL Searchcontrol::SearchInRoot(LPTSTR Searchstring)
 			}
 			else
 			{
-				__try
-				{
-					immediateExit = this->Analyse(Searchstring, index, rootData.cFileName, nullptr, rootPath, 0);
-					SendMessage(this->lps->Progress, PBM_STEPIT, 0, 0);
-				}
-				__except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
-				{
-					immediateExit = FALSE;
-				}
+				AddLogData(L"SearchControl: SearchInRoot Pos 0x0a.");
+
+				immediateExit = this->Analyse(Searchstring, index, rootData.cFileName, nullptr, rootPath, 0);
+				SendMessage(this->lps->Progress, PBM_STEPIT, 0, 0);
 			}
 		} while (FindNextFile(hFindRoot, &rootData) != 0);
 
@@ -1743,6 +1750,8 @@ BOOL Searchcontrol::SearchInRoot(LPTSTR Searchstring)
 
 BOOL Searchcontrol::ResultDisplayAndStorage(DWORD dwFlags, int& Index, LPCTSTR filename, LPCTSTR filepath, LPCTSTR projectname, LPCTSTR projectpath, LPCTSTR desc1, LPCTSTR desc2, LPCTSTR desc3, int image)
 {
+	AddLogData(L"SearchControl: ResultDisplayAndStorage invoked.");
+
 	HRESULT hr;
 
 	HWND search = FindWindow(Searchcontrol::searchWindowClass, nullptr);
@@ -2413,6 +2422,8 @@ void Searchcontrol::CleanUpThreadMemory(void)
 
 BOOL Searchcontrol::ProcessNextLevel(int level, int& index, LPTSTR Searchstring, LPTSTR subPath, LPWIN32_FIND_DATA subData, HANDLE hFindSub)
 {
+	AddLogData(L"SearchControl: ProcessNextLevel invoked.");
+
 	if (level == 99)
 		return TRUE;
 	/////////////////////////////////////////////////////////////
@@ -2439,6 +2450,8 @@ BOOL Searchcontrol::ProcessNextLevel(int level, int& index, LPTSTR Searchstring,
 			}
 			else
 			{
+				AddLogData(L"SearchControl: ProcessNextLevel Pos 0x01.");
+
 				hr = StringCbLength(subData->cFileName, MAX_PATH * sizeof(TCHAR), &name_len);
 				if (FAILED(hr))
 				{
@@ -2446,6 +2459,8 @@ BOOL Searchcontrol::ProcessNextLevel(int level, int& index, LPTSTR Searchstring,
 				}
 				else
 				{
+					AddLogData(L"SearchControl: ProcessNextLevel Pos 0x02.");
+
 					levelPath = new TCHAR[((sizeof(TCHAR) * 10) + buffer_len + name_len)];
 
 					if (levelPath != nullptr)
@@ -2463,6 +2478,8 @@ BOOL Searchcontrol::ProcessNextLevel(int level, int& index, LPTSTR Searchstring,
 						}
 						else
 						{
+							AddLogData(L"SearchControl: ProcessNextLevel Pos 0x03.");
+
 							hFindLevel = FindFirstFile(levelPath, &levelData);
 
 							this->ReconvertPath(levelPath);
@@ -2473,50 +2490,34 @@ BOOL Searchcontrol::ProcessNextLevel(int level, int& index, LPTSTR Searchstring,
 							}
 							else
 							{
+								AddLogData(L"SearchControl: ProcessNextLevel Pos 0x04.");
+
 								BOOL Proceed = TRUE;
 
 								while (levelData.cFileName[0] == '.')
 								{
 									if (FindNextFile(hFindLevel, &levelData) == 0)
 									{
-										__try
-										{
-											immediateExit = this->Analyse(Searchstring, index, nullptr, subData->cFileName, levelPath, RSLT_TYPE_EMPTYDIR);
-											SendMessage(this->lps->Progress, PBM_STEPIT, 0, 0);
-											Proceed = FALSE;
-										}
-										__except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
-										{
-											immediateExit = FALSE;
-											Proceed = FALSE;
-										}
+										AddLogData(L"SearchControl: ProcessNextLevel Pos 0x05.");
+
+										immediateExit = this->Analyse(Searchstring, index, nullptr, subData->cFileName, levelPath, RSLT_TYPE_EMPTYDIR);
+										SendMessage(this->lps->Progress, PBM_STEPIT, 0, 0);
+										Proceed = FALSE;
 										break;
 									}
 								}
 								if (Proceed)
 								{
-									__try
-									{
-										immediateExit = this->Analyse(Searchstring, index, nullptr, subData->cFileName, levelPath, RSLT_TYPE_DIRECTORY);
-										SendMessage(this->lps->Progress, PBM_STEPIT, 0, 0);
-									}
-									__except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
-									{
-										immediateExit = FALSE;
-									}
+									AddLogData(L"SearchControl: ProcessNextLevel Pos 0x06.");
+
+									immediateExit = this->Analyse(Searchstring, index, nullptr, subData->cFileName, levelPath, RSLT_TYPE_DIRECTORY);
+									SendMessage(this->lps->Progress, PBM_STEPIT, 0, 0);
 
 									this->Interrupt();
 
 									if (immediateExit)
 									{
-										__try
-										{
-											immediateExit = this->ProcessNextLevel(level + 1, index, Searchstring, levelPath, &levelData, hFindLevel);
-										}
-										__except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
-										{
-											immediateExit = FALSE;
-										}
+										immediateExit = this->ProcessNextLevel(level + 1, index, Searchstring, levelPath, &levelData, hFindLevel);
 									}
 								}
 								FindClose(hFindLevel);
@@ -2533,15 +2534,10 @@ BOOL Searchcontrol::ProcessNextLevel(int level, int& index, LPTSTR Searchstring,
 		}
 		else
 		{
-			__try
-			{
-				immediateExit = this->Analyse(Searchstring, index, subData->cFileName, nullptr, subPath, 0);
-				SendMessage(this->lps->Progress, PBM_STEPIT, 0, 0);
-			}
-			__except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
-			{
-				immediateExit = FALSE;
-			}
+			AddLogData(L"SearchControl: ProcessNextLevel Pos 0x06.");
+
+			immediateExit = this->Analyse(Searchstring, index, subData->cFileName, nullptr, subPath, 0);
+			SendMessage(this->lps->Progress, PBM_STEPIT, 0, 0);
 		}
 	} while (FindNextFile(hFindSub, subData) != 0);
 
@@ -2552,6 +2548,8 @@ BOOL Searchcontrol::ProcessNextLevel(int level, int& index, LPTSTR Searchstring,
 
 BOOL Searchcontrol::Analyse(LPTSTR Searchstring, int& index, LPTSTR filename, LPTSTR foldername, LPTSTR folderpath, DWORD Flag)
 {
+	AddLogData(L"SearchControl: Analyse invoked.");
+
 	if (Searchstring == nullptr)
 		return FALSE;
 
@@ -2743,7 +2741,7 @@ int Searchcontrol::CheckFileType(LPTSTR filename)
 				}
 			}
 		}
-		__except (GetExceptionCode() == EXCEPTION_ARRAY_BOUNDS_EXCEEDED ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+		__except ((GetExceptionCode() == EXCEPTION_ARRAY_BOUNDS_EXCEEDED || GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION) ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
 		{
 			return -1;
 		}
@@ -2753,6 +2751,8 @@ int Searchcontrol::CheckFileType(LPTSTR filename)
 
 void Searchcontrol::ReconvertPath(TCHAR* path)
 {
+	AddLogData(L"SearchControl: ReconvertPath invoked.");
+
 	if (path == nullptr)
 		return;
 	else
@@ -2899,7 +2899,7 @@ BOOL Searchcontrol::GetFolderName(LPTSTR path_in, LPTSTR name_out)
 			name_out[j] = L'\0';
 		}
 	}
-	__except (GetExceptionCode() == EXCEPTION_ARRAY_BOUNDS_EXCEEDED ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+	__except ((GetExceptionCode() == EXCEPTION_ARRAY_BOUNDS_EXCEEDED || GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION) ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
 	{
 		return FALSE;
 	}
@@ -2912,6 +2912,8 @@ BOOL Searchcontrol::TryInsert(NMLVDISPINFO* dInfo)
 	{
 		__try
 		{
+			AddLogData(L"SearchControl: TryInsert invoked.");
+
 			switch (dInfo->item.iSubItem)
 			{
 			case 0:

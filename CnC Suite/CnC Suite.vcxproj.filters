@@ -276,6 +276,9 @@
     <ClInclude Include="CommonControls\Xmap.h">
       <Filter>CommonControls</Filter>
     </ClInclude>
+    <ClInclude Include="LogControl.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CnC Suite.rc">
@@ -425,6 +428,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Async.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="LogControl.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
