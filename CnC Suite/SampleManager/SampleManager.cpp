@@ -2518,6 +2518,7 @@ BOOL SampleManager::saveSample(DWORD additonalAction)
 					iXML_Tag TAG;
 					TAG.tagName.Replace(L"name\0");
 					TAG.tagContent.Replace(name);
+					TAG.initallyClosed = false;
 
 					builder->AddTag(&TAG);
 

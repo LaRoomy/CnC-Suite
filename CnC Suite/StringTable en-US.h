@@ -274,7 +274,7 @@
 #define				_UI_STATUSBAR_SENDINPROGRESS		L"Sending data ..."
 #define				_UI_STATUSBAR_RECEIVEINPROGRESS		L"Receiving data ..."
 
-#define				_UI_PROGRESS_COLLECTINGDATA			L"Collecting data ..."
+#define				_UI_PROGRESS_COLLECTINGDATA			L"Analyze ..."
 #define				_UI_PROGRESS_LOADINGDATA			L"Loading data ..."
 
 #define				_UI_SEARCHCTRL_MAXSRCHRESULT		L"More than 300 results..."

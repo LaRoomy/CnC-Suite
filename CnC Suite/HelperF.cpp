@@ -1396,16 +1396,24 @@ int countLinefeed(LPCTSTR lpszbuffer)
 
 int _lengthOfString(LPCTSTR str)
 {
-	if (str != nullptr)
+	__try
 	{
-		size_t s; 
-		HRESULT hr = StringCbLength(str, STRSAFE_MAX_CCH, &s);
-		if (SUCCEEDED(hr))
+		if (str != nullptr)
 		{
-			return (int)(s / sizeof(TCHAR));
+			size_t s;
+			HRESULT hr = StringCbLength(str, STRSAFE_MAX_CCH, &s);
+			if (SUCCEEDED(hr))
+			{
+				return (int)(s / sizeof(TCHAR));
+			}
 		}
+		return 0;
 	}
-	return 0;
+	__except ((GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION || GetExceptionCode() == EXCEPTION_ARRAY_BOUNDS_EXCEEDED) 
+		? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+	{
+		return -1;
+	}
 }
 
 BOOL _cutString(LPCTSTR _string, int indexLow, int indexHigh, TCHAR ** newbuffer_out)

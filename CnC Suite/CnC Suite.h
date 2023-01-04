@@ -35,8 +35,8 @@
 
 /// buildinfo section ///////////////////////////////////////////////////////////////////////////////////////////////
 // this section contains displayable information regarding the buildinfo of the application (displayed on info page)
-#define		CNCSUITE_BUILDVERSION		L"CnC Suite Build 1.4.3"
-#define		CNCSUITE_BUILDDATE			L"Build-date: November, 28th 2022"
+#define		CNCSUITE_BUILDVERSION		L"CnC Suite Build 1.4.4"
+#define		CNCSUITE_BUILDDATE			L"Build-date: January, 4th 2023"
 /// buildinfo section END ///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// app identity section ///////////////////////////////////////////////////////////////////////////////////////////
@@ -51,8 +51,8 @@
 
 #define		IDSEX_APPLICATIONCLASS			L"CNCSUITECLASS"
 #define		APPLICATION_DISPLAY_NAME		L"CnC Suite"
-#define		APPLICATION_FULLVERSION_NAME	L"CnC Suite 1. 4. 3"
-#define		APPLICATION_VERSION				L"Version 1.4.3"
+#define		APPLICATION_FULLVERSION_NAME	L"CnC Suite 1. 4. 4"
+#define		APPLICATION_VERSION				L"Version 1.4.4"
 
 #define		EXECUTABLE_NAME					L"CnC Suite.exe"
 
