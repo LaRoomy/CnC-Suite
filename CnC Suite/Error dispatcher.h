@@ -66,3 +66,6 @@ void DispatchSystemError();
 
 // History Component
 // HST0001	- No history content to display
+
+// Data Exchange Window
+// DEC0001 - No data to set to tab

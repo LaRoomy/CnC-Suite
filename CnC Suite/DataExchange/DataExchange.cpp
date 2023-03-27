@@ -1790,7 +1790,8 @@ DWORD WINAPI SerialComm::TransmissionProc( LPVOID lParam )
 											}
 											InterlockedExchange((LONG*)&_this_->threadActive, (LONG)FALSE);
 
-											if ((_this_->threadInterruptCtrl == INTERRUPT_TRANSMISSION) || (_this_->threadInterruptCtrl == TERMINATE))
+											if ((_this_->threadInterruptCtrl == INTERRUPT_TRANSMISSION) || (_this_->threadInterruptCtrl == TERMINATE)
+												|| (_this_->threadInterruptCtrl == TERMINATE_AND_SET_TOTAB))
 											{
 												SendMessage(_this_->DataTrafficWnd, WM_INTERRUPT, static_cast<WPARAM>(Mode), static_cast<LPARAM>(0));
 											}
@@ -1946,13 +1947,13 @@ BOOL SerialComm::Process_Sending(HANDLE hFile, LPOVERLAPPED ovl)
 			return TRUE;
 		}
 
-		Err = GetLastError(); //wenn kein byte geschrieben
+		Err = GetLastError(); // when no byte is written
 		if( Err == ERROR_IO_PENDING )
 		{
-			//warte auf WriteFile, denn der port wird ja OVERLAPPED benutzt
+			// wait on writeFile, because the port is used overlapped
 			while( 1 )
 			{	
-				// max. 100 msec auf den event warten: 
+				// wait on the 100 milliseconds event
 				wait_result = WaitForSingleObject( ovl->hEvent, 100 ); 
 				if( wait_result == WAIT_TIMEOUT )
 				{
@@ -1989,7 +1990,7 @@ BOOL SerialComm::Process_Sending(HANDLE hFile, LPOVERLAPPED ovl)
 			}
 			else
 			{}
-		}// sehr gut -> zeichen geschrieben
+		}// ok -> character written
 		else
 		{
 			TCHAR* msg = nullptr;
@@ -2000,7 +2001,6 @@ BOOL SerialComm::Process_Sending(HANDLE hFile, LPOVERLAPPED ovl)
 			return FALSE;
 		}
 	}
-	//this->threadInterruptCtrl = TRANSMISSION_COMPLETE;
 	InterlockedExchange((LONG*)&this->threadInterruptCtrl, (LONG)TRANSMISSION_COMPLETE);
 
 	if(low_Buffer != nullptr)
@@ -2018,7 +2018,7 @@ BOOL SerialComm::Process_Recieving(HANDLE hFile, LPOVERLAPPED ovl)
 	char *low_Buffer = nullptr;
 	DWORD BytesRecieved, wait_result, Err;
 
-	low_Buffer = new (std::nothrow) CHAR[ 500000 ];
+	low_Buffer = new (std::nothrow) CHAR[500000];
 	if (low_Buffer == nullptr)
 		return FALSE;
 
@@ -2026,7 +2026,7 @@ BOOL SerialComm::Process_Recieving(HANDLE hFile, LPOVERLAPPED ovl)
 	{		
 		while(ReadFile(hFile, &trans, 1, &BytesRecieved, ovl))
 		{
-			//neue daten gelesen
+			// new data read
 			if((trans != 0)&&(!array_start))			// old line: if( trans == '%' )
 			{
 				PrintCharacter((char)0x0D);
@@ -2045,15 +2045,22 @@ BOOL SerialComm::Process_Recieving(HANDLE hFile, LPOVERLAPPED ovl)
 				SafeDeleteArray(&low_Buffer);
 				return TRUE;
 			}
+			else if (this->threadInterruptCtrl == TERMINATE_AND_SET_TOTAB)
+			{
+				low_Buffer[counter] = '\0';
+				this->bufferReconvert(low_Buffer);
+				delete[] low_Buffer;
+				return TRUE;
+			}
 		}
-		Err = GetLastError(); //wenn kein Byte gelesen
+		Err = GetLastError(); // when no byte is read
 
 		if (Err == ERROR_IO_PENDING)
 		{
-			//Warte auf ein Zeichen, denn der Port wird ja OVERLAPPED benutzt
+			// wait on a character, because the port is used overlapped
 			while( 1 )
 			{
-				// max. 500 msec auf den event warten: 
+				// wait on the 500 milliseconds timeout
 				wait_result = WaitForSingleObject(ovl->hEvent, 500);
 
 				if (wait_result == WAIT_TIMEOUT)
@@ -2063,14 +2070,13 @@ BOOL SerialComm::Process_Recieving(HANDLE hFile, LPOVERLAPPED ovl)
 						holding = false;
 						break;
 					}
-					if( ( this->threadInterruptCtrl == INTERRUPT_TRANSMISSION ) ||
-						( this->threadInterruptCtrl == TERMINATE ) )
+					if((this->threadInterruptCtrl == INTERRUPT_TRANSMISSION) ||
+						(this->threadInterruptCtrl == TERMINATE) || (this->threadInterruptCtrl == TERMINATE_AND_SET_TOTAB))
 					{
-						if( this->threadInterruptCtrl == INTERRUPT_TRANSMISSION )
+						if((this->threadInterruptCtrl == INTERRUPT_TRANSMISSION ) || (this->threadInterruptCtrl == TERMINATE_AND_SET_TOTAB))
 						{
 							low_Buffer[ counter ] = '\0';
 							this->bufferReconvert( low_Buffer );
-							delete[] low_Buffer;
 						}
 						SafeDeleteArray(&low_Buffer);
 						return TRUE;
@@ -2095,7 +2101,7 @@ BOOL SerialComm::Process_Recieving(HANDLE hFile, LPOVERLAPPED ovl)
 				Err = GetLastError(); 
 				if( ( Err == ERROR_IO_PENDING ) || ( Err == ERROR_IO_INCOMPLETE ) )
 				{
-					//doch kein zeichen? schwerer fehler
+					// no character ? severe error
 					TCHAR* msg = nullptr;
 					TranslateLastError(&msg);
 					this->PrintErrorMessage(L"Reception Process _Lc1", msg);
@@ -2106,8 +2112,8 @@ BOOL SerialComm::Process_Recieving(HANDLE hFile, LPOVERLAPPED ovl)
 			}
 			else
 			{
-				//abfangen der zeichen die sonst verlohren gehen würden (ReadFile returns FALSE obwohl weiter zeichen eintreffen, warum?)
-				if ((trans != 0) && (!array_start))// old line: if( trans == '%' )
+				// catch the characters before they get lost..
+				if ((trans != 0) && (!array_start))
 				{
 					array_start = true;
 				}
@@ -2132,7 +2138,6 @@ BOOL SerialComm::Process_Recieving(HANDLE hFile, LPOVERLAPPED ovl)
 	low_Buffer[ counter ] = '\0';
 
 	this->bufferReconvert( low_Buffer );
-//	this->threadInterruptCtrl = TRANSMISSION_COMPLETE;
 
 	if( low_Buffer != NULL )
 	{
@@ -2209,7 +2214,6 @@ LRESULT SerialComm::OnClose( HWND Traffic )
 {
 	if(this->threadActive)
 	{
-		//this->threadInterruptCtrl = TERMINATE;
 		InterlockedExchange((LONG*)&this->threadInterruptCtrl, (LONG)TERMINATE);
 	}
 	else
@@ -2249,9 +2253,21 @@ void SerialComm::Set_Recieved_Text(void)
 {
 	if( this->SENDBUFFERTOMAIN )
 	{
-		if( this->SRtext != NULL )
+		if(this->SRtext != nullptr)
 		{
-			SendMessage( this->ParentWindow, WM_TRANSMISSIONCOMPLETE, 0, reinterpret_cast<LPARAM>( this->SRtext ) );
+			if (this->SRtext[0] != L'\0')
+			{
+				SendMessage(this->ParentWindow, WM_TRANSMISSIONCOMPLETE, 0, reinterpret_cast<LPARAM>(this->SRtext));
+			}
+			else
+			{
+				DispatchEWINotification(
+					EDSP_WARNING,
+					L"DEC0001",
+					getStringFromResource(UI_DATAEXCHANGE_SETTEXT_NOCONT),
+					L"DataExchange"
+				);
+			}
 		}
 	}
 }
@@ -2275,10 +2291,7 @@ void SerialComm::onCancelTransmission(HWND Traf)
 
 	if(this->threadActive)
 	{
-		//this->threadInterruptCtrl = TERMINATE;
-
-		// TODO: test it
-
+		// terminate and discard received content
 		InterlockedExchange((LONG*)&this->threadInterruptCtrl, (LONG)TERMINATE);
 	}
 	else
@@ -2291,15 +2304,12 @@ void SerialComm::onFinishTransmission( HWND Traf )
 {
 	if(this->threadActive)
 	{
-		//this->threadInterruptCtrl = INTERRUPT_TRANSMISSION;
-
-		// TODO: test it!
-
-		InterlockedExchange((LONG*)&this->threadInterruptCtrl, (LONG)INTERRUPT_TRANSMISSION);
+		// terminate but set the received content to tab (if there is one)
+		InterlockedExchange((LONG*)&this->threadInterruptCtrl, (LONG)TERMINATE_AND_SET_TOTAB);
 	}
 	else
 	{
-		if( this->SRtext != NULL )
+		if(this->SRtext != nullptr)
 		{
 			this->Set_Recieved_Text();
 			DestroyWindow( Traf );
@@ -2315,11 +2325,11 @@ LRESULT SerialComm::OnInterrupt(HWND hWnd, WPARAM wParam)
 	{
 		DestroyWindow(hWnd);
 	}
-	else if( this->threadInterruptCtrl == INTERRUPT_TRANSMISSION )
+	else if((this->threadInterruptCtrl == INTERRUPT_TRANSMISSION) || (this->threadInterruptCtrl == TERMINATE_AND_SET_TOTAB))
 	{
 		if( Mode == RECEIVE_ )
 		{
-			if( this->SRtext != NULL )
+			if(this->SRtext != nullptr)
 			{
 				this->Set_Recieved_Text();
 			}

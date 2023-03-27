@@ -16,6 +16,7 @@
 #define				_UI_DATAEXCHANGE_FINALIZE			L"Transfer to Tab\0"
 #define				_UI_CANCEL							L"Cancel\0"
 #define				_UI_DATAEXCHANGE_COMREADY			L"Terminal ready / waiting for data: \0"
+#define				_UI_DATAEXCHANGE_SETTEXT_NOCONT		L"No transmission data to transfer found.\0"
 #define				_UI_EDITCONTROL_SELECTIONRANGE		L"Selection range\0"
 #define				_UI_EDITCONTROL_LINE				L"Line\0"
 #define				_UI_EDITCONTROL_COLUMN				L"Column\0"
